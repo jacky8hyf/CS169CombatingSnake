@@ -1,1 +1,1 @@
-web: gunicorn smile.wsgi --log-file -
+web: gunicorn combatingSnake.wsgi --log-file -
