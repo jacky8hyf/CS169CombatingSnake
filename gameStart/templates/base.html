@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Snake{% endblock %}</title>
+</head>
+
+<body>
+    <p>Welcome, {{ user.username }}.</p>
+    <div id="sidebar">
+        {% block sidebar %}
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+        {% endblock %}
+    </div>
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
