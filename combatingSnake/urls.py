@@ -21,6 +21,7 @@ urlpatterns = [
     #url('^', include('django.contrib.auth.urls')),
     url(r'^$', views.homePage),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/', views.renderLogin),
-    url(r'^register/', views.renderRegister)
+    url(r'^user/login', views.login),
+    url(r'^user/logout',  views.logout),
+    url(r'^user', views.createUser)
 ]
