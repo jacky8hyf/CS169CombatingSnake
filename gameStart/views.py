@@ -8,6 +8,9 @@ import json
 def gameStart(request):
     return render(request, 'snake.html')
 
+def homePage(request):
+    return render(request, 'index.html')
+
 def renderRegister(request):
     return render(request, 'registration_form.html')
 

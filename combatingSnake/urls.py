@@ -19,8 +19,8 @@ from gameStart import views
 
 urlpatterns = [
     #url('^', include('django.contrib.auth.urls')),
-    url(r'^$', views.gameStart),
+    url(r'^$', views.homePage),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/', views.renderLogin()),
-    url(r'^register/', views.renderRegister())
+    url(r'^login/', views.renderLogin),
+    url(r'^register/', views.renderRegister)
 ]
