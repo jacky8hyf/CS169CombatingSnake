@@ -2,19 +2,18 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" href="style.css" />
-    <title>{% block title %}My amazing site{% endblock %}</title>
+    <title>{% block title %}Snake{% endblock %}</title>
 </head>
 
 <body>
+    <p>Welcome, {{ user.username }}.</p>
     <div id="sidebar">
         {% block sidebar %}
         <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/blog/">Blog</a></li>
         </ul>
         {% endblock %}
     </div>
-
     <div id="content">
         {% block content %}{% endblock %}
     </div>
