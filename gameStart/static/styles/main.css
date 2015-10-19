@@ -1,0 +1,56 @@
+body{
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	font-family: "Lucida Console", Monaco, monospace;
+	background-image: url("../images/background.jpg");
+	background-color: #808080;
+}
+.logo{
+	text-align: center;
+}
+nav{
+	width: 100%;
+	margin: 20px 0;
+}
+nav ul{
+	width: 100%;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+nav ul li a {
+	display: block;
+	width: 100%;
+}
+nav ul li{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 20px;
+	background: blue;
+	float: left;
+}
+.gamerule{
+	border-radius: 10px;
+	background: white;
+	margin-top: 15px;
+	margin-left: 25%;
+	margin-right: 25%
+}
+.intro{
+	border-radius: 10px;
+	background: white;
+	margin-top: 15px;
+	margin-left: 25%;
+	margin-right: 25%
+}
+.leaderboard, .animate form{
+	border-radius: 10px;
+	background: white;
+	margin-top: 15px;
+	margin-left: 25%;
+	margin-right: 25%
+}
