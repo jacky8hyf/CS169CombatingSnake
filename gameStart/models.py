@@ -8,6 +8,8 @@ class User(models.Model):
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
     inroom = models.ForeignKey('Room')
+    session_id = models.CharField(max_length = 32, default = None)
+    
 
 class Room(models.Model):
     roomId = models.AutoField(primary_key=True)

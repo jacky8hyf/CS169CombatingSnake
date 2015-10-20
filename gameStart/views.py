@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.http import HttpResponse
 from django.views.generic import View
 import json
+from viewsutils import *
 
 # Create your views here.
 def gameStart(request):
@@ -71,13 +72,25 @@ class UsersView(View):
     /users path
     '''
     def post(self, request):
-        pass
+        jsonbody = parse_json(request.body);
+        assert_types(jsonbody, required = {
+            'username': str,
+            'password': str
+        }, optional = {
+            'nickname': str
+        })
+        pass # FIXME
 
 class UsersLoginView(View):
     '''
     /users/login
     '''
-    def put(self, request, *args, **kwargs):
+    def put(self, request):
+        jsonbody = parse_json(request.body);
+        assert_types(jsonbody, required = {
+            'username': str,
+            'password': str
+        })
         pass
     def delete(self, request, *args, **kwargs):
         pass
@@ -113,7 +126,7 @@ class SingleRoomMembersView(View):
     '''
     def get(self, request, roomId):
         pass
-    
+
 class SingleRoomMemberView(View):
     '''
     /rooms/:roomId/members/:memberId
