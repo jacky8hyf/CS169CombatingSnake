@@ -25,7 +25,3 @@ def sanitize_dict(obj, required = dict(), optional = dict()):
             return None
         d[fieldName] = obj[fieldName]
     return d
-
-def fetch_user(request):
-    '''Looks up user from X-Snake-Session-Id, and return him/her'''
-    pass

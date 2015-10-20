@@ -67,6 +67,14 @@ def login(request):
 
 ###########################
 
+### utils
+
+def fetch_user(request):
+    '''Looks up user from X-Snake-Session-Id, and return him/her'''
+    return User()
+
+### actual routes
+
 class UsersView(View):
     '''
     /users path
@@ -102,40 +110,57 @@ class SingleUserView(View):
     '''
     def putSingleUser(self, request, userId):
         '''update profile or password'''
-        user = fetch_user()
-        
-        pass
+        user = fetch_user(request)
+        # FIXME assert user exists
+        user.update_profile(parse_json(request.body))
+        pass # FIXME return {}
 
 class RoomsView(View):
     '''
     /rooms path
     '''
-    def post(self, request, *args, **kwargs):
-        pass
-    def get(self, request, *args, **kwargs):
-        pass
+    def post(self, request):
+        user = fetch_user(request)
+        # FIXME assert user exists
+        room = Room.createBy(user)
+        pass # FIXME save it and return its json dump
+    def get(self, request):
+        includeCreatorProfile = request.GET.get('creator-profile', False)
+        includeMembers = request.GET.get('members', False)
+        pass # FIXME get rooms and return its json dump
 
 class SingleRoomView(View):
     '''
     /rooms/:roomId
     '''
     def get(self, request, roomId):
-        pass
-
-
+        includeCreatorProfile = request.GET.get('creator-profile', False)
+        includeMembers = request.GET.get('members', False)
+        includeMemberProfile = request.GET.get('member-profile', False)
+        pass # FIXME get from data base and dump to json
 
 class SingleRoomMembersView(View):
     '''
     /rooms/:roomId/members/
     '''
     def get(self, request, roomId):
-        pass
+        includeMembers = request.GET.get('members', False)
+        includeMemberProfile = request.GET.get('member-profile', False)
+        pass # FIXME get from data base and dump to json
 
 class SingleRoomMemberView(View):
     '''
     /rooms/:roomId/members/:memberId
     '''
     def put(self, request, roomId, memberId):
-        pass
+        user = fetch_user(request)
+        # FIXME assert user exists
+        # FIXME assert memberId matches user.id
+        # FIXME set user.inroom
+        pass # return {}
     def delete(self, request, roomId, memberId):
-        pass
+        user = fetch_user(request)
+        # FIXME assert user exists
+        # FIXME assert memberId matches user.id
+        # FIXME set user.inroom
+        pass # return {}
