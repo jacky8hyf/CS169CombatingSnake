@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.http import HttpResponse
+from django.views.generic import View
 import json
 
 # Create your views here.
@@ -63,3 +64,61 @@ def login(request):
     response["msg"] = ""
     return HttpResponse(json.dumps(response), content_type='application/json')
 
+###########################
+
+class UsersView(View):
+    '''
+    /users path
+    '''
+    def post(self, request):
+        pass
+
+class UsersLoginView(View):
+    '''
+    /users/login
+    '''
+    def put(self, request, *args, **kwargs):
+        pass
+    def delete(self, request, *args, **kwargs):
+        pass
+
+class SingleUserView(View):
+    def putSingleUser(self, request, userId):
+        '''
+        /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
+        '''
+        pass
+
+class RoomsView(View):
+    '''
+    /rooms path
+    '''
+    def post(self, request, *args, **kwargs):
+        pass
+    def get(self, request, *args, **kwargs):
+        pass
+
+class SingleRoomView(View):
+    '''
+    /rooms/:roomId
+    '''
+    def get(self, request, roomId):
+        pass
+
+
+
+class SingleRoomMembersView(View):
+    '''
+    /rooms/:roomId/members/
+    '''
+    def get(self, request, roomId):
+        pass
+    
+class SingleRoomMemberView(View):
+    '''
+    /rooms/:roomId/members/:memberId
+    '''
+    def put(self, request, roomId, memberId):
+        pass
+    def delete(self, request, roomId, memberId):
+        pass

@@ -18,10 +18,15 @@ from django.contrib import admin
 from gameStart import views
 
 urlpatterns = [
-    #url('^', include('django.contrib.auth.urls')),
     url(r'^$', views.homePage),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^user/login', views.login),
-    url(r'^user/logout',  views.logout),
-    url(r'^user', views.createUser)
+    url(r'^users(/|)$', views.UsersView.as_view()),
+    url(r'^users/login(/|)$', views.UsersLoginView.as_view()),
+    url(r'^users/(?P<userId>\w*?)(/|)$', views.SingleUserView.as_view()),
+    url(r'^rooms(/|)$', views.RoomsView.as_view()),
+    url(r'^rooms/(?P<roomId>\w*?)(/|)$', views.SingleRoomView.as_view()),
+    url(r'^rooms/(?P<roomId>\w*?)/members(/|)$', 
+    views.SingleRoomMembersView.as_view()),
+    url(r'^rooms/(?P<roomId>\w*?)/members/(?P<memberId>\w*?)(/|)$', 
+        views.SingleRoomMembersView.as_view()),
 ]
