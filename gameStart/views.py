@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
+from django.http import *
 from django.views.generic import View
 import json
 from viewsutils import *
+from errors import errors
 
 # Create your views here.
 def gameStart(request):
@@ -73,6 +74,10 @@ def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
     return User()
 
+def OKResponse(**kwargs):
+	d = dict(kwargs)
+	return JsonResponse(d)
+
 ### actual routes
 
 class UsersView(View):
@@ -87,7 +92,7 @@ class UsersView(View):
         # FIXME log him/her in
         user.save()
         # FIXME fetch the id and session_id
-        pass # FIXME return the id and session_id
+        return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
 
 class UsersLoginView(View):
     '''
@@ -99,10 +104,10 @@ class UsersLoginView(View):
         username, password = jsonbody['username'], jsonbody['password']
         # FIXME if either are none return error
         # FIXME log user in
-        pass # FIXME return user id and session_id
+        return errors.NOT_IMPLEMENTED # FIXME return user id and session_id
     def delete(self, request, *args, **kwargs):
         ''' log user out '''
-        pass # FIXME log user out and return {}
+        return errors.NOT_IMPLEMENTED # FIXME log user out and return {}
 
 class SingleUserView(View):
     '''
@@ -113,7 +118,7 @@ class SingleUserView(View):
         user = fetch_user(request)
         # FIXME assert user exists
         user.update_profile(parse_json(request.body))
-        pass # FIXME return {}
+        return errors.NOT_IMPLEMENTED # FIXME return {}
 
 class RoomsView(View):
     '''
@@ -123,11 +128,11 @@ class RoomsView(View):
         user = fetch_user(request)
         # FIXME assert user exists
         room = Room.createBy(user)
-        pass # FIXME save it and return its json dump
+        return errors.NOT_IMPLEMENTED # FIXME save it and return its json dump
     def get(self, request):
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
-        pass # FIXME get rooms and return its json dump
+        return errors.NOT_IMPLEMENTED # FIXME get rooms and return its json dump
 
 class SingleRoomView(View):
     '''
@@ -137,7 +142,7 @@ class SingleRoomView(View):
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        pass # FIXME get from data base and dump to json
+        return errors.NOT_IMPLEMENTED # FIXME get from data base and dump to json
 
 class SingleRoomMembersView(View):
     '''
@@ -146,7 +151,7 @@ class SingleRoomMembersView(View):
     def get(self, request, roomId):
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        pass # FIXME get from data base and dump to json
+        return errors.NOT_IMPLEMENTED # FIXME get from data base and dump to json
 
 class SingleRoomMemberView(View):
     '''
@@ -157,10 +162,10 @@ class SingleRoomMemberView(View):
         # FIXME assert user exists
         # FIXME assert memberId matches user.id
         # FIXME set user.inroom
-        pass # return {}
+        return errors.NOT_IMPLEMENTED # return {}
     def delete(self, request, roomId, memberId):
         user = fetch_user(request)
         # FIXME assert user exists
         # FIXME assert memberId matches user.id
         # FIXME set user.inroom
-        pass # return {}
+        return errors.NOT_IMPLEMENTED # return {}
