@@ -3,7 +3,8 @@ body{
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	font-family: "Lucida Console", Monaco, monospace;
+	//font-family: "Lucida Console", Monaco, monospace;
+	font: 11px BlinkMacSystemFont;
 	background-image: url("../images/background.jpg");
 	background-repeat: no-repeat;
 	background-color: #060606;
