@@ -19,50 +19,35 @@ body{
 @keyframes blinker {  
   80% { opacity: 0.7; }
 }
-
-nav{
-	width: 100%;
-	margin: 20px 0;
-}
-nav ul{
-	width: 100%;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-nav ul li a {
-	display: block;
-	width: 100%;
-}
-nav ul li{
-	margin: 0;
-	padding: 0;
-	border: 0;
-	outline: 0;
-	font-size: 20px;
-	background: blue;
-	float: left;
-}
 .gamerule{
 	border-radius: 10px;
-	background: white;
+	padding: 15px;
+	color: gray;
+	background-color: rgba(0,0,0,0.8);
 	margin-top: 15px;
 	margin-left: 25%;
-	margin-right: 25%
+	margin-right: 25%;
+	box-shadow: 0 0 10px #CCCCCC;
 }
 .intro{
 	border-radius: 10px;
-	background: white;
+	padding: 15px;
+	color: gray;
+	background-color: rgba(0,0,0,0.8);
 	margin-top: 15px;
 	margin-left: 25%;
-	margin-right: 25%
+	margin-right: 25%;
+	box-shadow: 0 0 10px #CCCCCC;
 }
-.leaderboard, .animate form{
+.leaderboard{
 	border-radius: 10px;
-	background: white;
+	padding: 15px;
+	color: gray;
+	background-color: rgba(0,0,0,0.8);
 	margin-top: 15px;
 	margin-left: 25%;
-	margin-right: 25%
+	margin-right: 25%;
+	box-shadow: 0 0 10px #CCCCCC;
 }
 .login_container{
 	-webkit-box-flex: 1;
@@ -74,7 +59,8 @@ nav ul li{
 	background-color: rgba(0,0,0,0.8);
 	margin-top: 15px;
 	margin-left: 35%;
-	margin-right: 35%
+	margin-right: 35%;
+	box-shadow: 0 0 10px #CCCCCC;
 }
 .form input[type="password"], .form input[type="text"], .form input[type="submit"] {
 	width: 100%;
@@ -136,7 +122,8 @@ nav ul li{
 	background-color: rgba(0,0,0,0.8);
 	margin-top: 15px;
 	margin-left: 35%;
-	margin-right: 35%
+	margin-right: 35%;
+	box-shadow: 0 0 10px #CCCCCC;
 }
 .form input[type="password"], .form input[type="text"], .form input[type="submit"] {
 	width: 100%;
