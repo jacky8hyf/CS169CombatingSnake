@@ -83,10 +83,10 @@ class UsersLoginView(View):
         pass
 
 class SingleUserView(View):
+    '''
+    /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
+    '''
     def putSingleUser(self, request, userId):
-        '''
-        /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
-        '''
         pass
 
 class RoomsView(View):
