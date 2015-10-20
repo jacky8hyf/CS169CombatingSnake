@@ -2,14 +2,15 @@ from django.shortcuts import render
 from models import User, Room
 from django.http import *
 from django.views.generic import View
-import json
 from errors import errors
 from utils import *
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def gameStart(request):
     return render(request, 'snake.html')
 
+@csrf_exempt
 def homePage(request):
     return render(request, 'index.html')
 
@@ -117,3 +118,4 @@ class SingleRoomMemberView(View):
         # FIXME assert memberId matches user.id
         # FIXME set user.inroom
         return errors.NOT_IMPLEMENTED # return {}
+
