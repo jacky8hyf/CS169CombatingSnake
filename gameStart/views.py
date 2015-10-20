@@ -72,34 +72,38 @@ class UsersView(View):
     /users path
     '''
     def post(self, request):
-        jsonbody = parse_json(request.body);
-        assert_types(jsonbody, required = {
-            'username': str,
-            'password': str
-        }, optional = {
-            'nickname': str
-        })
-        pass # FIXME
+        ''' reg user '''
+        jsonbody = parse_json(request.body)
+        user = User.from_dict(jsonbody)
+        # FIXME check user is not None
+        # FIXME log him/her in
+        user.save()
+        # FIXME fetch the id and session_id
+        pass # FIXME return the id and session_id
 
 class UsersLoginView(View):
     '''
     /users/login
     '''
     def put(self, request):
+        ''' log user in '''
         jsonbody = parse_json(request.body);
-        assert_types(jsonbody, required = {
-            'username': str,
-            'password': str
-        })
-        pass
+        username, password = jsonbody['username'], jsonbody['password']
+        # FIXME if either are none return error
+        # FIXME log user in
+        pass # FIXME return user id and session_id
     def delete(self, request, *args, **kwargs):
-        pass
+        ''' log user out '''
+        pass # FIXME log user out and return {}
 
 class SingleUserView(View):
     '''
     /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
     '''
     def putSingleUser(self, request, userId):
+        '''update profile or password'''
+        user = fetch_user()
+        
         pass
 
 class RoomsView(View):

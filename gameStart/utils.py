@@ -13,18 +13,19 @@ def assert_type(value, theType):
     except ValueError:
         return False
 
-def assert_types(obj, required = dict(), optional = dict()):
-    '''
-    assert_types
-    '''
+def sanitize_dict(obj, required = dict(), optional = dict()):
+    d = dict()
     for fieldName in required:
-        if fieldName not in obj: return False
+        if fieldName not in obj: return None
         if not assert_type(obj[fieldName], required[fieldName]):
-            return False
-
+            return None
+        d[fieldName] = obj[fieldName]
     for fieldName in optional:
         if not assert_type(obj[fieldName], optional[fieldName]):
-            return False
+            return None
+        d[fieldName] = obj[fieldName]
+    return d
 
-    return True
-
+def fetch_user(request):
+    '''Looks up user from X-Snake-Session-Id, and return him/her'''
+    pass
