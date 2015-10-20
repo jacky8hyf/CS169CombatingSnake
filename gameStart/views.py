@@ -1,10 +1,9 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
+from django.contrib.auth.models import *
 from django.contrib.auth import authenticate
 from django.http import *
 from django.views.generic import View
 import json
-from viewsutils import *
 from errors import errors
 
 # Create your views here.

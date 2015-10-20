@@ -1,7 +1,7 @@
 /* CSS declarations go here */
 body {
     font-size: 24px;
-    background-image: url("/static/images/background.jpg");
+    background-image: url("/gameStart/static/images/background.jpg");
 }
 
 .cell {
