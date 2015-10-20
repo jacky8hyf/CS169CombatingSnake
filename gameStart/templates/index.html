@@ -25,6 +25,7 @@
  		$(function(){
  			Frontpage.start();
 			UserHandler.start();
+			Room.start();
  		});
 	</script>
 </head>
@@ -111,13 +112,18 @@ Freezing Pellet: a snake which gets the pellet will slow the opponent snakes for
 			</div>
 		</form>
 	</div>
+
+	<!-- remove me when implementing logged in page (user's homepage) -->
+	<button type="button" class="create_button">Create Room</button>
+	<!-- create room -->
 	<div class="create_room">
+		
 		<form method="GET" action="snake.html" class="myform">
 			<div class="right_panel">
 				<div class="title">
 					<div class="room_id"> Room 0001</div>
 				</div>
-				<div class="players">
+				<div class="player">
 					<div class="name">Messi</div>
 					<select class="ready" name="ready_status">
 						<option value="1">Not ready</option>

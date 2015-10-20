@@ -42,27 +42,27 @@ var Room = (function(){
 
 
 	var clickHandler = function(){
-		$('body').on('click','.create',function(){
+		$('body').on('click','.create_button',function(){
 			
-/*
+
 			var room = {};
 			var onSuccess = function(data) {
                 
-                recommend added 1 field: status = 1: success, -1: fail
+             /*   recommend added 1 field: status = 1: success, -1: fail
                 add: best_score field to user:
                 add:picture to user
-
                 and change original status to: room_status
 				POST /rooms
 				Input: {}
 				Output: {"roomId":"sheZs8w34","capacity":8,"status":"waiting"
 				"creator":{"userId":"2s98dD","nickname":"jacky"},
-				"members":[]}/
+				"members":[]}/*/
                 if(data.status == 1){
                 	form.find(".room_id").text('Room' + data.roomId);
-					form.find(".player1 .name").text(data.creator.nickname);
+					form.find(".player .name").text(data.creator.nickname);
                 	form.show();
 					button.hide();
+                    $('#cssmenu').hide();
                 }
                 else{
                     console.error(data.errors);
@@ -73,11 +73,13 @@ var Room = (function(){
                 console.error('create room fails'); 
             };
             var url = "/rooms";
-            makePostRequest(url, room, onSuccess, onFailure);*/
-            		id = 10;
+            makePostRequest(url, room, onSuccess, onFailure);
+            /*		id = 10;
 					form.find(".room_id").text("new room"+id);
-                	form.show();
-					button.hide();
+                    form.fadeIn("slow","linear");
+                	//form.show();
+					button.hide();*/
+                    
 			
 		});
 	};
