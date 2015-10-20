@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f792c00f-d8d6-49bc-8553-aefdca2e51d7" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gameStart/templates/index.html" afterPath="$PROJECT_DIR$/gameStart/templates/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gameStart/static/js/user.js" afterPath="$PROJECT_DIR$/gameStart/static/js/user.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gameStart/views.py" afterPath="$PROJECT_DIR$/gameStart/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/combatingSnake/settings.py" afterPath="$PROJECT_DIR$/combatingSnake/settings.py" />
     </list>
     <ignored path="combatingSnake.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -54,18 +52,8 @@
           <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/gameStart/templates/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-10.285714">
-                  <caret line="18" column="32" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="requirements.txt" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/requirements.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.13675214">
-                  <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+                <state vertical-scroll-proportion="-4.571429">
+                  <caret line="8" column="33" selection-start-line="8" selection-start-column="33" selection-end-line="8" selection-end-column="33" />
                   <folding />
                 </state>
               </provider>
@@ -101,11 +89,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/combatingSnake/settings.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="46" column="49" selection-start-line="46" selection-start-column="49" selection-end-line="46" selection-end-column="49" />
+                <state vertical-scroll-proportion="0.7606838">
+                  <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -192,10 +180,11 @@
         <option value="$PROJECT_DIR$/gameStart/static/styles/main.css" />
         <option value="$PROJECT_DIR$/gameStart/models.py" />
         <option value="$PROJECT_DIR$/gameStart/utils.py" />
-        <option value="$PROJECT_DIR$/combatingSnake/settings.py" />
         <option value="$PROJECT_DIR$/gameStart/static/js/user.js" />
         <option value="$PROJECT_DIR$/gameStart/views.py" />
         <option value="$PROJECT_DIR$/gameStart/templates/index.html" />
+        <option value="$PROJECT_DIR$/requirements.txt" />
+        <option value="$PROJECT_DIR$/combatingSnake/settings.py" />
       </list>
     </option>
   </component>
@@ -957,14 +946,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/combatingSnake/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="46" column="49" selection-start-line="46" selection-start-column="49" selection-end-line="46" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gameStart/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -993,18 +974,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gameStart/templates/index.html">
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.285714">
-          <caret line="18" column="32" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.15384616">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
+    <entry file="file://$PROJECT_DIR$/gameStart/templates/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.13675214">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+        <state vertical-scroll-proportion="-4.571429">
+          <caret line="8" column="33" selection-start-line="8" selection-start-column="33" selection-end-line="8" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/combatingSnake/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7606838">
+          <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
           <folding />
         </state>
       </provider>
