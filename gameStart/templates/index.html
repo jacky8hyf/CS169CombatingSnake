@@ -47,7 +47,7 @@
 	<ul>
 		<li class='active'><a href='#'>Home</a></li>
 		<li class='rule-button'><a href='#'>Game Rules</a></li>
-		<li><a href='#'>Start Game</a></li>
+		<li class='gamestart-button'><a href='#'>Start Game</a></li>
 		<li class="leader-button"><a href='#'>Leaderboard</a></li>
 		<li class='intro-button'><a href='#'>Designers Intro</a></li>
 	</ul>
@@ -62,11 +62,11 @@
 		<br/><br/><br/><br/><br/><br/>Hi,<br/><br/><br/><br/><br/><br/><br/><br/>Hello!!!
 		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>YOoooo!
 	</section>
-	<section class = "leaderboard">1.Elsk<br/>2.Tu<br/>3.Weijiek<br/>4.Johnson<br/>
-		5.Chris<br/>6.Tommy<br/>7.Mary<br/>8.Willis<br/>9.Davis<br/>10.Trevor
+	<section class = "leaderboard">1. Trevor<br/>2.Tu<br/>3.Elsk<br/>4.Johnson<br/>
+		5.Weijie<br/>6.Tommy<br/>7.Mary<br/>8.Willis<br/>9.Davis<br/>10.Chris
 	</section>
 
-	<div id="login" class="animate form">
+	<!--<div id="login" class="animate form">
 		<form  action="mysuperscript.php" autocomplete="on"> 
 			<h1>Log in</h1> 
 			<p> 
@@ -89,6 +89,43 @@
 				<a href="#toregister" class="to_register">Join us</a>
 			</p>
 		</form>
+	</div>-->
+	<div class = "login_container">
+		<form action = "" method="post" class="form form-login">
+			<div class="form_field">
+				<label class="username" for="login_username">Username</label>
+				<input id="login_username" type="text" class="form_input" placeholder="Ussername"required>
+			</div>
+			<div class = "form_field">
+				<label class = "userpassword" for="login_password">Password</label>
+				<input id="login_password" type="password" class="form_input" placeholder="Password" required>
+			</div>
+			<div class="form_field">
+				<input type = "submit" value="Sign In">
+			</div>
+		</form>
+		<p class = "text-center">Not a member?<a href="#">Sign up now</a></p>
 	</div>
+	<div class = "signup_container">
+		<form action = "" method="post" class="form form-signup">
+			<div class="form_field">
+				<label class="username" for="signup_username">Username</label>
+				<input id="signup_username" type="text" class="form_input" placeholder="Ussername"required>
+			</div>
+			<div class="form_field">
+				<label class="usernickname" for="signup_nickname">Nickname</label>
+				<input id="signup_nickname" type="text" class="form_input" placeholder="Usser Nickname"required>
+			</div>
+			<div class = "form_field">
+				<label class = "userpassword" for="signup_password">Password</label>
+				<input id="signup_password" type="password" class="form_input" placeholder="Password" required>
+			</div>
+			<div class="form_field">
+				<input type = "submit" value="Sign Up">
+			</div>
+		</form>
+	</div>
+	</div>
+
 </body>
 </html>
