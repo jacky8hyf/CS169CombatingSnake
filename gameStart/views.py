@@ -5,6 +5,7 @@ from django.views.generic import View
 from errors import errors
 from utils import *
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 # Create your views here.
 def gameStart(request):
@@ -17,6 +18,11 @@ def homePage(request):
 ###########################
 
 ### utils
+def sendResponse(responseDict):
+    response = {}
+    response["status"] = 1
+    response["data"] = responseDict
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
@@ -32,15 +38,23 @@ class UsersView(View):
     '''
     /users path
     '''
-    def post(self, request):
+    def post(self, request, args):
         ''' reg user '''
+        print "========> request", request
+        print "========> method", request.method
+        print "========> body", request.body
+        print "========> args", args
         jsonbody = parse_json(request.body)
+        #jsonbody = request.body
+        print "========> jsonbody", jsonbody
         user = User.from_dict(jsonbody)
         # FIXME check user is not None
         # FIXME log him/her in
         user.save()
+        print "===================>"
+        print "users", user
         # FIXME fetch the id and session_id
-        return OKResponse({'user': 'User has been created'})
+        return sendResponse({"user": user.username, "session": user.userId})
         #return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
 
 class UsersLoginView(View):

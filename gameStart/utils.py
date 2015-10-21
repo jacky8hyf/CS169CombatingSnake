@@ -3,6 +3,7 @@ def parse_json(body):
     try:
         return json.loads(body)
     except ValueError:
+        print "Inside value error"
         return None
 
 def assert_type(value, theType):

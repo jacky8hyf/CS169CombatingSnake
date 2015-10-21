@@ -9,8 +9,8 @@ class User(models.Model):
     username = models.CharField(max_length = 64)
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
-    inroom = models.ForeignKey('Room')
-    session_id = models.CharField(max_length = 32, default = None)
+    #inroom = models.ForeignKey('Room')
+    #session_id = models.CharField(max_length = 32, default = None)
 
     @property
     def password(self):
@@ -21,18 +21,21 @@ class User(models.Model):
 
     @classmethod
     def from_dict(cls, d):
+        print "d", d
         d = sanitize_dict(d, required = {
             'username': str,
             'password': str
         }, optional = {
             'nickname': str
         });
+
         obj = cls();
         for key in d:
             setattr(obj, key, d[key])
         return obj
 
     def update_profile(self, d):
+        print "d", d
         d = sanitize_dict(d, required = {
             'password': str
         }, optional = {
