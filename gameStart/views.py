@@ -87,7 +87,7 @@ class SingleUserView(View):
     '''
     /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
     '''
-    def putSingleUser(self, request, userId, *args, **kwargs):
+    def put(self, request, userId, *args, **kwargs):
         '''update profile or password'''
         user = fetch_user(request)
         if userId != user.strId:
@@ -95,10 +95,11 @@ class SingleUserView(View):
         user.update_profile(parse_json(request.body))
         return OKResponse()
 
-    def getSingleUser(self, request, userId, *args, **kwargs):
+    def get(self, request, userId, *args, **kwargs):
         ''' get user profile'''
-        User.find_by_id(str(userId))
-        return errors.NOT_IMPLEMENTED # FIXME get single user profile route
+        includeProfile = request.GET.get('profile', False)
+        user = User.find_by_id(str(userId))
+        return OKResponse(user.to_dict(includeProfile = includeProfile))
 
 class RoomsView(View):
     '''
@@ -109,7 +110,7 @@ class RoomsView(View):
         Create room
         '''
         user = fetch_user(request)
-        room = Room.create_by(user)
+        room = Room.create_by(user).save()
         return OKResponse(room.to_dict())
     def get(self, request, *args, **kwargs):
         '''

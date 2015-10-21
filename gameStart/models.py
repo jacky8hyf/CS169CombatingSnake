@@ -22,16 +22,17 @@ class BaseModel(models.Model):
 
     @property
     def strId(self):
-        return ('id~' + hex(self.primary_key)[2:]) if self.primary_key is not None else None
+        return (hex(self.primary_key)[2:]) if self.primary_key is not None else None
 
     @classmethod
     def find_by_id(cls, id):
         if isinstance(id, basestring):
-            id = int(id[3:], 16)
+            id = int(id, 16)
         return cls.objects.get(pk = id)
 
 class User(BaseModel):
-    userId = models.AutoField(primary_key=True)
+    # In views.py, use strId instead.
+    userId = models.AutoField(primary_key=True) 
     username = models.CharField(max_length = 64, unique = True)
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
@@ -133,6 +134,7 @@ class User(BaseModel):
         return d
 
 class Room(BaseModel):
+    # In views.py, use strId instead.
     roomId = models.AutoField(primary_key=True)
     capacity = models.IntegerField(default = 8)
     # 0: waiting; 1: playing. More enum values may be added.

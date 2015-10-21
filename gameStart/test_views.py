@@ -40,6 +40,9 @@ class RestTestCase(TestCase):
         return response
 
     def assertResponseSuccess(self, response, msg = None):
+        '''
+        Assert the response 2xx and 3xx, and return the parsed content
+        '''
         self.assertLess(response.status_code, 400,
             'response is not successful with status code {} and content{}{}'
                 .format(response.status_code,response.content,
@@ -47,6 +50,9 @@ class RestTestCase(TestCase):
         return json.loads(response.content)
 
     def assertResponseFail(self, response, msg = None):
+        '''
+        Assert the response 4xx and 5xx, and return the parsed content
+        '''
         self.assertGreaterEqual(response.status_code, 400,
             'response is successful with status code {} and content{}{}'
                 .format(response.status_code,response.content,
@@ -97,11 +103,33 @@ class UsersViewTestCase(RestTestCase):
 
     def testUrlsPattern(self):
         k = 0
-        # while True:
-        #     userId = self.assertResponseSuccess(self.post('/users', {'username':'user' + str(k),'password':'pass'}))['userId']
-        #     k += 1
-        #     for e in ('a','b','c','d','e','f'):
-        #         if e in userId: break
+        userId = None
+        while True:
+            userId = self.assertResponseSuccess(self.post('/users', {'username':'user' + str(k),'password':'pass'}))['userId']
+            k += 1
+            toBreak = False
+            for e in ('a','b','c','d','e','f'):
+                if e in userId:
+                    toBreak = True
+                    break
+            if toBreak:
+                break
+        anotherUserId = self.assertResponseSuccess(self.get('/users/' + userId))['userId']
+        self.assertEquals(userId, anotherUserId)
+
+class RoomsViewTestCase(RestTestCase):
+    def setUp(self):
+        RestTestCase.setUp(self)
+        self.user = self.assertResponseSuccess(self.post('/users', {'username':'user','password':'pass'}));
+        self.sessionId = self.user['sessionId']
+
+    def testCreateBy(self):
+        d = self.assertResponseSuccess(self.post('/rooms'))
+        self.assertEquals(self.user['userId'], d['creator']['userId'])
+        self.assertIn('roomId', d)
+        self.assertTrue(d['roomId'], '{} is False or empty'.format(d['roomId']))
+
+
 
 
 
