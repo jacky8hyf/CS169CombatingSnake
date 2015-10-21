@@ -5,6 +5,7 @@ from django.views.generic import View
 from errors import errors
 from utils import *
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import *
 
 # Create your views here.
 def gameStart(request):
@@ -20,11 +21,25 @@ def homePage(request):
 
 def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
-    return User()
+    if 'X-Snake-Session-Id' not in request.META:
+        raise errors.NOT_LOGGED_IN
+    sessionId = request.META['X-Snake-Session-Id']
+    try:
+        return User.find_by_session_id(sessionId)
+    except ObjectDoesNotExist:
+        raise errors.NOT_LOGGED_IN
 
-def OKResponse(**kwargs):
-	d = dict(kwargs)
-	return JsonResponse(d)
+def OKResponse(*args, **kwargs):
+    '''
+    Accept:
+    OKResponse({'k':'v'})
+    OKResponse(k = 'v')
+    OKResponse({'k':'v'}, k = 'v')
+    '''
+    d = dict(kwargs)
+    for arg in args:
+        d.update(arg)
+    return JsonResponse(d)
 
 ### actual routes
 
@@ -35,13 +50,13 @@ class UsersView(View):
     def post(self, request):
         ''' reg user '''
         jsonbody = parse_json(request.body)
-        user = User.from_dict(jsonbody)
-        # FIXME check user is not None
-        # FIXME log him/her in
-        user.save()
-        # FIXME fetch the id and session_id
-        return OKResponse({'user': 'User has been created'})
-        #return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
+        try:
+            User.find_by_username(username) # best effort check if username exists
+            return errors.USERNAME_TAKEN
+        except ObjectDoesNotExist:
+            pass
+        user = User.from_dict(jsonbody).login().save();
+        return OKResponse(userId = user.hexId, sessionId = user.session_id)
 
 class UsersLoginView(View):
     '''
@@ -49,14 +64,19 @@ class UsersLoginView(View):
     '''
     def put(self, request):
         ''' log user in '''
-        jsonbody = parse_json(request.body);
-        username, password = jsonbody['username'], jsonbody['password']
-        # FIXME if either are none return error
-        # FIXME log user in
-        return errors.NOT_IMPLEMENTED # FIXME return user id and session_id
+        args = sanitize_dict(parse_json(request.body), {'username':str, 'password':str})
+        username, password = args['username'], args['password']
+        user = User.find_by_username(username)
+        if not user.check_password(password):
+            return errors.INCORRECT_PASSWORD
+        user.login().save()
+        return OKResponse(userId = user.hexId, sessionId = user.session_id)
+            
     def delete(self, request, *args, **kwargs):
         ''' log user out '''
-        return errors.NOT_IMPLEMENTED # FIXME log user out and return {}
+        user = fetch_user(request)
+        user.logout().save()
+        return OKResponse()
 
 class SingleUserView(View):
     '''
@@ -65,23 +85,35 @@ class SingleUserView(View):
     def putSingleUser(self, request, userId):
         '''update profile or password'''
         user = fetch_user(request)
-        # FIXME assert user exists
+        if userId != user.hexId:
+            return errors.PERMISSION_DENIED
         user.update_profile(parse_json(request.body))
-        return errors.NOT_IMPLEMENTED # FIXME return {}
+        return OKResponse()
 
 class RoomsView(View):
     '''
     /rooms path
     '''
     def post(self, request):
+        '''
+        Create room
+        '''
         user = fetch_user(request)
-        # FIXME assert user exists
-        room = Room.createBy(user)
-        return errors.NOT_IMPLEMENTED # FIXME save it and return its json dump
+        room = Room.create_by(user)
+        return OKResponse(room.to_dict())
     def get(self, request):
+        '''
+        Get all rooms
+        '''
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
-        return errors.NOT_IMPLEMENTED # FIXME get rooms and return its json dump
+        includeMemberProfile = request.GET.get('member-profile', False)
+        
+        rooms = Room.all_rooms()
+        return OKResponse(rooms = [room.to_dict(self, 
+            includeCreatorProfile = includeCreatorProfile, 
+            includeMembers = includeMembers, 
+            includeMemberProfile = includeMemberProfile) for room in rooms])
 
 class SingleRoomView(View):
     '''
@@ -91,16 +123,23 @@ class SingleRoomView(View):
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        return errors.NOT_IMPLEMENTED # FIXME get from data base and dump to json
+        
+        room = Room.find_by_id(roomId)
+        return OKResponse(room.to_dict(self, 
+            includeCreatorProfile = includeCreatorProfile, 
+            includeMembers = includeMembers, 
+            includeMemberProfile = includeMemberProfile))
 
 class SingleRoomMembersView(View):
     '''
     /rooms/:roomId/members/
     '''
     def get(self, request, roomId):
-        includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        return errors.NOT_IMPLEMENTED # FIXME get from data base and dump to json
+        room = Room.find_by_id(roomId)
+        return OKResponse(room.to_dict(self, 
+            membersOnly = True,
+            includeMemberProfile = includeMemberProfile));
 
 class SingleRoomMemberView(View):
     '''
@@ -108,14 +147,16 @@ class SingleRoomMemberView(View):
     '''
     def put(self, request, roomId, memberId):
         user = fetch_user(request)
-        # FIXME assert user exists
-        # FIXME assert memberId matches user.id
-        # FIXME set user.inroom
-        return errors.NOT_IMPLEMENTED # return {}
+        if memberId != user.hexId:
+            return errors.PERMISSION_DENIED
+        room = Room.find_by_id(roomId)
+        user.enter_room(room)
+        return OKResponse()
     def delete(self, request, roomId, memberId):
         user = fetch_user(request)
-        # FIXME assert user exists
-        # FIXME assert memberId matches user.id
-        # FIXME set user.inroom
-        return errors.NOT_IMPLEMENTED # return {}
+        if memberId != user.hexId:
+            return errors.PERMISSION_DENIED
+        room = Room.find_by_id(roomId)
+        user.exit(room)
+        return OKResponse()
 

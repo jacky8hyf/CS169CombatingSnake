@@ -51,6 +51,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
+    'gameStart.errors.ErrorMiddleware', # Custom error handling by throwing exceptions
 )
 
 ROOT_URLCONF = 'combatingSnake.urls'
