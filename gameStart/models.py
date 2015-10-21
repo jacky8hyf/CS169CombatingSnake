@@ -5,7 +5,18 @@ from uuid import uuid4
 
 # Create your models here.
 
-class User(models.Model):
+class BaseModel(models.Model):
+    def save(self):
+        '''
+        Save this object to database. Return self for chaining.
+        '''
+        models.Model.save(self)
+        return self
+
+    class Meta:
+        abstract = True
+
+class User(BaseModel):
     userId = models.AutoField(primary_key=True)
     username = models.CharField(max_length = 64, unique = True)
     pwhash = models.CharField(max_length = 69)
@@ -18,7 +29,7 @@ class User(models.Model):
         return None # cannot get the password from the object
     @password.setter
     def password(self, value):
-        pwhash = make_hash(value)
+        self.pwhash = make_hash(value)
 
     @property
     def hexId(self):
@@ -83,7 +94,7 @@ class User(models.Model):
         '''
         self.session_id = None
         return self
-    
+
     def enter_room(self, room):
         '''
         inroom setter. Return self to allow chaining.
@@ -91,7 +102,7 @@ class User(models.Model):
         self.inroom = room
         # FIXME check if room is full by F expressions
         return self
-    
+
     def exit_room(self, room):
         '''
         inroom setter. Return self to allow chaining.
@@ -101,15 +112,14 @@ class User(models.Model):
             self.inroom = None
         # FIXME consider deleting room here??? it should be done after self.save
         return self
-    
+
     def to_dict(self, includeProfile = False):
         d = {'userId': self.userId}
         if includeProfile:
             d.update({'nickname': self.nickname})
         return d
 
-
-class Room(models.Model):
+class Room(BaseModel):
     roomId = models.AutoField(primary_key=True)
     capacity = models.IntegerField(default = 8)
     # 0: waiting; 1: playing. More enum values may be added.
@@ -135,11 +145,11 @@ class Room(models.Model):
     @property
     def all_members(self):
         return User.find_by_inroom(self)
-    
+
     @classmethod
     def all_rooms(cls):
         return cls.objects.all()
-    
+
     @classmethod
     def find_by_id(cls, roomId):
         return cls.objects.get(roomId = roomId)

@@ -8,7 +8,12 @@ class UserTestCase(TestCase):
 
     def tearDown(self):
         User.objects.all().delete()
-        
+
+    def testUserSetPassword(self):
+        user = User()
+        setattr(user, 'password', 'good')
+        self.assertTrue(user.pwhash, 'pwhash is empty: {}'.format(user.pwhash))
+
     def testCreateUserAndLogin(self):
         user = User.from_dict({
             'username': 'testUser',
@@ -16,10 +21,10 @@ class UserTestCase(TestCase):
             }).login().save()
         print 'new user id {}'.format(user.hexId)
         self.assertIsNone(user.password)
-        self.assertIsNotNone(user.pwhash)
-        self.assertTrue(check_hash('password', user.pwhash),'check_hash for correct password')
-        self.assertFalse(check_hash('passw0rd', user.pwhash),'check_hash for incorrect password')
+        self.assertTrue(user.pwhash)
+        self.assertTrue(check_hash('password', user.pwhash),'check_hash for correct password: {}'.format(user.pwhash))
+        self.assertFalse(check_hash('passw0rd', user.pwhash),'check_hash for incorrect password {}'.format(user.pwhash))
         self.assertIsNotNone(user.session_id)
-        
+
         user.logout().save()
         self.assertIsNone(user.session_id)
