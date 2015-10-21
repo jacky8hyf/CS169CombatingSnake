@@ -7,6 +7,7 @@ body{
 	font: 14px BlinkMacSystemFont;
 	background-image: url("../images/background.jpg");
 	background-repeat: no-repeat;
+	background-size: cover;
 	background-color: #060606;
 }
 .logo{
@@ -19,7 +20,8 @@ body{
 @keyframes blinker {  
   80% { opacity: 0.7; }
 }
-.gamerule{
+
+.frame {
 	border-radius: 10px;
 	padding: 15px;
 	color: gray;
@@ -28,27 +30,15 @@ body{
 	margin-left: 25%;
 	margin-right: 25%;
 	box-shadow: 0 0 10px #CCCCCC;
+}
+
+.gamerule{
 }
 .intro{
-	border-radius: 10px;
-	padding: 15px;
-	color: gray;
-	background-color: rgba(0,0,0,0.8);
-	margin-top: 15px;
-	margin-left: 25%;
-	margin-right: 25%;
-	box-shadow: 0 0 10px #CCCCCC;
 }
 .leaderboard{
-	border-radius: 10px;
-	padding: 15px;
-	color: gray;
-	background-color: rgba(0,0,0,0.8);
-	margin-top: 15px;
-	margin-left: 25%;
-	margin-right: 25%;
-	box-shadow: 0 0 10px #CCCCCC;
 }
+
 .login_container{
 	-webkit-box-flex: 1;
 	-webkit-flex: 1;
