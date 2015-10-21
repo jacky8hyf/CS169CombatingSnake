@@ -151,3 +151,24 @@ body{
 .form-signup input[type="submit"]:focus, .form-signup input[type="submit"]:hover {
 	background-color: #1F3311;
 }
+
+.error {
+	color: red;
+}
+
+.userInfo{
+	float: right;
+	padding-right: 20px;
+	font-size: 16px;
+}
+
+.usernameInfo {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	color: whitesmoke;
+}
+
+.logout {
+	font-size: 16px;
+	width: 100%;
+}

@@ -5,6 +5,7 @@ var Frontpage = (function() {
 	var leaderboard;
 	var signup;
 	var fadeInTime = 1000;
+	var userInfo;
 
 	var hideAll = function() {
 		gameRule.hide();
@@ -62,6 +63,7 @@ var Frontpage = (function() {
 		login = $('.login_container');
 		leaderboard = $('.leaderboard');
 		signup = $('.signup_container');
+		$('.userInfo').hide();
 		hideAll();
 		$('.logo').hide();
 		$('#cssmenu').hide();

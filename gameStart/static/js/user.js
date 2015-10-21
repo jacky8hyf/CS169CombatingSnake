@@ -5,10 +5,13 @@ var UserHandler = (function() {
     // PRIVATE METHODS
     var loginForm;
     var signupForm;
+    var sessionId;
+    var userId;
+    var usernameGlobal;
 
    /**
     * HTTP GET request
-    * @param  {string}   url       URL path, e.g. "/api/smiles"
+    * @param  {string}   url       URL path
     * @param  {function} onSuccess   callback method to execute upon request success (200 status)
     * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
     * @return {None}
@@ -23,9 +26,30 @@ var UserHandler = (function() {
        });
    };
 
+   /**
+    * HTTP PUT request
+     * @param  {string}   url       URL path
+     * @param  {Object}   data      JSON data to send in request body
+     * @param  {function} onSuccess   callback method to execute upon request success (200 status)
+     * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
+     * @return {None}
+    */
+   var makePutRequest = function(url, data, onSuccess, onFailure) {
+        $.ajax({
+            type: 'PUT',
+            url: apiUrl + url,
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            success: onSuccess,
+            error: onFailure
+        });
+   };
+
+
     /**
      * HTTP POST request
-     * @param  {string}   url       URL path, e.g. "/api/smiles"
+     * @param  {string}   url       URL path
      * @param  {Object}   data      JSON data to send in request body
      * @param  {function} onSuccess   callback method to execute upon request success (200 status)
      * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
@@ -43,65 +67,77 @@ var UserHandler = (function() {
         });
     };
 
+    var onSuccessLogin = function(data) {
+        sessionId = data.sessionId;
+        userId = data.userId;
+        loginForm.find('div.error div.login_error').text(" ");
+        signupForm.find('div.error div.signup_error').text(" ");
+        $('div.userInfo').show();
+        $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
+        loginForm.hide();
+        signupForm.hide();
+    }
+
     /**
      * Add event handlers for submitting the create form.
      * @return {None}
      */
     var attachLoginHandler = function(e) {
-        signupForm.on('click', '.submit-login', function(e) {
+        loginForm.on('click', '.submit-login', function(e) {
             e.preventDefault()
-            console.log("inside attach login handler");
-
-            var error = "";
+            var errorElem = loginForm.find('div.error div.login_error');
             var username = loginForm.find('div.form_field #login_username').val();
+            usernameGlobal = username;
             var password = loginForm.find('div.form_field #login_password').val();
             var user ={'username':username, 'password' : password};
+
+            if (username.length == 0 || password.length == 0) {
+                errorElem.text("Username and password must be nonempty.");
+                return;
+            }
+
             var onSuccess = function(data) {
-                alert("Log in successful");
+                sessionId = data.sessionId;
+                userId = data.userId;
+                errorElem.text(" ");
             };
-            var onFailure = function() {
-                alert("Log in failed");
-            }
 
-            console.log(user);
-
-            if (error.length > 0) {
-                alert(error);
-            } else {
-                makePostRequest("/users/login", user, onSuccess, onFailure);
-            }
+            var onFailure = function(response) {
+                var data = response.responseJSON;
+                errorElem.text(data.msg);
+            };
+            makePutRequest("/users/login", user, onSuccessLogin, onFailure);
         });
 
     };
 
     var attachSignupHandler = function(e) {
         signupForm.on('click', '.submit-signup', function(e) {
-            // TODO: ADD ERROR MESSAGES
             e.preventDefault()
-            console.log("inside attach signup handler");
-
-            var error = "";
+            var errorElem = signupForm.find('div.error div.signup_error');
             var username = signupForm.find('div.form_field #signup_username').val();
+            usernameGlobal = username;
             var nickname = signupForm.find('div.form_field #signup_nickname').val();
             var password = signupForm.find('div.form_field #signup_password').val();
             var passwordRetype = signupForm.find('div.form_field #signup_password_retype').val();
+            // Error handling
+            if (password != passwordRetype) {
+                errorElem.text("Pasword does not match.");
+                return;
+            }
+
             var user ={'username':username, 'nickname':nickname, 'password' : password};
-
-            // TODO: HANDLE RESPONSE FROM SERVER
+            // HANDLE RESPONSE FROM SERVER
             var onSuccess = function(data) {
-                alert("Sign up successful");
+                sessionId = data.sessionId;
+                userId = data.userId;
+                errorElem.text(" ");
             };
-            var onFailure = function() {
-                alert("Sign up failed");
+            var onFailure = function(response) {
+                var data = response.responseJSON;
+                errorElem.text(data.msg);
             }
-
-            console.log(user);
-
-            if (error.length > 0) {
-                alert(error);
-            } else {
-                makePostRequest("/users/", user, onSuccess, onFailure);
-            }
+            makePostRequest("/users/", user, onSuccessLogin, onFailure);
         });
     };
 
