@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from models import User, Room
 from django.http import *
 from django.views.generic import View
-from errors import errors
-from utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import *
+from django.db import IntegrityError
+
+from models import User, Room
+from errors import errors
+from utils import *
 
 # Create your views here.
 def gameStart(request):
@@ -47,22 +49,20 @@ class UsersView(View):
     '''
     /users path
     '''
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         ''' reg user '''
         jsonbody = parse_json(request.body)
         try:
-            User.find_by_username(username) # best effort check if username exists
+            user = User.from_dict(jsonbody).login().save();
+        except IntegrityError:
             return errors.USERNAME_TAKEN
-        except ObjectDoesNotExist:
-            pass
-        user = User.from_dict(jsonbody).login().save();
         return OKResponse(userId = user.hexId, sessionId = user.session_id)
 
 class UsersLoginView(View):
     '''
     /users/login
     '''
-    def put(self, request):
+    def put(self, request, *args, **kwargs):
         ''' log user in '''
         args = sanitize_dict(parse_json(request.body), {'username':str, 'password':str})
         username, password = args['username'], args['password']
@@ -71,7 +71,7 @@ class UsersLoginView(View):
             return errors.INCORRECT_PASSWORD
         user.login().save()
         return OKResponse(userId = user.hexId, sessionId = user.session_id)
-            
+
     def delete(self, request, *args, **kwargs):
         ''' log user out '''
         user = fetch_user(request)
@@ -82,7 +82,7 @@ class SingleUserView(View):
     '''
     /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
     '''
-    def putSingleUser(self, request, userId):
+    def putSingleUser(self, request, userId, *args, **kwargs):
         '''update profile or password'''
         user = fetch_user(request)
         if userId != user.hexId:
@@ -94,50 +94,50 @@ class RoomsView(View):
     '''
     /rooms path
     '''
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         '''
         Create room
         '''
         user = fetch_user(request)
         room = Room.create_by(user)
         return OKResponse(room.to_dict())
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         '''
         Get all rooms
         '''
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        
+
         rooms = Room.all_rooms()
-        return OKResponse(rooms = [room.to_dict(self, 
-            includeCreatorProfile = includeCreatorProfile, 
-            includeMembers = includeMembers, 
+        return OKResponse(rooms = [room.to_dict(self,
+            includeCreatorProfile = includeCreatorProfile,
+            includeMembers = includeMembers,
             includeMemberProfile = includeMemberProfile) for room in rooms])
 
 class SingleRoomView(View):
     '''
     /rooms/:roomId
     '''
-    def get(self, request, roomId):
+    def get(self, request, roomId, *args, **kwargs):
         includeCreatorProfile = request.GET.get('creator-profile', False)
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
-        
+
         room = Room.find_by_id(roomId)
-        return OKResponse(room.to_dict(self, 
-            includeCreatorProfile = includeCreatorProfile, 
-            includeMembers = includeMembers, 
+        return OKResponse(room.to_dict(self,
+            includeCreatorProfile = includeCreatorProfile,
+            includeMembers = includeMembers,
             includeMemberProfile = includeMemberProfile))
 
 class SingleRoomMembersView(View):
     '''
     /rooms/:roomId/members/
     '''
-    def get(self, request, roomId):
+    def get(self, request, roomId, *args, **kwargs):
         includeMemberProfile = request.GET.get('member-profile', False)
         room = Room.find_by_id(roomId)
-        return OKResponse(room.to_dict(self, 
+        return OKResponse(room.to_dict(self,
             membersOnly = True,
             includeMemberProfile = includeMemberProfile));
 
@@ -145,14 +145,14 @@ class SingleRoomMemberView(View):
     '''
     /rooms/:roomId/members/:memberId
     '''
-    def put(self, request, roomId, memberId):
+    def put(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
         if memberId != user.hexId:
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(roomId)
         user.enter_room(room)
         return OKResponse()
-    def delete(self, request, roomId, memberId):
+    def delete(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
         if memberId != user.hexId:
             return errors.PERMISSION_DENIED

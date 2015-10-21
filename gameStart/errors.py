@@ -29,6 +29,10 @@ class Errors:
     def WRONG_TYPE(arg):
         return Error(-491, 'argument {} has wrong type'.format(arg), 400);
 
+    @staticmethod
+    def MALFORMED_JSON(arg):
+        return Error(-488, 'Malformed JSON {}'.format(arg), 400);
+
 errors = Errors()
 
 class ErrorMiddleware(object):

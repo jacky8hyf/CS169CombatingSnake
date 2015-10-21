@@ -4,11 +4,8 @@ from hashing_passwords import *
 from django.core.exceptions import *
 
 class UserTestCase(TestCase):
-    def setUp(self):
-        User.objects.all().delete()
-
-    def tearDown(self):
-        User.objects.all().delete()
+    # no need to clear user table, as django test clears the in-memory
+    # database each time
 
     def testUserSetPassword(self):
         user = User()
@@ -92,16 +89,11 @@ class UserTestCase(TestCase):
 
 class RoomTestCase(TestCase):
     def setUp(self):
-        Room.objects.all().delete()
-
         self.user = User.from_dict({
             'username': 'user',
             'password': 'password',
             'nickname': 'nick'
         }).login().save()
-
-    def tearDown(self):
-        Room.objects.all().delete()
 
     def testCreateBy(self):
         room = Room.create_by(self.user)
@@ -128,4 +120,15 @@ class RoomTestCase(TestCase):
         for room in rooms:
             self.assertEquals(room, Room.find_by_id(room.roomId))
 
-
+    def testConflictUsername(self):
+        User.from_dict({
+            'username': 'user',
+            'password': 'password',
+            'nickname': 'nick'
+        }).save()
+        with self.assertRaises(IntegrityError):
+            User.from_dict({
+                'username': 'user',
+                'password': 'password',
+                'nickname': 'nick'
+            }).save()

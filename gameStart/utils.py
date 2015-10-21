@@ -4,8 +4,7 @@ def parse_json(body):
     try:
         return json.loads(body)
     except ValueError:
-        print "Inside value error"
-        return None
+        raise errors.MALFORMED_JSON(body)
 
 def assert_type(value, theType):
     if type(value) == theType: return True
