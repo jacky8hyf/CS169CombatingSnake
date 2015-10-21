@@ -5,11 +5,11 @@ def e(err, msg, status_code = 400):
 	js = JsonResponse();
 	js.status_code = status_code;
 	return js
-	
+
 class Error(BaseException, JsonResponse):
     def __init__(self, err, msg, status_code = 400):
         JsonResponse.__init__(self, {'err':err, 'msg':msg})
-        BaseException.__init__(self)
+        BaseException.__init__(self, '{}: {}'.format(err, msg))
         self.status_code = status_code
 
 class Errors:
@@ -21,7 +21,7 @@ class Errors:
     NOT_LOGGED_IN =         Error(-489, 'Not logged in',            403);
     PERMISSION_DENIED =     Error(-403, 'Permission denied',        403); # generic permission denied
     # FIXME more errors
-    
+
     @staticmethod
     def MISSING_ARGS(arg):
         return Error(-492, 'missing argument {}'.format(arg), 400);
@@ -39,4 +39,3 @@ class ErrorMiddleware(object):
             print exception
             return Errors.UNKNOWN_USER_ERROR
         return None
-        

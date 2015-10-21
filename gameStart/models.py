@@ -72,9 +72,8 @@ class User(BaseModel):
         Update the current object from a dictionary. Only password and nickname
         is allowed to be updated. Return self to allow chaining.
         '''
-        d = sanitize_dict(d, required = {
-            'password': str
-        }, optional = {
+        d = sanitize_dict(d, optional = {
+            'password': str,
             'nickname': str
         });
         for key in d:

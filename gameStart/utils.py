@@ -1,5 +1,5 @@
 import json
-import errors
+from errors import errors
 def parse_json(body):
     try:
         return json.loads(body)
