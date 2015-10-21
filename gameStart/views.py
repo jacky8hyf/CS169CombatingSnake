@@ -3,7 +3,7 @@ from django.http import *
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import *
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from models import User, Room
 from errors import errors
@@ -156,18 +156,26 @@ class SingleRoomSingleMemberView(View):
     '''
     /rooms/:roomId/members/:memberId
     '''
+
+    @transaction.atomic
     def put(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
         if memberId != user.strId:
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
-        user.enter_room(room).save()
-        return OKResponse()
+        if len(room.all_members) < room.capacity - 1: # -1 for the creator
+            user.enter_room(room).save()
+            return OKResponse()
+        else:
+            return errors.ROOM_FULL
+
+    @transaction.atomic
     def delete(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
         if memberId != user.strId:
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
+        room.destroy_if_created_by(user)
         return OKResponse()
 

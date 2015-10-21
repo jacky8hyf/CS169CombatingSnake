@@ -36,7 +36,7 @@ class User(BaseModel):
     username = models.CharField(max_length = 64, unique = True)
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
-    inroom = models.ForeignKey('Room', default = None, null = True)
+    inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
     session_id = models.CharField(max_length = 32, default = None, null = True)
 
     @property
@@ -139,7 +139,7 @@ class Room(BaseModel):
     capacity = models.IntegerField(default = 8)
     # 0: waiting; 1: playing. More enum values may be added.
     status = models.SmallIntegerField(default = 0)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
     @property
     def primary_key(self):
         return self.roomId
@@ -168,8 +168,10 @@ class Room(BaseModel):
     def all_rooms(cls):
         return cls.objects.all()
 
-
-
+    def destroy_if_created_by(self, user):
+        if self.creator != user:
+            return
+        self.delete() # this will sets all member users' inroom attribute to null
 
 
 
