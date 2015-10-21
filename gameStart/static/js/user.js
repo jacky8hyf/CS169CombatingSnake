@@ -48,12 +48,35 @@ var UserHandler = (function() {
      * @return {None}
      */
     var attachLoginHandler = function(e) {
+        signupForm.on('click', '.submit-login', function(e) {
+            e.preventDefault()
+            console.log("inside attach login handler");
 
+            var error = "";
+            var username = loginForm.find('div.form_field #login_username').val();
+            var password = loginForm.find('div.form_field #login_password').val();
+            var user ={'username':username, 'password' : password};
+            var onSuccess = function(data) {
+                alert("Log in successful");
+            };
+            var onFailure = function() {
+                alert("Log in failed");
+            }
+
+            console.log(user);
+
+            if (error.length > 0) {
+                alert(error);
+            } else {
+                makePostRequest("/users/login", user, onSuccess, onFailure);
+            }
+        });
 
     };
 
     var attachSignupHandler = function(e) {
         signupForm.on('click', '.submit-signup', function(e) {
+            // TODO: ADD ERROR MESSAGES
             e.preventDefault()
             console.log("inside attach signup handler");
 
@@ -63,6 +86,8 @@ var UserHandler = (function() {
             var password = signupForm.find('div.form_field #signup_password').val();
             var passwordRetype = signupForm.find('div.form_field #signup_password_retype').val();
             var user ={'username':username, 'nickname':nickname, 'password' : password};
+
+            // TODO: HANDLE RESPONSE FROM SERVER
             var onSuccess = function(data) {
                 alert("Sign up successful");
             };
@@ -85,7 +110,7 @@ var UserHandler = (function() {
      * @return {None}
      */
     var start = function() {
-        loginForm = $(".loginForm");
+        loginForm = $("div.login_container");
         signupForm = $("div.signup_container");
 
         attachLoginHandler();

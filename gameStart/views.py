@@ -40,22 +40,15 @@ class UsersView(View):
     '''
     def post(self, request, args):
         ''' reg user '''
-        print "========> request", request
-        print "========> method", request.method
-        print "========> body", request.body
-        print "========> args", args
         jsonbody = parse_json(request.body)
-        #jsonbody = request.body
-        print "========> jsonbody", jsonbody
         user = User.from_dict(jsonbody)
         # FIXME check user is not None
         # FIXME log him/her in
         user.save()
-        print "===================>"
-        print "users", user
         # FIXME fetch the id and session_id
-        return sendResponse({"user": user.username, "session": user.userId})
         #return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
+        # FIXME: use this to temporarily test the front end
+        return sendResponse({"user": user.username, "session": user.userId})
 
 class UsersLoginView(View):
     '''

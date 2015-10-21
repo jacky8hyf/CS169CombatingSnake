@@ -1,78 +1,79 @@
 var Frontpage = (function() {
+	var gameRule;
+	var intro;
+	var login;
+	var leaderboard;
+	var signup;
+	var fadeInTime = 1000;
+
+	var hideAll = function() {
+		gameRule.hide();
+		intro.hide();
+		login.hide();
+		leaderboard.hide();
+		signup.hide();
+	};
+
 	var attachHomeHandler = function(e){
 		$('.active').click(function(e){
 			e.preventDefault();
-			$('.gamerule').fadeOut(1000);
-			$('.intro').fadeOut(1000);
-			$('.login_container').fadeOut(1000);
-			$('.leaderboard').fadeOut(1000);
-			$('.signup_container').hide();
+			hideAll();
+			$('.login_container').fadeIn(fadeInTime);
 		});
 	};
 	var attachGameRuleHandler = function(e) {
 		$('.rule-button').click(function(e){
 			e.preventDefault();
-			$('.leaderboard').hide();
-			$('.intro').hide();
-			$('.login_container').hide();
-			$('.signup_container').hide();
+			hideAll();
 			$('.gamerule').fadeIn(1000);
 		});
 	};
 	var attachIntroductionHandler = function(e){
 		$('.intro-button').click(function(e){
 			e.preventDefault();
-			$('.gamerule').hide();
-			$('.leaderboard').hide();
-			$('.login_container').hide();
-			$('.signup_container').hide();
+			hideAll();
 			$('.intro').fadeIn(1000);
 		});
 	};
 	var attachLeaderboardHandler = function(e){
 		$('.leader-button').click(function(e){
 			e.preventDefault();
-			$('.gamerule').hide();
-			$('.intro').hide();
-			$('.login_container').hide();
-			$('.signup_container').hide();
+			hideAll();
 			$('.leaderboard').fadeIn(1000);
 		});
 	};
 	var attachStartGameHandler = function(e){
 		$('.gamestart-button').click(function(e){
 			e.preventDefault();
-			$('.gamerule').hide();
-			$('.intro').hide();
-			$('.leaderboard').hide();
-			$('.signup_container').hide();
-			$('.login_container').fadeIn(1000);
+			hideAll();
+			$('.login_container').fadeIn(fadeInTime);
 		});
 	};
 	var attachSignUpHandler = function(e){
 		$('.text-center').click(function(e){
 			e.preventDefault();
 			$('.login_container').hide();
-			$('.signup_container').fadeIn(1000);
+			$('.signup_container').fadeIn(100);
 		});
 	};
 	var start = function(){
+		gameRule = $('.gamerule');
+		intro = $('.intro');
+		login = $('.login_container');
+		leaderboard = $('.leaderboard');
+		signup = $('.signup_container');
+		hideAll();
 		$('.logo').hide();
 		$('#cssmenu').hide();
-		$('.logo').fadeToggle(1000);
-		$('#cssmenu').fadeIn(2000);
-		$('.gamerule').hide();
-		$('.intro').hide();
-		$('.signup_container').hide();
-		$('.leaderboard').hide();
-		$('.login_container').hide();
+		$('.logo').fadeToggle(fadeInTime);
+		$('#cssmenu').fadeIn(fadeInTime);
+		$('.login_container').fadeIn(fadeInTime);
 		attachGameRuleHandler();
 		attachHomeHandler();
 		attachIntroductionHandler();
 		attachLeaderboardHandler();
 		attachStartGameHandler();
 		attachSignUpHandler();
-
 	};
 
 	return {
