@@ -151,38 +151,60 @@ class RoomsViewTestCase(RestTestCase):
             gotRoom = self.assertResponseSuccess(self.get('/rooms/' + roomId))
             self.assertEquals(gotArrayLookup[roomId], gotRoom)
 
+    def testJoinExitRoom(self):
+        self.iAmAlice()
+        room = self.assertResponseSuccess(self.post('/rooms'))
+        roomId = room['roomId']
+        self.iAmBob()
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        self.assertIsNotNone(User.find_by_id(self.bob['userId']).inroom)
+        self.assertEquals(roomId, User.find_by_id(self.bob['userId']).inroom.strId)
+
+        gotUserId = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members'][0]['userId'];
+        self.assertEquals(self.bob['userId'], gotUserId)
+
+        anotherRoomId = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+        self.assertResponseSuccess(self.delete('/rooms/' + anotherRoomId + '/members/' + self.bob['userId']))
+        self.assertIsNotNone(User.find_by_id(self.bob['userId']).inroom, 'exiting a wrong room should not have effects')
+        self.assertEquals(roomId, User.find_by_id(self.bob['userId']).inroom.strId, 'exiting a wrong room should not have effects')
+
+        # exit it
+        self.assertResponseSuccess(self.delete('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        self.assertIsNone(User.find_by_id(self.bob['userId']).inroom)
+        gotMembers = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members']
+        self.assertEquals(0, len(gotMembers))
+
+
     def testParams(self):
         self.iAmAlice()
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
         self.iAmBob()
-
         self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+
         d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'creator-profile': True}))
         self.assertIn('creator',d)
         self.assertIn('nickname',d['creator'])
-        self.assertEquals(self.alice['nickname'], d['creator']['nickname'])
+        self.assertEquals('alice', d['creator']['nickname'])
 
-        self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))
+        d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))
         self.assertIn('members', d)
         members = d['members']
         self.assertIsInstance(members, list)
         self.assertEquals(1, len(members))
-        self.assertEquals(self.bob['userId'], self[members][0]['userId'])
+        self.assertEquals(self.bob['userId'], d['members'][0]['userId'])
 
-        self.assertResponseSuccess(self.get('/rooms/' + roomId, {'member-profile': True}))
+        d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'member-profile': True}))
         self.assertIn('members', d)
         members = d['members']
         self.assertIsInstance(members, list)
         self.assertEquals(1, len(members))
-        self.assertEquals(self.bob['userId'], self[members][0]['userId'])
-        self.assertEquals(self.bob['nickname'], self[members][0]['nickname'])
+        self.assertEquals(self.bob['userId'], d['members'][0]['userId'])
+        self.assertEquals('bob', d['members'][0]['nickname'])
 
 
     def testUrls(self):
         resp = self.put('/rooms/a/members/b')
-        print resp.status_code
-        print resp
         self.assertNotEquals(405, resp.status_code)
 
 

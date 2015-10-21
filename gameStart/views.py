@@ -161,13 +161,13 @@ class SingleRoomSingleMemberView(View):
         if memberId != user.strId:
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
-        user.enter_room(room)
+        user.enter_room(room).save()
         return OKResponse()
     def delete(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
         if memberId != user.strId:
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
-        user.exit(room)
+        user.exit_room(room).save()
         return OKResponse()
 

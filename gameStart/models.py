@@ -32,7 +32,7 @@ class BaseModel(models.Model):
 
 class User(BaseModel):
     # In views.py, use strId instead.
-    userId = models.AutoField(primary_key=True) 
+    userId = models.AutoField(primary_key=True)
     username = models.CharField(max_length = 64, unique = True)
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
