@@ -1,69 +1,18 @@
 from django.shortcuts import render
-from django.contrib.auth.models import *
-from django.contrib.auth import authenticate
+from models import User, Room
 from django.http import *
 from django.views.generic import View
-import json
 from errors import errors
+from utils import *
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def gameStart(request):
     return render(request, 'snake.html')
 
+@csrf_exempt
 def homePage(request):
     return render(request, 'index.html')
-
-def renderRegister(request):
-    return render(request, 'registration_form.html')
-
-def renderLogin(request):
-    return render(request, 'login.html')
-
-def createUser(request):
-    assert request.method == 'POST', "createUser must be a POST request"
-    requestData = json.loads(request.body) # decode the request data into a dictionary
-    username = requestData['username']
-    email = requestData['email']
-    password = requestData['password']
-
-    user = User.objects.create_user(username, email, password)
-    response = {}
-    response["status"] = 1
-    response["msg"] = ""
-    return HttpResponse(json.dumps(response), content_type='application/json')
-
-def changePassword(request):
-    assert request.method == 'POST', "changePassword must be a POST request"
-    requestData = json.loads(request.body) # decode the request data into a dictionary
-    username = requestData['username']
-    newPassword = requestData['newPassword']
-
-    user = User.objects.get(username=username)
-    user.set_password(newPassword)
-    response = {}
-    response["status"] = 1
-    response["msg"] = ""
-    return HttpResponse(json.dumps(response), content_type='application/json')
-
-def login(request):
-    assert request.method == 'GET', "login must be a GET request"
-    requestData = json.loads(request.body) # decode the request data into a dictionary
-    username = requestData['username']
-    password = requestData['password']
-
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            print("user is valid, active and aunthenticated")
-        else:
-            print("The password is valid, but the account has been disabled")
-    else:
-        print("The username and password were incorrect")
-
-    response = {}
-    response["status"] = 1
-    response["msg"] = ""
-    return HttpResponse(json.dumps(response), content_type='application/json')
 
 ###########################
 
@@ -91,7 +40,8 @@ class UsersView(View):
         # FIXME log him/her in
         user.save()
         # FIXME fetch the id and session_id
-        return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
+        return OKResponse({'user': 'User has been created'})
+        #return errors.NOT_IMPLEMENTED # FIXME return the id and session_id
 
 class UsersLoginView(View):
     '''
@@ -168,3 +118,4 @@ class SingleRoomMemberView(View):
         # FIXME assert memberId matches user.id
         # FIXME set user.inroom
         return errors.NOT_IMPLEMENTED # return {}
+

@@ -25,3 +25,4 @@ def sanitize_dict(obj, required = dict(), optional = dict()):
             return None
         d[fieldName] = obj[fieldName]
     return d
+

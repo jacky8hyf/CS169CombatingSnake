@@ -1,14 +1,10 @@
-var User = (function() {
+var UserHandler = (function() {
 
     // PRIVATE VARIABLES
     var apiUrl = '';
-    var smileSpace = 'tta'; // The smile space to use.
-    var smiles; // smiles container, value set in the "start" method below
-    var smileTemplateHtml; // a template for creating smiles. Read from index.html
-                           // in the "start" method
-    var create; // create form, value set in the "start" method below
-
     // PRIVATE METHODS
+    var loginForm;
+    var signupForm;
 
    /**
     * HTTP GET request
@@ -36,6 +32,21 @@ var User = (function() {
      * @return {None}
      */
     var makePostRequest = function(url, data, onSuccess, onFailure) {
+        var csrftoken = $.cookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
         $.ajax({
             type: 'POST',
             url: apiUrl + url,
@@ -53,6 +64,35 @@ var User = (function() {
      */
     var attachLoginHandler = function(e) {
 
+
+    };
+
+    var attachSignupHandler = function(e) {
+        signupForm.on('click', '.submit-signup', function(e) {
+            e.preventDefault()
+            console.log("inside attach signup handler");
+
+            var error = "";
+            var username = signupForm.find('div.form_field #signup_username').val();
+            var nickname = signupForm.find('div.form_field #signup_nickname').val();
+            var password = signupForm.find('div.form_field #signup_password').val();
+            var passwordRetype = signupForm.find('div.form_field #signup_password_retype').val();
+            var user ={'username':username, 'nickname':nickname, 'password' : password};
+            var onSuccess = function(data) {
+                alert("Sign up successful");
+            };
+            var onFailure = function() {
+                alert("Sign up failed");
+            }
+
+            console.log(user);
+
+            if (error.length > 0) {
+                alert(error);
+            } else {
+                makePostRequest("/users/", user, onSuccess, onFailure);
+            }
+        });
     };
 
 
@@ -62,8 +102,10 @@ var User = (function() {
      */
     var start = function() {
         loginForm = $(".loginForm");
+        signupForm = $("div.signup_container");
 
         attachLoginHandler();
+        attachSignupHandler();
     };
 
     // PUBLIC METHODS
