@@ -28,6 +28,7 @@ class SnakeErrors:
     USERNAME_TAKEN =        SnakeError(-498, 'Username is taken',        400);
     INCORRECT_PASSWORD =    SnakeError(-496, 'Incorrect password',       403);
     UNKNOWN_USER_ERROR =    SnakeError(-490, 'Unknown error',            400);
+    ROOM_FULL =             SnakeError(-494, 'Room is full',             400);
     NOT_LOGGED_IN =         SnakeError(-489, 'Not logged in',            403);
     PERMISSION_DENIED =     SnakeError(-403, 'Permission denied',        403); # generic permission denied
     # FIXME more errors

@@ -168,12 +168,20 @@ class RoomsViewTestCase(RestTestCase):
         self.assertIsNotNone(User.find_by_id(self.bob['userId']).inroom, 'exiting a wrong room should not have effects')
         self.assertEquals(roomId, User.find_by_id(self.bob['userId']).inroom.strId, 'exiting a wrong room should not have effects')
 
-        # exit it
+        # bob exit it
         self.assertResponseSuccess(self.delete('/rooms/' + roomId + '/members/' + self.bob['userId']))
         self.assertIsNone(User.find_by_id(self.bob['userId']).inroom)
         gotMembers = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members']
         self.assertEquals(0, len(gotMembers))
 
+        # bob enter again
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        # alice exit it
+        self.iAmAlice()
+        self.assertResponseSuccess(self.delete('/rooms/' + roomId + '/members/' + self.alice['userId']))
+        with self.assertRaises(ObjectDoesNotExist):
+            Room.find_by_id(roomId)
+        self.assertIsNone(User.find_by_id(self.bob['userId']).inroom, 'bob should not be in the room')
 
     def testParams(self):
         self.iAmAlice()

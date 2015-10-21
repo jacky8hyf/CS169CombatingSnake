@@ -3,6 +3,8 @@ from models import *
 from hashing_passwords import *
 from django.core.exceptions import *
 from django.db import IntegrityError
+from django.db.models import When, F, Q, Count, Sum
+
 
 class UserTestCase(TestCase):
     # no need to clear user table, as django test clears the in-memory
@@ -99,6 +101,9 @@ class UserTestCase(TestCase):
                 'password': 'password',
                 'nickname': 'nick'
             }).save()
+
+    def testEnterExpression(self):
+        pass
 
 class RoomTestCase(TestCase):
     def setUp(self):
