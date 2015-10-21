@@ -17,7 +17,7 @@ def assert_type(value, theType):
 
 def sanitize_dict(obj, required = dict(), optional = dict()):
     '''
-    Requires obj to have certain keys and assert value types. If 
+    Requires obj to have certain keys and assert value types. If
     no then throw MISSING_ARGS
     '''
     d = dict()
@@ -27,6 +27,7 @@ def sanitize_dict(obj, required = dict(), optional = dict()):
             raise errors.WRONG_TYPE(fieldName)
         d[fieldName] = obj[fieldName]
     for fieldName in optional:
+        if fieldName not in obj: continue
         if not assert_type(obj[fieldName], optional[fieldName]):
             raise errors.WRONG_TYPE(fieldName)
         d[fieldName] = obj[fieldName]

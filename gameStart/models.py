@@ -10,8 +10,8 @@ class User(models.Model):
     username = models.CharField(max_length = 64, unique = True)
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
-    inroom = models.ForeignKey('Room')
-    session_id = models.CharField(max_length = 32, default = None)
+    inroom = models.ForeignKey('Room', default = None, null = True)
+    session_id = models.CharField(max_length = 32, default = None, null = True)
 
     @property
     def password(self):
