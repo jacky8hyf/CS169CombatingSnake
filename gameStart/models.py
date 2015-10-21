@@ -173,5 +173,9 @@ class Room(BaseModel):
             return
         self.delete() # this will sets all member users' inroom attribute to null
 
+    def reassign_creator_if_created_by(self, user):
+        if self.creator != user:
+            return
+        pass # FIXME need to reassign the creator of the room
 
 

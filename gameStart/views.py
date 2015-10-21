@@ -176,6 +176,6 @@ class SingleRoomSingleMemberView(View):
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
-        room.destroy_if_created_by(user)
+        room.reassign_creator_if_created_by(user).save()
         return OKResponse()
 
