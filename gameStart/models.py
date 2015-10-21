@@ -140,6 +140,7 @@ class Room(BaseModel):
             'creator':self.creator.to_dict(includeProfile = includeCreatorProfile)}
         if includeMembers or membersOnly:
             d.update({'members': [m.to_dict(includeProfile = includeMemberProfile) for m in self.all_members]})
+        return d
 
     @property
     def all_members(self):

@@ -1,6 +1,7 @@
 from django.test import TestCase
-from models import User
+from models import *
 from hashing_passwords import *
+from django.core.exceptions import *
 
 class UserTestCase(TestCase):
     def setUp(self):
@@ -19,7 +20,6 @@ class UserTestCase(TestCase):
             'username': 'testUser',
             'password': 'password'
         }).login().save()
-        print 'new user id {}'.format(user.hexId)
         self.assertIsNone(user.password)
         self.assertTrue(user.pwhash)
         self.assertTrue(user.check_password('password'),'check_password for correct password: {}'.format(user.pwhash))
@@ -77,14 +77,55 @@ class UserTestCase(TestCase):
         self.assertIn('nickname', d)
 
     def testRooms(self):
-        pass # TODO test find_by_inroom, enter_room, exit_room
-    
+        pass # TODO test find_by_inroom, enter_room, exit_room, all_members
+
     def testFinds(self):
         users = [User.from_dict({
             'username': 'user{}'.format(i),
             'password': 'password'
         }).login().save() for i in range(10)]
-        
+
         for expectUser in users:
             self.assertEquals(expectUser, User.find_by_username(expectUser.username))
             self.assertEquals(expectUser, User.find_by_session_id(expectUser.session_id))
+
+
+class RoomTestCase(TestCase):
+    def setUp(self):
+        Room.objects.all().delete()
+
+        self.user = User.from_dict({
+            'username': 'user',
+            'password': 'password',
+            'nickname': 'nick'
+        }).login().save()
+
+    def tearDown(self):
+        Room.objects.all().delete()
+
+    def testCreateBy(self):
+        room = Room.create_by(self.user)
+        self.assertEquals(self.user, room.creator)
+
+        with self.assertRaises(ValueError):
+            Room.create_by(None).save()
+
+        d = room.to_dict()
+        for key in ('roomId','capacity','status','creator'):
+            self.assertIn(key, d)
+        self.assertNotIn('nickname', d['creator'])
+        self.assertNotIn('members', d)
+
+        d = room.to_dict(includeCreatorProfile = True)
+        self.assertIn('nickname', d['creator'])
+
+        d = room.to_dict(includeMembers = True)
+        self.assertIn('members',d)
+
+    def testAllRoomsAndFind(self):
+        rooms = [Room.create_by(self.user).save() for _ in range(10)]
+        self.assertEquals(set(rooms), set(Room.all_rooms()))
+        for room in rooms:
+            self.assertEquals(room, Room.find_by_id(room.roomId))
+
+
