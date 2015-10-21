@@ -56,7 +56,7 @@ class UsersView(View):
             user = User.from_dict(jsonbody).login().save();
         except IntegrityError:
             return errors.USERNAME_TAKEN
-        return OKResponse(userId = user.hexId, sessionId = user.session_id)
+        return OKResponse(userId = user.strId, sessionId = user.session_id)
 
 class UsersLoginView(View):
     '''
@@ -64,18 +64,23 @@ class UsersLoginView(View):
     '''
     def put(self, request, *args, **kwargs):
         ''' log user in '''
-        args = sanitize_dict(parse_json(request.body), {'username':str, 'password':str})
+        args = sanitize_dict(parse_json(request.body), {'username':basestring, 'password':basestring})
         username, password = args['username'], args['password']
         user = User.find_by_username(username)
         if not user.check_password(password):
             return errors.INCORRECT_PASSWORD
         user.login().save()
-        return OKResponse(userId = user.hexId, sessionId = user.session_id)
+        return OKResponse(userId = user.strId, sessionId = user.session_id)
 
     def delete(self, request, *args, **kwargs):
         ''' log user out '''
-        user = fetch_user(request)
-        user.logout().save()
+        try:
+            user = fetch_user(request)
+            user.logout().save()
+        except errors.SnakeError as e:
+            if e != errors.NOT_LOGGED_IN:
+                raise e
+            # as per the doc, logging out a non-existent session id has no effect
         return OKResponse()
 
 class SingleUserView(View):
@@ -85,10 +90,15 @@ class SingleUserView(View):
     def putSingleUser(self, request, userId, *args, **kwargs):
         '''update profile or password'''
         user = fetch_user(request)
-        if userId != user.hexId:
+        if userId != user.strId:
             return errors.PERMISSION_DENIED
         user.update_profile(parse_json(request.body))
         return OKResponse()
+
+    def getSingleUser(self, request, userId, *args, **kwargs):
+        ''' get user profile'''
+        User.find_by_id(str(userId))
+        return errors.NOT_IMPLEMENTED # FIXME get single user profile route
 
 class RoomsView(View):
     '''
@@ -124,7 +134,7 @@ class SingleRoomView(View):
         includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
 
-        room = Room.find_by_id(roomId)
+        room = Room.find_by_id(str(roomId))
         return OKResponse(room.to_dict(self,
             includeCreatorProfile = includeCreatorProfile,
             includeMembers = includeMembers,
@@ -136,7 +146,7 @@ class SingleRoomMembersView(View):
     '''
     def get(self, request, roomId, *args, **kwargs):
         includeMemberProfile = request.GET.get('member-profile', False)
-        room = Room.find_by_id(roomId)
+        room = Room.find_by_id(str(roomId))
         return OKResponse(room.to_dict(self,
             membersOnly = True,
             includeMemberProfile = includeMemberProfile));
@@ -147,16 +157,16 @@ class SingleRoomMemberView(View):
     '''
     def put(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
-        if memberId != user.hexId:
+        if memberId != user.strId:
             return errors.PERMISSION_DENIED
-        room = Room.find_by_id(roomId)
+        room = Room.find_by_id(str(roomId))
         user.enter_room(room)
         return OKResponse()
     def delete(self, request, roomId, memberId, *args, **kwargs):
         user = fetch_user(request)
-        if memberId != user.hexId:
+        if memberId != user.strId:
             return errors.PERMISSION_DENIED
-        room = Room.find_by_id(roomId)
+        room = Room.find_by_id(str(roomId))
         user.exit(room)
         return OKResponse()
 

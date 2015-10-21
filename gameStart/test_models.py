@@ -2,6 +2,7 @@ from django.test import TestCase
 from models import *
 from hashing_passwords import *
 from django.core.exceptions import *
+from django.db import IntegrityError
 
 class UserTestCase(TestCase):
     # no need to clear user table, as django test clears the in-memory
@@ -86,6 +87,18 @@ class UserTestCase(TestCase):
             self.assertEquals(expectUser, User.find_by_username(expectUser.username))
             self.assertEquals(expectUser, User.find_by_session_id(expectUser.session_id))
 
+    def testConflictUsername(self):
+        User.from_dict({
+            'username': 'user',
+            'password': 'password',
+            'nickname': 'nick'
+        }).save()
+        with self.assertRaises(IntegrityError):
+            User.from_dict({
+                'username': 'user',
+                'password': 'password',
+                'nickname': 'nick'
+            }).save()
 
 class RoomTestCase(TestCase):
     def setUp(self):
@@ -118,17 +131,6 @@ class RoomTestCase(TestCase):
         rooms = [Room.create_by(self.user).save() for _ in range(10)]
         self.assertEquals(set(rooms), set(Room.all_rooms()))
         for room in rooms:
-            self.assertEquals(room, Room.find_by_id(room.roomId))
+            self.assertEquals(room, Room.find_by_id(room.strId))
 
-    def testConflictUsername(self):
-        User.from_dict({
-            'username': 'user',
-            'password': 'password',
-            'nickname': 'nick'
-        }).save()
-        with self.assertRaises(IntegrityError):
-            User.from_dict({
-                'username': 'user',
-                'password': 'password',
-                'nickname': 'nick'
-            }).save()
+

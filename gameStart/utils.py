@@ -7,7 +7,7 @@ def parse_json(body):
         raise errors.MALFORMED_JSON(body)
 
 def assert_type(value, theType):
-    if type(value) == theType: return True
+    if type(value) == theType or isinstance(value, theType): return True
     try:
         theType(value)
         return True

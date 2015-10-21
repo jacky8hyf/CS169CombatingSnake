@@ -16,6 +16,20 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def primary_key(self):
+        raise NotImplementedError()
+
+    @property
+    def strId(self):
+        return ('id~' + hex(self.primary_key)[2:]) if self.primary_key is not None else None
+
+    @classmethod
+    def find_by_id(cls, id):
+        if isinstance(id, basestring):
+            id = int(id[3:], 16)
+        return cls.objects.get(pk = id)
+
 class User(BaseModel):
     userId = models.AutoField(primary_key=True)
     username = models.CharField(max_length = 64, unique = True)
@@ -32,8 +46,8 @@ class User(BaseModel):
         self.pwhash = make_hash(value)
 
     @property
-    def hexId(self):
-        return hex(self.userId)[2:]
+    def primary_key(self):
+        return self.userId
 
     @classmethod
     def from_dict(cls, d):
@@ -42,10 +56,10 @@ class User(BaseModel):
         is allowed to be set.
         '''
         d = sanitize_dict(d, required = {
-            'username': str,
-            'password': str
+            'username': basestring,
+            'password': basestring
         }, optional = {
-            'nickname': str
+            'nickname': basestring
         });
         obj = cls();
         for key in d:
@@ -73,8 +87,8 @@ class User(BaseModel):
         is allowed to be updated. Return self to allow chaining.
         '''
         d = sanitize_dict(d, optional = {
-            'password': str,
-            'nickname': str
+            'password': basestring,
+            'nickname': basestring
         });
         for key in d:
             setattr(self, key, d[key])
@@ -113,7 +127,7 @@ class User(BaseModel):
         return self
 
     def to_dict(self, includeProfile = False):
-        d = {'userId': self.userId}
+        d = {'userId': self.strId}
         if includeProfile:
             d.update({'nickname': self.nickname})
         return d
@@ -124,7 +138,9 @@ class Room(BaseModel):
     # 0: waiting; 1: playing. More enum values may be added.
     status = models.SmallIntegerField(default = 0)
     creator = models.ForeignKey(User)
-
+    @property
+    def primary_key(self):
+        return self.roomId
     @classmethod
     def create_by(cls, creator):
         '''Return a room created by creator'''
@@ -134,7 +150,7 @@ class Room(BaseModel):
 
     def to_dict(self, includeCreatorProfile = False, includeMembers = False, includeMemberProfile = False, membersOnly = False):
         d = dict() if membersOnly else \
-            {'roomId': self.roomId,
+            {'roomId': self.strId,
             'capacity': self.capacity,
             'status':self.status,
             'creator':self.creator.to_dict(includeProfile = includeCreatorProfile)}
@@ -150,9 +166,6 @@ class Room(BaseModel):
     def all_rooms(cls):
         return cls.objects.all()
 
-    @classmethod
-    def find_by_id(cls, roomId):
-        return cls.objects.get(roomId = roomId)
 
 
 
