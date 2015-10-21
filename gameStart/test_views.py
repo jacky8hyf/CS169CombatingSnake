@@ -120,8 +120,14 @@ class UsersViewTestCase(RestTestCase):
 class RoomsViewTestCase(RestTestCase):
     def setUp(self):
         RestTestCase.setUp(self)
-        self.user = self.assertResponseSuccess(self.post('/users', {'username':'user','password':'pass'}));
-        self.sessionId = self.user['sessionId']
+        self.user = self.alice = self.assertResponseSuccess(self.post('/users', {'username':'alice','password':'pass','nickname':'alice'}));
+        self.bob = self.assertResponseSuccess(self.post('/users', {'username':'bob','password':'pass','nickname':'bob'}));
+        self.iAmAlice()
+
+    def iAmAlice(self):
+        self.sessionId = self.alice['sessionId']
+    def iAmBob(self):
+        self.sessionId = self.bob['sessionId']
 
     def testCreateBy(self):
         d = self.assertResponseSuccess(self.post('/rooms'))
@@ -129,6 +135,55 @@ class RoomsViewTestCase(RestTestCase):
         self.assertIn('roomId', d)
         self.assertTrue(d['roomId'], '{} is False or empty'.format(d['roomId']))
 
+    def testGetRooms(self):
+        roomIds = [self.assertResponseSuccess(self.post('/rooms'))['roomId']
+            for _ in range(20)]
+        gotArray = self.assertResponseSuccess(self.get('/rooms'))['rooms']
+        gotRoomIds = [e['roomId'] for e in gotArray]
+        self.assertEquals(set(roomIds), set(gotRoomIds))
+        self.assertEquals(len(roomIds), len(gotRoomIds), 'GET /rooms size doesn\'t match')
+
+        gotArrayLookup = dict()
+        for e in gotArray:
+            gotArrayLookup[e['roomId']] = e
+
+        for roomId in roomIds:
+            gotRoom = self.assertResponseSuccess(self.get('/rooms/' + roomId))
+            self.assertEquals(gotArrayLookup[roomId], gotRoom)
+
+    def testParams(self):
+        self.iAmAlice()
+        room = self.assertResponseSuccess(self.post('/rooms'))
+        roomId = room['roomId']
+        self.iAmBob()
+
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'creator-profile': True}))
+        self.assertIn('creator',d)
+        self.assertIn('nickname',d['creator'])
+        self.assertEquals(self.alice['nickname'], d['creator']['nickname'])
+
+        self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))
+        self.assertIn('members', d)
+        members = d['members']
+        self.assertIsInstance(members, list)
+        self.assertEquals(1, len(members))
+        self.assertEquals(self.bob['userId'], self[members][0]['userId'])
+
+        self.assertResponseSuccess(self.get('/rooms/' + roomId, {'member-profile': True}))
+        self.assertIn('members', d)
+        members = d['members']
+        self.assertIsInstance(members, list)
+        self.assertEquals(1, len(members))
+        self.assertEquals(self.bob['userId'], self[members][0]['userId'])
+        self.assertEquals(self.bob['nickname'], self[members][0]['nickname'])
+
+
+    def testUrls(self):
+        resp = self.put('/rooms/a/members/b')
+        print resp.status_code
+        print resp
+        self.assertNotEquals(405, resp.status_code)
 
 
 

@@ -50,6 +50,6 @@ class ErrorMiddleware(object):
         if isinstance(exception, SnakeError):
             return exception
         if isinstance(exception, FieldError):
-            print exception
             return Errors.UNKNOWN_USER_ERROR
+        print exception
         return None

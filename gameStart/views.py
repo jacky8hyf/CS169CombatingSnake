@@ -117,11 +117,11 @@ class RoomsView(View):
         Get all rooms
         '''
         includeCreatorProfile = request.GET.get('creator-profile', False)
-        includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
+        includeMembers = includeMemberProfile or request.GET.get('members', False)
 
         rooms = Room.all_rooms()
-        return OKResponse(rooms = [room.to_dict(self,
+        return OKResponse(rooms = [room.to_dict(
             includeCreatorProfile = includeCreatorProfile,
             includeMembers = includeMembers,
             includeMemberProfile = includeMemberProfile) for room in rooms])
@@ -132,11 +132,11 @@ class SingleRoomView(View):
     '''
     def get(self, request, roomId, *args, **kwargs):
         includeCreatorProfile = request.GET.get('creator-profile', False)
-        includeMembers = request.GET.get('members', False)
         includeMemberProfile = request.GET.get('member-profile', False)
+        includeMembers = includeMemberProfile or request.GET.get('members', False)
 
         room = Room.find_by_id(str(roomId))
-        return OKResponse(room.to_dict(self,
+        return OKResponse(room.to_dict(
             includeCreatorProfile = includeCreatorProfile,
             includeMembers = includeMembers,
             includeMemberProfile = includeMemberProfile))
@@ -148,11 +148,11 @@ class SingleRoomMembersView(View):
     def get(self, request, roomId, *args, **kwargs):
         includeMemberProfile = request.GET.get('member-profile', False)
         room = Room.find_by_id(str(roomId))
-        return OKResponse(room.to_dict(self,
+        return OKResponse(room.to_dict(
             membersOnly = True,
             includeMemberProfile = includeMemberProfile));
 
-class SingleRoomMemberView(View):
+class SingleRoomSingleMemberView(View):
     '''
     /rooms/:roomId/members/:memberId
     '''

@@ -133,4 +133,9 @@ class RoomTestCase(TestCase):
         for room in rooms:
             self.assertEquals(room, Room.find_by_id(room.strId))
 
-
+    def testToDict(self):
+        room = Room.create_by(self.user)
+        d = room.to_dict(
+            includeCreatorProfile = True,
+            includeMembers = True,
+            includeMemberProfile = True)
