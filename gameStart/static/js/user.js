@@ -83,7 +83,7 @@ var UserHandler = (function() {
         $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
         loginForm.hide();
         signupForm.hide();
-        createRoomForm.show();
+        //createRoomForm.show();
     }
 
     /**
@@ -153,37 +153,19 @@ var UserHandler = (function() {
         $('body').on('click','.create_button', function(e){
             var room = {};
             var onSuccess = function(data) {
-                /*   recommend added 1 field: status = 1: success, -1: fail
-                 add: best_score field to user:
-                 add:picture to user
-                 and change original status to: room_status
-                 POST /rooms
-                 Input: {}
-                 Output: {"roomId":"sheZs8w34","capacity":8,"status":"waiting"
-                 "creator":{"userId":"2s98dD","nickname":"jacky"},
-                 "members":[]}/*/
-                if(data.status == 1){
-                    form.find(".room_id").text('Room' + data.roomId);
-                    form.find(".player .name").text(data.creator.nickname);
-                    form.show();
-                    button.hide();
-                    $('#cssmenu').hide();
-                }
-                else{
-                    console.error(data.errors);
-                }
+                createRoomForm.find(".room_id").text('Room ' + data.roomId);
+                //createRoomForm.find(".player .name").text(data.creator.nickname);
+                createRoomForm.find(".player .name").text(usernameGlobal);
+                createRoomForm.show();
+                createRoomButton.hide();
+                $('#cssmenu').hide();
             };
             var onFailure = function(error) {
                 console.log(error);
-                console.error('create room fails');
+                //console.error('create room fails');
             };
             var url = "/rooms";
             makePostRequest(url, room, onSuccess, onFailure);
-            /*		id = 10;
-             form.find(".room_id").text("new room"+id);
-             form.fadeIn("slow","linear");
-             //form.show();
-             button.hide();*/
         });
     };
 
