@@ -15,7 +15,8 @@
 .room_id{
 	margin-bottom: 20px;
 }
-.create_room{
+
+.create_room {
 	position: relative;
  	box-shadow: 0 0 20px #CCCCCC;
 	margin-right: 2%;

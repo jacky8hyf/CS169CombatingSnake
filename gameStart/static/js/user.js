@@ -8,6 +8,7 @@ var UserHandler = (function() {
     var sessionId;
     var userId;
     var usernameGlobal;
+    var userInfo;
 
     // Handle room requests
     var createRoomForm;
@@ -64,7 +65,7 @@ var UserHandler = (function() {
             type: 'POST',
             url: apiUrl + url,
             headers: {
-                'Snake-Session-Id': sessionId,
+                'X-Snake-Session-Id': sessionId,
             },
             data: JSON.stringify(data),
             contentType: "application/json",
@@ -74,6 +75,22 @@ var UserHandler = (function() {
         });
     };
 
+    var makeDeleteRequest = function(url, onSuccess, onFailure) {
+        $.ajax({
+            type: 'DELETE',
+            url: apiUrl + url,
+            headers: {
+                'Snake-Session-Id': sessionId,
+            },
+            //data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            success: onSuccess,
+            error: onFailure
+        });
+    };
+
+
     var onSuccessLogin = function(data) {
         sessionId = data.sessionId;
         userId = data.userId;
@@ -81,6 +98,15 @@ var UserHandler = (function() {
         signupForm.find('div.error div.signup_error').text(" ");
         $('div.userInfo').show();
         $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
+
+        $('div.form_field #signup_username').val("");
+        $('div.form_field #signup_nickname').val("");
+        $('div.form_field #signup_password').val("");
+        $('div.form_field #signup_password_retype').val("");
+
+        $('div.form_field #login_username').val("");
+        $('div.form_field #login_password').val("");
+
         loginForm.hide();
         signupForm.hide();
         //createRoomForm.show();
@@ -103,13 +129,6 @@ var UserHandler = (function() {
                 errorElem.text("Username and password must be nonempty.");
                 return;
             }
-
-            var onSuccess = function(data) {
-                sessionId = data.sessionId;
-                userId = data.userId;
-                errorElem.text(" ");
-            };
-
             var onFailure = function(response) {
                 var data = response.responseJSON;
                 errorElem.text(data.msg);
@@ -118,6 +137,25 @@ var UserHandler = (function() {
         });
 
     };
+
+    var attachLogoutHandler = function(e) {
+        $('div.userInfo').on('click', '.logout', function(e) {
+            e.preventDefault()
+
+            var onSuccess = function(data) {
+                loginForm.show();
+                userInfo.hide();
+            };
+
+            var onFailure = function(response) {
+                var data = response.responseJSON;
+                errorElem.text(data.msg);
+            };
+            makeDeleteRequest("/users/login", onSuccess, onFailure);
+        });
+
+    };
+
 
     var attachSignupHandler = function(e) {
         signupForm.on('click', '.submit-signup', function(e) {
@@ -128,6 +166,7 @@ var UserHandler = (function() {
             var nickname = signupForm.find('div.form_field #signup_nickname').val();
             var password = signupForm.find('div.form_field #signup_password').val();
             var passwordRetype = signupForm.find('div.form_field #signup_password_retype').val();
+
             // Error handling
             if (password != passwordRetype) {
                 errorElem.text("Pasword does not match.");
@@ -136,11 +175,6 @@ var UserHandler = (function() {
 
             var user ={'username':username, 'nickname':nickname, 'password' : password};
             // HANDLE RESPONSE FROM SERVER
-            var onSuccess = function(data) {
-                sessionId = data.sessionId;
-                userId = data.userId;
-                errorElem.text(" ");
-            };
             var onFailure = function(response) {
                 var data = response.responseJSON;
                 errorElem.text(data.msg);
@@ -179,9 +213,11 @@ var UserHandler = (function() {
         signupForm = $("div.signup_container");
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
-        //createRoomForm.hide();
+        userInfo = $('div.userInfo');
+        createRoomForm.hide();
 
         attachLoginHandler();
+        attachLogoutHandler();
         attachSignupHandler();
         attachCreateRoomHandler();
     };
