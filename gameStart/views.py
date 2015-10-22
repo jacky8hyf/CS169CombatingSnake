@@ -23,9 +23,9 @@ def homePage(request):
 
 def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
-    if 'HTTP_SNAKE_SESSION_ID' not in request.META:
+    if 'HTTP_X_SNAKE_SESSION_ID' not in request.META:
         raise errors.NOT_LOGGED_IN
-    sessionId = request.META['HTTP_SNAKE_SESSION_ID']
+    sessionId = request.META['HTTP_X_SNAKE_SESSION_ID']
     try:
         return User.find_by_session_id(sessionId)
     except ObjectDoesNotExist:
@@ -66,7 +66,10 @@ class UsersLoginView(View):
         ''' log user in '''
         args = sanitize_dict(parse_json(request.body), {'username':basestring, 'password':basestring})
         username, password = args['username'], args['password']
-        user = User.find_by_username(username)
+        try:
+            user = User.find_by_username(username)
+        except Exception:
+            return errors.USERNAME_NOT_VALID
         if not user.check_password(password):
             return errors.INCORRECT_PASSWORD
         user.login().save()
