@@ -14,12 +14,12 @@
  	<script type = "text/javascript" src="../static/scripts/script.js"></script>
 	<script type = "text/javascript" src="../static/scripts/mainPage.js"></script>
 	<script type = "text/javascript" src="../static/js/user.js"></script>
-	<script type = "text/javascript" src="../static/scripts/create_room.js"></script>
+	<!--script type = "text/javascript" src="../static/scripts/create_room.js"></script-->
  	<script type="text/javascript">
  		$(function(){
  			Frontpage.start();
 			UserHandler.start();
-			Room.start();
+			//Room.start();
  		});
 	</script>
 </head>
@@ -27,9 +27,15 @@
 <body>
 	<header>
 		<!-- create the logo on top of the front page -->
-		<h1 class = "logo">
+		<div class="logo">
 			<img src = "../static/images/CombatingSnakes.png">
-		</h1>
+            <div class="userInfo">
+                <div class="usernameInfo">Welcome, Username!</div>
+                <div class="form_field logout">
+                    <input type="submit" value="Log out" class="logout">
+                </div>
+            </div>
+		</div>
 	</header>
 	<div id = 'cssmenu'>
 	<ul>
@@ -62,7 +68,6 @@
 	<button type="button" class="create_button">Create Room</button>
 	<!-- create room -->
 	<div class="create_room">
-
 		<form method="GET" action="snake.html" class="myform">
 			<div class="right_panel">
 				<div class="title">

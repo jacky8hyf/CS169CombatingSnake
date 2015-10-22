@@ -22,6 +22,7 @@
 
 .right_panel{
 	float:right;
+	margin-right: 10px;
 }
 
 .room_id{
