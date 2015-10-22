@@ -2,7 +2,8 @@
 var Room = (function(){
 	var form;
 	var button;
-	var apiUrl = 'https://shielded-hollows-7501.herokuapp.com'; 
+	//var apiUrl = 'https://shielded-hollows-7501.herokuapp.com';
+    var apiUrl = '';
 	/**
     * HTTP GET request 
     * @param  {string}   url       URL path, e.g. "/api/smiles"
@@ -43,8 +44,6 @@ var Room = (function(){
 
 	var clickHandler = function(){
 		$('body').on('click','.create_button',function(){
-			
-
 			var room = {};
 			var onSuccess = function(data) {
                 
@@ -69,7 +68,8 @@ var Room = (function(){
                 }
                 
             };
-            var onFailure = function() { 
+            var onFailure = function(error) {
+                console.log(error);
                 console.error('create room fails'); 
             };
             var url = "/rooms";

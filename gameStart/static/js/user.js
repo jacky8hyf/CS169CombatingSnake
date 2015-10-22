@@ -9,32 +9,36 @@ var UserHandler = (function() {
     var userId;
     var usernameGlobal;
 
-   /**
-    * HTTP GET request
-    * @param  {string}   url       URL path
-    * @param  {function} onSuccess   callback method to execute upon request success (200 status)
-    * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
-    * @return {None}
-    */
-   var makeGetRequest = function(url, onSuccess, onFailure) {
-       $.ajax({
-           type: 'GET',
-           url: apiUrl + url,
-           dataType: "json",
-           success: onSuccess,
-           error: onFailure
-       });
-   };
+    // Handle room requests
+    var createRoomForm;
+    var createRoomButton;
 
-   /**
-    * HTTP PUT request
+    /**
+     * HTTP GET request
+     * @param  {string}   url       URL path
+     * @param  {function} onSuccess   callback method to execute upon request success (200 status)
+     * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
+     * @return {None}
+     */
+    var makeGetRequest = function(url, onSuccess, onFailure) {
+        $.ajax({
+            type: 'GET',
+            url: apiUrl + url,
+            dataType: "json",
+            success: onSuccess,
+            error: onFailure
+        });
+    };
+
+    /**
+     * HTTP PUT request
      * @param  {string}   url       URL path
      * @param  {Object}   data      JSON data to send in request body
      * @param  {function} onSuccess   callback method to execute upon request success (200 status)
      * @param  {function} onFailure   callback method to execute upon request failure (non-200 status)
      * @return {None}
-    */
-   var makePutRequest = function(url, data, onSuccess, onFailure) {
+     */
+    var makePutRequest = function(url, data, onSuccess, onFailure) {
         $.ajax({
             type: 'PUT',
             url: apiUrl + url,
@@ -44,7 +48,7 @@ var UserHandler = (function() {
             success: onSuccess,
             error: onFailure
         });
-   };
+    };
 
 
     /**
@@ -59,6 +63,9 @@ var UserHandler = (function() {
         $.ajax({
             type: 'POST',
             url: apiUrl + url,
+            headers: {
+                'Snake-Session-Id': sessionId,
+            },
             data: JSON.stringify(data),
             contentType: "application/json",
             dataType: "json",
@@ -76,6 +83,7 @@ var UserHandler = (function() {
         $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
         loginForm.hide();
         signupForm.hide();
+        createRoomForm.show();
     }
 
     /**
@@ -141,6 +149,45 @@ var UserHandler = (function() {
         });
     };
 
+    var attachCreateRoomHandler = function(e) {
+        $('body').on('click','.create_button', function(e){
+            var room = {};
+            var onSuccess = function(data) {
+                /*   recommend added 1 field: status = 1: success, -1: fail
+                 add: best_score field to user:
+                 add:picture to user
+                 and change original status to: room_status
+                 POST /rooms
+                 Input: {}
+                 Output: {"roomId":"sheZs8w34","capacity":8,"status":"waiting"
+                 "creator":{"userId":"2s98dD","nickname":"jacky"},
+                 "members":[]}/*/
+                if(data.status == 1){
+                    form.find(".room_id").text('Room' + data.roomId);
+                    form.find(".player .name").text(data.creator.nickname);
+                    form.show();
+                    button.hide();
+                    $('#cssmenu').hide();
+                }
+                else{
+                    console.error(data.errors);
+                }
+            };
+            var onFailure = function(error) {
+                console.log(error);
+                console.error('create room fails');
+            };
+            var url = "/rooms";
+            makePostRequest(url, room, onSuccess, onFailure);
+            /*		id = 10;
+             form.find(".room_id").text("new room"+id);
+             form.fadeIn("slow","linear");
+             //form.show();
+             button.hide();*/
+        });
+    };
+
+
     /**
      * Start the app by displaying the most recent smiles and attaching event handlers.
      * @return {None}
@@ -148,9 +195,13 @@ var UserHandler = (function() {
     var start = function() {
         loginForm = $("div.login_container");
         signupForm = $("div.signup_container");
+        createRoomForm = $(".create_room");
+        createRoomButton = $(".create_button");
+        createRoomForm.hide();
 
         attachLoginHandler();
         attachSignupHandler();
+        attachCreateRoomHandler();
     };
 
     // PUBLIC METHODS

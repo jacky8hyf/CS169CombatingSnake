@@ -23,9 +23,9 @@ def homePage(request):
 
 def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
-    if 'X-Snake-Session-Id' not in request.META:
+    if 'HTTP_SNAKE_SESSION_ID' not in request.META:
         raise errors.NOT_LOGGED_IN
-    sessionId = request.META['X-Snake-Session-Id']
+    sessionId = request.META['HTTP_SNAKE_SESSION_ID']
     try:
         return User.find_by_session_id(sessionId)
     except ObjectDoesNotExist:
@@ -112,6 +112,7 @@ class RoomsView(View):
         user = fetch_user(request)
         room = Room.create_by(user).save()
         return OKResponse(room.to_dict())
+
     def get(self, request, *args, **kwargs):
         '''
         Get all rooms
