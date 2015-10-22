@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from django.core.exceptions import *
 
+import models
+
 def e(err, msg, status_code = 400):
 	js = JsonResponse();
 	js.status_code = status_code;
@@ -23,7 +25,7 @@ class SnakeErrors:
 
     SnakeError = SnakeError
 
-    NOT_IMPLEMENTED =       SnakeError(-500, 'Not implemented',          500);
+    NOT_IMPLEMENTED =       SnakeError(-501, 'Not implemented',          500);
     USERNAME_NOT_VALID =    SnakeError(-499, 'Username is not valid',    403);
     USERNAME_TAKEN =        SnakeError(-498, 'Username is taken',        400);
     INCORRECT_PASSWORD =    SnakeError(-496, 'Incorrect password',       403);
@@ -44,13 +46,23 @@ class SnakeErrors:
     def MALFORMED_JSON(arg):
         return SnakeError(-488, 'Malformed JSON {}'.format(arg), 400);
 
+    @staticmethod
+    def INTERNAL_SERVER_ERROR(arg):
+        return SnakeError(-500, 'Internal Server Error {}'.format(arg), 500);
+
+    @staticmethod
+    def DOES_NOT_EXIST(arg):
+        return SnakeError(-404, 'Not Found {}'.format(arg), 404);
+
 errors = SnakeErrors()
 
 class ErrorMiddleware(object):
     def process_exception(self, request, exception):
+        for t in (models.User, models.Room):
+            if isinstance(exception, t.DoesNotExist):
+                return errors.DOES_NOT_EXIST(t.__name__)
         if isinstance(exception, SnakeError):
             return exception
         if isinstance(exception, FieldError):
             return Errors.UNKNOWN_USER_ERROR
-        print exception
-        return None
+        return errors.INTERNAL_SERVER_ERROR(str(type(exception)))

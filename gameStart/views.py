@@ -23,9 +23,9 @@ def homePage(request):
 
 def fetch_user(request):
     '''Looks up user from X-Snake-Session-Id, and return him/her'''
-    if 'HTTP_SNAKE_SESSION_ID' not in request.META:
+    if SESSION_ID_HEADER not in request.META:
         raise errors.NOT_LOGGED_IN
-    sessionId = request.META['HTTP_SNAKE_SESSION_ID']
+    sessionId = request.META[SESSION_ID_HEADER]
     try:
         return User.find_by_session_id(sessionId)
     except ObjectDoesNotExist:
@@ -80,6 +80,7 @@ class UsersLoginView(View):
         except errors.SnakeError as e:
             if e != errors.NOT_LOGGED_IN:
                 raise e
+            print '[WARNING] cannot logout', e
             # as per the doc, logging out a non-existent session id has no effect
         return OKResponse()
 

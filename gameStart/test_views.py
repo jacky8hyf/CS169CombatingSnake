@@ -5,6 +5,8 @@ from models import *
 from django.core.exceptions import *
 import json
 
+from utils import SESSION_ID_HEADER
+
 class RestTestCase(TestCase):
     def setUp(self):
         self.c = Client()
@@ -14,13 +16,13 @@ class RestTestCase(TestCase):
 
     def get(self, path, data=None, **extra):
         if self.sessionId:
-            extra.update({'X-Snake-Session-Id' : self.sessionId})
+            extra.update({SESSION_ID_HEADER : self.sessionId})
         response = self.c.get(path, data = data, **extra)
         return response
 
     def post(self, path, data = None, **extra):
         if self.sessionId:
-            extra.update({'X-Snake-Session-Id' : self.sessionId})
+            extra.update({SESSION_ID_HEADER : self.sessionId})
         extra.update({'data' : json.dumps(data) if data else None,
             'content_type' : 'application/json'})
         response = self.c.post(path, **extra)
@@ -28,14 +30,14 @@ class RestTestCase(TestCase):
 
     def put(self, path, data = None, **extra):
         if self.sessionId:
-            extra.update({'X-Snake-Session-Id' : self.sessionId})
+            extra.update({SESSION_ID_HEADER : self.sessionId})
         extra.update({'data' : json.dumps(data) if data else None,
             'content_type' : 'application/json'})
         response = self.c.put(path, **extra)
         return response
     def delete(self, path, **extra):
         if self.sessionId:
-            extra.update({'X-Snake-Session-Id' : self.sessionId})
+            extra.update({SESSION_ID_HEADER : self.sessionId})
         response = self.c.delete(path, **extra)
         return response
 
@@ -78,7 +80,7 @@ class UsersViewTestCase(RestTestCase):
         self.sessionId = d['sessionId']
         d = self.assertResponseSuccess(self.delete('/users/login'))
         with self.assertRaises(ObjectDoesNotExist):
-            User.find_by_session_id(self.sessionId)
+            print User.find_by_session_id(self.sessionId).session_id
 
         self.assertResponseSuccess(self.delete('/users/login'), 'logging out again should not fail')
         self.sessionId = 'Invalid id'
@@ -116,6 +118,10 @@ class UsersViewTestCase(RestTestCase):
                 break
         anotherUserId = self.assertResponseSuccess(self.get('/users/' + userId))['userId']
         self.assertEquals(userId, anotherUserId)
+
+    def testNotExist(self):
+        body = self.assertResponseFail(self.get('/users/a'))
+        self.assertEquals(errors.DOES_NOT_EXIST(None).err, body['err'])
 
 class RoomsViewTestCase(RestTestCase):
     def setUp(self):
@@ -215,7 +221,9 @@ class RoomsViewTestCase(RestTestCase):
         resp = self.put('/rooms/a/members/b')
         self.assertNotEquals(405, resp.status_code)
 
-
+    def testNotExist(self):
+        body = self.assertResponseFail(self.get('/rooms/a'))
+        self.assertEquals(errors.DOES_NOT_EXIST(None).err, body['err'])
 
 
 
