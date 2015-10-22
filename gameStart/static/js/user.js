@@ -179,7 +179,7 @@ var UserHandler = (function() {
         signupForm = $("div.signup_container");
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
-        createRoomForm.hide();
+        //createRoomForm.hide();
 
         attachLoginHandler();
         attachSignupHandler();

@@ -1,4 +1,7 @@
 
+.player{
+	width: 100%;
+}
 .player .ready{
 	float:right;
 	margin-top: 10px;
@@ -12,7 +15,7 @@
 .room_id{
 	margin-bottom: 20px;
 }
-.create_roo{
+.create_room{
 	position: relative;
  	box-shadow: 0 0 20px #CCCCCC;
 	margin-right: 2%;
@@ -38,6 +41,7 @@
 	height: 100%;
 	width: calc(27%  - 10px);
 	float: right;
+	position: relative;
 }
 .right_panel{
 	text-align: center;
@@ -79,7 +83,8 @@
 .room-create{
 	width: 100%;
 	float: left;
-	position: relative;
+	bottom:0;
+	position: absolute;
 }
 .room-create .form_field{
 	width: 40%;
