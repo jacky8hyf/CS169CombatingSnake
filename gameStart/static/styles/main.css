@@ -39,6 +39,8 @@ body{
 .leaderboard{
 }
 
+
+/* log in container design */
 .login_container{
 	-webkit-box-flex: 1;
 	-webkit-flex: 1;
@@ -102,6 +104,7 @@ body{
 	color: white;
 }
 
+/* sign up container design */
 .signup_container{
 	-webkit-box-flex: 1;
 	-webkit-flex: 1;
@@ -171,4 +174,38 @@ body{
 .logout {
 	font-size: 16px;
 	width: 100%;
+}
+
+/* room create page container design */
+.roomcreate_container{
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	padding: 3rem 0;
+	background: #363b41;
+	background-color: rgba(0,0,0,0.8);
+	margin-top: 15px;
+	margin-left: 35%;
+	margin-right: 35%;
+	box-shadow: 0 0 10px #CCCCCC;
+}
+.room-create {
+	margin-left: 10%;
+	margin-right: 10%;
+	color: #606468;
+}
+
+.room-create input[type="submit"]{
+	border-radius: 6px;
+	padding: 1rem;
+}
+.room-create input[type="submit"] {
+	background-color: #265108;
+	color: #eee;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.room-create input[type="submit"]:focus, .room-create input[type="submit"]:hover {
+	background-color: #1F3311;
 }

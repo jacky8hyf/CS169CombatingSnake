@@ -64,11 +64,21 @@
         {% block signup %}{% include 'signup.html' %}{% endblock %}
 	</div>
 
+	<div class = "roomcreate_container">
+	{% block roomcreate %}{% include 'roomCreatePage.html' %}{% endblock %}
+	</div>
 	<!-- remove me when implementing logged in page (user's homepage) -->
 	<button type="button" class="create_button">Create Room</button>
+
+
 	<!-- create room -->
-	<div class="create_room">
-		<form method="GET" action="snake.html" class="myform">
+	<div class="create_roo">
+	<!--{% block roompage %}{% include 'roompage.html' %}{% endblock %}-->
+		<div class = "gameboard">
+		<!-- insert gameboard here-->
+		</div>
+
+		<div class = "user-panel">
 			<div class="right_panel">
 				<div class="title">
 					<div class="room_id"> Room 0001</div>
@@ -81,11 +91,15 @@
 					</select>
 				</div>
 			</div>
-			<div class="buttons">
-				<input class="start" type="submit" value="Start"/>
-				<a class="leave" href="index.html">Leave</a>
+			<div class="form room-create">
+			    	<div class="form_field">
+			        		<input type="submit" value="Start Game" class="submit-start">
+			    	</div>
+			    	<div class="form_field">
+			        		<input type="submit" value="Leave Room" class="submit-leave">
+			    	</div>
 			</div>
-        </form>
+		</div>
 	</div>
 </body>
 </html>
