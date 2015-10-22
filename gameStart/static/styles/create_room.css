@@ -12,16 +12,35 @@
 .room_id{
 	margin-bottom: 20px;
 }
-.create_room{
+.create_room {
+	position: relative;
  	box-shadow: 0 0 20px #CCCCCC;
-	margin-right: 5%;
-	margin-left: 5%;
+	margin-right: 2%;
+	margin-left: 2%;
+	margin-bottom: 2%;
 	background-color:rgba(0,0,0,0.8);
 	height: 500px;
 }
-
+.gameboard{
+	display: block;
+	border:solid;
+	border-width: 2px;
+	border-color: white;
+	height: 100%;
+	width: 73%;
+	float: left;
+}
+.user-panel{
+	display: block;
+	border:solid;
+	border-width: 2px;
+	border-color: white;
+	height: 100%;
+	width: calc(27%  - 10px);
+	float: right;
+}
 .right_panel{
-	float:right;
+	text-align: center;
 	margin-right: 10px;
 }
 
@@ -56,4 +75,19 @@
 	position: absolute;
 	bottom: 0;
 	margin-left: 80%;
+}
+.room-create{
+	width: 100%;
+	float: left;
+	position: relative;
+}
+.room-create .form_field{
+	width: 40%;
+	float: left;
+}
+.submit-leave{
+	margin-left: 20px;
+}
+.submit-start{
+	margin-right: 20px;
 }
