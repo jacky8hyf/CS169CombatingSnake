@@ -39,14 +39,10 @@ class BaseModel(models.Model):
 class User(BaseModel):
     # In views.py, use strId instead.
     userId = models.AutoField(primary_key=True)
-    username = models.CharField(max_length = 255, unique = True)
-    pwhash = models.CharField(max_length = 255)
-    nickname = models.CharField(max_length = 255)
-    session_id = models.CharField(max_length = 255, default = None, null = True, unique = True)
-    # username = models.TextField(max_length = 255, unique = True)
-    # pwhash = models.TextField(max_length = 255)
-    # nickname = models.TextField(max_length = 255)
-    # session_id = models.TextField(max_length = 255, default = None, null = True, unique = True)
+    username = models.CharField(max_length = 64, unique = True)
+    pwhash = models.CharField(max_length = 64)
+    nickname = models.CharField(max_length = 64)
+    session_id = models.CharField(max_length = 64, default = None, null = True, unique = True)
 
 
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
@@ -150,7 +146,6 @@ class User(BaseModel):
         inroom setter. Return self to allow chaining.
         '''
         self.inroom = room
-        # FIXME check if room is full by F expressions
         return self
 
     def exit_room(self, room):
@@ -239,6 +234,8 @@ class Room(BaseModel):
             raise errors.ROOM_PLAYING
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator
             raise errors.ROOM_FULL
+        if self.creator and self.creator == user:
+            raise errors.CREATOR_CANNOT_JOIN
         return self
 
 
