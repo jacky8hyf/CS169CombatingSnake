@@ -190,6 +190,7 @@ body{
 	margin-right: 35%;
 	box-shadow: 0 0 10px #CCCCCC;
 }
+
 .ready,.room-create {
 	margin-left: 10%;
 	margin-right: 10%;
@@ -207,5 +208,15 @@ body{
 	text-transform: uppercase;
 }
 .ready input[type="submit"]:focus,.room-create input[type="submit"]:focus, .ready input[type="submit"]:hover,.room-create input[type="submit"]:hover {
+	background-color: #1F3311;
+}
+
+.generic-button {
+	background-color: #265108;
+	color: #eee;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.generic-button:focus {
 	background-color: #1F3311;
 }

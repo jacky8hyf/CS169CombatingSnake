@@ -13,10 +13,6 @@ from models import User, Room
 from errors import errors
 from utils import *
 
-# Create your views here.
-def gameStart(request):
-    return render(request, 'snake.html')
-
 @csrf_exempt
 def homePage(request):
     return render(request, 'index.html')

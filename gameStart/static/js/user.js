@@ -9,6 +9,8 @@ var UserHandler = (function() {
     var userId;
     var usernameGlobal;
     var userInfo;
+    var roomsAction;
+    var actionMenu;
 
     // Handle room requests
     var createRoomForm;
@@ -48,6 +50,9 @@ var UserHandler = (function() {
         $.ajax({
             type: 'PUT',
             url: apiUrl + url,
+            headers: {
+                'Snake-Session-Id': sessionId,
+            },
             data: JSON.stringify(data),
             contentType: "application/json",
             dataType: "json",
@@ -95,7 +100,6 @@ var UserHandler = (function() {
         });
     };
 
-
     var onSuccessLogin = function(data) {
         sessionId = data.sessionId;
         userId = data.userId;
@@ -114,7 +118,7 @@ var UserHandler = (function() {
 
         loginForm.hide();
         signupForm.hide();
-        //createRoomForm.show();
+        roomsAction.show();
     }
 
     /**
@@ -140,7 +144,6 @@ var UserHandler = (function() {
             };
             makePutRequest("/users/login", user, onSuccessLogin, onFailure);
         });
-
     };
 
     var attachLogoutHandler = function(e) {
@@ -150,6 +153,8 @@ var UserHandler = (function() {
             var onSuccess = function(data) {
                 loginForm.show();
                 userInfo.hide();
+                actionMenu.show();
+                createRoomForm.hide();
             };
 
             var onFailure = function(response) {
@@ -190,25 +195,99 @@ var UserHandler = (function() {
 
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
+			e.preventDefault();
             var room = {};
             var onSuccess = function(data) {
+                var player = $(playerHtmlTemplate);
+                //player.find('.ready').val(1);
+                player.find('.name').text(usernameGlobal);
+                players.append(player);
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
                 //createRoomForm.find(".player .name").text(data.creator.nickname);
                 createRoomForm.find(".player .name").text(usernameGlobal);
                 createRoomForm.show();
-                createRoomButton.hide();
-                $('#cssmenu').hide();
+                actionMenu.hide();
+                roomsAction.hide();
             };
             var onFailure = function(error) {
                 console.log(error);
-                //console.error('create room fails');
             };
             var url = "/rooms";
             makePostRequest(url, room, onSuccess, onFailure);
         });
     };
 
+    var attachJoinRoomHandler = function(e) {
+        $('body').on('click','.submit-roomjoin', function(e){
+            e.preventDefault()
+            var onSuccess = function(data) {
+                /* loop through room list to find the first available room and 
+                assign it to the user, then make a post request to inform the server
+                size-1 for creator
+                */
+                console.log("enter onSuccess");
+                var available_room;
+                for (room in data.rooms){
+                    if(!room.hasOwnProperty("members")){
+                        available_room = data.rooms[room];
+                        break;
+                    }
+                    else if((room.members).length < roomSize-1){
+                        available_room = data.rooms[room];
+                        break;
+                    }
+                }
+                //if find available room
+                if(available_room != null){
+                    var url = "/rooms/" + available_room.roomId + "/members/" + userId;
+                    console.log("find available_room");
+                    var onFinalSuccess = function(e){
+                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
 
+                        var player1 = $(playerHtmlTemplate);
+                        player1.find('.name').text(available_room.creator.userId);
+                        //player1.find('.ready').val(1);
+                        players.append(player1);
+                        
+                        
+                        if(available_room.hasOwnProperty("members")){
+                            for(i=0; i< available_room.members.length; i++){
+                                var player = $(playerHtmlTemplate);
+                                player.find('.name').text(data.members[i].userId);
+                                player.find('.ready').val(1);
+                                players.append(player);
+                            }
+                        }
+                        else{
+                            var player2 = $(playerHtmlTemplate);
+                            player2.find('.name').text(usernameGlobal);
+                            //player2.find('.ready').val(1);
+                            players.append(player2);
+
+                        }
+                        createRoomForm.show();
+                        joinRoomButton.hide();
+                        createRoomButton.hide();
+                        console.log("join ok");
+                             
+                    };
+
+                    var onFinalFailure = function(e){
+                        console.log(e);
+                    }
+                    var room={};
+                    makePutRequest(url, room, onFinalSuccess, onFinalFailure);
+                   
+                    $('#cssmenu').hide();
+                }
+            };
+            var onFailure = function(error) {
+                console.log(error);
+            };
+            var url = "/rooms";
+            makeGetRequest(url, onSuccess, onFailure);
+        });
+    };
     /**
      * Start the app by displaying the most recent smiles and attaching event handlers.
      * @return {None}
@@ -219,16 +298,20 @@ var UserHandler = (function() {
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
+        roomsAction = $('.roomcreate_container');
+        actionMenu = $('#cssmenu');
 
-        joinRoomButton=$(".submit-roomjoin");
-        playerHtmlTemplate=(".right_panel .player")[0].outerHTML;
-        players = $(".right_panel");
-        //createRoomForm.hide();
+        joinRoomButton = $(".submit-roomjoin");
+        playerHtmlTemplate = $(".players .player")[0].outerHTML;
+        players = $(".players");
+        players.html('');
+        createRoomForm.hide();
 
         attachLoginHandler();
         attachLogoutHandler();
         attachSignupHandler();
         attachCreateRoomHandler();
+        attachJoinRoomHandler();
     };
 
     // PUBLIC METHODS

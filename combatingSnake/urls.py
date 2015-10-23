@@ -16,9 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from gameStart import views
+from django.conf import settings
+from django.views.static import serve
 
 urlpatterns = [
     url(r'^$', views.homePage),
+    # TODO: REFACTOR FILES IN NEXT ITERATION TO USE STATIC SERVING INSTEAD
+    #url(r'^$', serve, kwargs = {'path': 'templates/index.html', 'document_root': settings.STATIC_ROOT}),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^users(/|)$', views.UsersView.as_view()),
     url(r'^users/login(/|)$', views.UsersLoginView.as_view()),

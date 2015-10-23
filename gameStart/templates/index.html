@@ -31,8 +31,8 @@
         <img src = "../static/images/CombatingSnakes.png">
         <div class="userInfo">
             <div class="usernameInfo">Welcome, Username!</div>
-            <div class="form_field logout">
-                <input type="submit" value="Log out" class="logout">
+            <div class="form_field">
+                <input type="submit" value="Log out" class="logout generic-button">
             </div>
         </div>
     </div>
@@ -60,18 +60,18 @@
 <div class = "login_container">
     {% block login %}{% include 'login.html' %}{% endblock %}
 </div>
+
 <div class = "signup_container">
     {% block signup %}{% include 'signup.html' %}{% endblock %}
 </div>
 
-<button type="button" class="create_button">Create Room</button>
-
 <div class = "roomcreate_container">
-{% block createroom %}{% include 'roomCreatePage.html' %}{% endblock %}
+    {% block createroom %}{% include 'roomCreatePage.html' %}{% endblock %}
 </div>
+
 <!-- create room -->
 <div class="create_room">
-     {% block roompage %}{% include 'roompage.html' %}{% endblock %}
+    {% block roompage %}{% include 'roompage.html' %}{% endblock %}
 </div>
 
 </body>

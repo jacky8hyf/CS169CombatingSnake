@@ -99,16 +99,19 @@
 	bottom: 0;
 	margin-left: 80%;
 }*/
+
 .game-start-leave{
 	width: 100%;
 	float: left;
 	bottom:0;
 	position: absolute;
 }
+
 .game-start-leave .form_field{
 	width: 40%;
 	float: left;
 }
+
 .submit-leave{
 	margin-left: 5%;
 	margin-right: 8%;
