@@ -78,7 +78,7 @@ class ErrorMiddleware(object):
                 return errors.DOES_NOT_EXIST(t.__name__)
         if isinstance(exception, SnakeError):
             return exception
-        if isinstance(exception, FieldError):
-            return Errors.UNKNOWN_USER_ERROR
+        # if isinstance(exception, FieldError):
+        #     return Errors.UNKNOWN_USER_ERROR
         print '[WARNING] internal server error:{}'.format(exception)
         return errors.INTERNAL_SERVER_ERROR('{}: {}'.format(str(type(exception)), str(exception)))
