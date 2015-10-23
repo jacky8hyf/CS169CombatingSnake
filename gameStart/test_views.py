@@ -1,3 +1,11 @@
+######################
+# Author: Yifan Hong #
+######################
+
+#
+# Tests for views.py
+#
+
 # https://docs.djangoproject.com/en/1.8/topics/testing/tools/
 from django.test import TestCase
 from django.test import Client

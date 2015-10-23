@@ -1,3 +1,11 @@
+######################
+# Author: Yifan Hong #
+######################
+
+#
+# Tests for models.py
+#
+
 from django.test import TestCase
 from models import *
 from hashing_passwords import *

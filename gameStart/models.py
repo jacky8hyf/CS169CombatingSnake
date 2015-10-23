@@ -1,3 +1,7 @@
+######################
+# Author: Yifan Hong #
+######################
+
 from django.db import models
 from utils import *
 from hashing_passwords import *

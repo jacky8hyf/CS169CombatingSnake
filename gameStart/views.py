@@ -1,3 +1,7 @@
+######################
+# Author: Yifan Hong #
+######################
+
 from django.shortcuts import render
 from django.http import *
 from django.views.generic import View
