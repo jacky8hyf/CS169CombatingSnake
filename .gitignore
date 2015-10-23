@@ -115,3 +115,6 @@ crashlytics-build.properties
 
 # SQLite database
 db.sqlite3
+
+# Database Migrations
+*/migrations/

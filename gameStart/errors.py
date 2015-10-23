@@ -66,7 +66,7 @@ class SnakeErrors:
         return SnakeError(-404, 'Not Found {}'.format(arg), 404);
 
 errors = SnakeErrors()
-
+import traceback
 class ErrorMiddleware(object):
     # FIXME: this middleware is not catching SnakeError!
     def process_exception(self, request, exception):
@@ -80,5 +80,5 @@ class ErrorMiddleware(object):
             return exception
         # if isinstance(exception, FieldError):
         #     return Errors.UNKNOWN_USER_ERROR
-        print '[WARNING] internal server error:{}'.format(exception)
+        traceback.print_exc();
         return errors.INTERNAL_SERVER_ERROR('{}: {}'.format(str(type(exception)), str(exception)))

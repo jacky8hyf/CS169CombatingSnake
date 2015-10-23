@@ -76,17 +76,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'combatingSnake.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -109,8 +98,18 @@ STATIC_URL = '/static/'
 # Yifan removed the following lines because it overrides the configs above
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
-# FIXME: ADD CODE TO EXECUTE ONLY IN PRODUCTION
-DATABASES['default'] =  dj_database_url.config()
+HEROKU_LOCAL = os.environ.get('HEROKU_LOCAL')
+HEROKU_SERVER = os.environ.get('HEROKU_SERVER')
+
+if HEROKU_LOCAL:
+    DATABASES = {'default': dj_database_url.config(default = 'postgres:///postgres')} # TODO when running locally should set up the database and do HEROKU_LOCAL=true heroku local
+elif HEROKU_SERVER: # up on deployment
+    DATABASES = {'default': dj_database_url.config()}
+else: # django - use sqlite3 # where it goes when python manage.py runserver or heroku local
+    DATABASES = {'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }}
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
