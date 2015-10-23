@@ -10,6 +10,7 @@ var UserHandler = (function() {
     var usernameGlobal;
     var userInfo;
     var roomsAction;
+    var actionMenu;
 
     // Handle room requests
     var createRoomForm;
@@ -91,7 +92,6 @@ var UserHandler = (function() {
         });
     };
 
-
     var onSuccessLogin = function(data) {
         sessionId = data.sessionId;
         userId = data.userId;
@@ -110,7 +110,6 @@ var UserHandler = (function() {
 
         loginForm.hide();
         signupForm.hide();
-        //createRoomForm.show();
         roomsAction.show();
     }
 
@@ -137,7 +136,6 @@ var UserHandler = (function() {
             };
             makePutRequest("/users/login", user, onSuccessLogin, onFailure);
         });
-
     };
 
     var attachLogoutHandler = function(e) {
@@ -147,6 +145,8 @@ var UserHandler = (function() {
             var onSuccess = function(data) {
                 loginForm.show();
                 userInfo.hide();
+                actionMenu.show();
+                createRoomForm.hide();
             };
 
             var onFailure = function(response) {
@@ -187,18 +187,18 @@ var UserHandler = (function() {
 
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
+			e.preventDefault();
             var room = {};
             var onSuccess = function(data) {
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
                 //createRoomForm.find(".player .name").text(data.creator.nickname);
                 createRoomForm.find(".player .name").text(usernameGlobal);
                 createRoomForm.show();
-                createRoomButton.hide();
-                $('#cssmenu').hide();
+                actionMenu.hide();
+                roomsAction.hide();
             };
             var onFailure = function(error) {
                 console.log(error);
-                //console.error('create room fails');
             };
             var url = "/rooms";
             makePostRequest(url, room, onSuccess, onFailure);
@@ -216,9 +216,8 @@ var UserHandler = (function() {
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
-        roomsAction = $('.rooms_action');
-        //createRoomForm.hide();
-
+        roomsAction = $('.roomcreate_container');
+        actionMenu = $('#cssmenu');
         attachLoginHandler();
         attachLogoutHandler();
         attachSignupHandler();
