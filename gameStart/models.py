@@ -196,7 +196,7 @@ class Room(BaseModel):
 
     @property
     def all_members(self):
-        return User.find_by_inroom(self)
+        return [u for u in User.find_by_inroom(self) if u != self.creator]
 
     @classmethod
     def all_rooms(cls):
