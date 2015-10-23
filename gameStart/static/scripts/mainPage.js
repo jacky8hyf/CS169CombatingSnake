@@ -1,3 +1,5 @@
+
+
 var Frontpage = (function() {
 	var gameRule;
 	var intro;
@@ -6,6 +8,8 @@ var Frontpage = (function() {
 	var signup;
 	var fadeInTime = 1000;
 	var userInfo;
+	var roomAction;
+	var createRoom;
 
 	var hideAll = function() {
 		gameRule.hide();
@@ -13,6 +17,8 @@ var Frontpage = (function() {
 		login.hide();
 		leaderboard.hide();
 		signup.hide();
+		//roomAction.hide();
+		createRoom.hide();
 	};
 
 	var attachHomeHandler = function(e){
@@ -63,6 +69,8 @@ var Frontpage = (function() {
 		login = $('.login_container');
 		leaderboard = $('.leaderboard');
 		signup = $('.signup_container');
+		roomAction = $('.roomcreate_container');
+		createRoom = $('.create_room');
 		$('.userInfo').hide();
 		hideAll();
 		$('.logo').hide();

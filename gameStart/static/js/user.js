@@ -9,6 +9,7 @@ var UserHandler = (function() {
     var userId;
     var usernameGlobal;
     var userInfo;
+    var roomsAction;
 
     // Handle room requests
     var createRoomForm;
@@ -110,6 +111,7 @@ var UserHandler = (function() {
         loginForm.hide();
         signupForm.hide();
         //createRoomForm.show();
+        roomsAction.show();
     }
 
     /**
@@ -214,6 +216,7 @@ var UserHandler = (function() {
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
+        roomsAction = $('.rooms_action');
         //createRoomForm.hide();
 
         attachLoginHandler();

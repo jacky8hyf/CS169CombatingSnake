@@ -64,12 +64,25 @@
     {% block signup %}{% include 'signup.html' %}{% endblock %}
 </div>
 
-<button type="button" class="create_button">Create Room</button>
+<div class="roomcreate_container form room-create">
 
+        <div class="form_field">
+            <input type="submit" value="Create a Room" class="submit-roomcreate create_button">
+        </div>
+        <div class="form_field">
+            <input type="submit" value="Join a Random Room" class="submit-roomjoin">
+        </div>
+</div>
+
+<!--div class="roomcreate_container">
+    {% block rooms %}{% include 'roomCreatePage.html' %}{% endblock %}
+</div-->
+
+<!--button type="button" class="create_button">Create Room</button-->
 
 <!-- create room -->
 <div class="create_room">
-     {% block roompage %}{% include 'roompage.html' %}{% endblock %}
+    {% block roompage %}{% include 'roompage.html' %}{% endblock %}
 </div>
 
 </body>
