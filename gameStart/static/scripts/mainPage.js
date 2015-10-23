@@ -18,7 +18,7 @@ var Frontpage = (function() {
 		leaderboard.hide();
 		signup.hide();
 		//roomAction.hide();
-		createRoom.hide();
+		//createRoom.hide();
 	};
 
 	var attachHomeHandler = function(e){

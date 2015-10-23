@@ -128,7 +128,7 @@ class User(BaseModel):
         '''
         Generate and set session_id. Return self to allow chaining.
         '''
-        self.session_id = uuid4()
+        self.session_id = str(uuid4())
         return self
 
     def logout(self):
