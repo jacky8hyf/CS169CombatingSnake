@@ -51,7 +51,7 @@ var UserHandler = (function() {
             type: 'PUT',
             url: apiUrl + url,
             headers: {
-                'Snake-Session-Id': sessionId,
+                'X-Snake-Session-Id': sessionId,
             },
             data: JSON.stringify(data),
             contentType: "application/json",
@@ -90,7 +90,7 @@ var UserHandler = (function() {
             type: 'DELETE',
             url: apiUrl + url,
             headers: {
-                'Snake-Session-Id': sessionId,
+                'X-Snake-Session-Id': sessionId,
             },
             //data: JSON.stringify(data),
             contentType: "application/json",
@@ -276,6 +276,7 @@ var UserHandler = (function() {
                         console.log(e);
                     }
                     var room={};
+                    console.log(url);
                     makePutRequest(url, room, onFinalSuccess, onFinalFailure);
                    
                     $('#cssmenu').hide();
