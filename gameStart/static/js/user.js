@@ -214,7 +214,7 @@ var UserHandler = (function() {
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
-        createRoomForm.hide();
+        //createRoomForm.hide();
 
         attachLoginHandler();
         attachLogoutHandler();

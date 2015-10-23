@@ -190,7 +190,7 @@ body{
 	margin-right: 35%;
 	box-shadow: 0 0 10px #CCCCCC;
 }
-.room-create {
+.ready,.room-create {
 	margin-left: 10%;
 	margin-right: 10%;
 	color: #606468;
@@ -200,12 +200,12 @@ body{
 	border-radius: 6px;
 	padding: 1rem;
 }
-.room-create input[type="submit"] {
+.ready input[type="submit"],.room-create input[type="submit"] {
 	background-color: #265108;
 	color: #eee;
 	font-weight: bold;
 	text-transform: uppercase;
 }
-.room-create input[type="submit"]:focus, .room-create input[type="submit"]:hover {
+.ready input[type="submit"]:focus,.room-create input[type="submit"]:focus, .ready input[type="submit"]:hover,.room-create input[type="submit"]:hover {
 	background-color: #1F3311;
 }
