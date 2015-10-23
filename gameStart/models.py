@@ -38,7 +38,7 @@ class BaseModel(models.Model):
 
 class User(BaseModel):
     # In views.py, use strId instead.
-    userId = models.AutoField(primary_key=True)
+    userId = models.AutoField(max_length = 255, primary_key=True)
     username = models.CharField(max_length = 255, unique = True)
     pwhash = models.CharField(max_length = 255)
     nickname = models.CharField(max_length = 255)
@@ -48,8 +48,7 @@ class User(BaseModel):
     # nickname = models.TextField(max_length = 255)
     # session_id = models.TextField(max_length = 255, default = None, null = True, unique = True)
 
-
-    inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
+    inroom = models.ForeignKey('Room', max_length = 255, default = None, null = True, on_delete=models.SET_NULL)
 
 
     @property
