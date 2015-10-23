@@ -110,17 +110,17 @@ def test():
     # From Crypt-PBKDF2
     check('password', 'ATHENA.MIT.EDUraeburn', 1, 16,
           'cdedb5281bb2f801565a1122b2563515')
-    check('password', 'ATHENA.MIT.EDUraeburn', 1, 320,
+    check('password', 'ATHENA.MIT.EDUraeburn', 1, 32,
           'cdedb5281bb2f801565a1122b25635150ad1f7a04bb9f3a333ecc0e2e1f70837')
     check('password', 'ATHENA.MIT.EDUraeburn', 2, 16,
           '01dbee7f4a9e243e988b62c73cda935d')
-    check('password', 'ATHENA.MIT.EDUraeburn', 2, 320,
+    check('password', 'ATHENA.MIT.EDUraeburn', 2, 32,
           '01dbee7f4a9e243e988b62c73cda935da05378b93244ec8f48a99e61ad799d86')
-    check('password', 'ATHENA.MIT.EDUraeburn', 1200, 320,
+    check('password', 'ATHENA.MIT.EDUraeburn', 1200, 32,
           '5c08eb61fdf71e4e4ec3cf6ba1f5512ba7e52ddbc5e5142f708a31e2e62b1e13')
-    check('X' * 64, 'pass phrase equals block size', 1200, 320,
+    check('X' * 64, 'pass phrase equals block size', 1200, 32,
           '139c30c0966bc32ba55fdbf212530ac9c5ec59f1a452f5cc9ad940fea0598ed1')
-    check('X' * 65, 'pass phrase exceeds block size', 1200, 320,
+    check('X' * 65, 'pass phrase exceeds block size', 1200, 32,
           '9ccad6d468770cd51b10e6a68721be611a8b4d282601db3b36be9246915ec82a')
 
     raise SystemExit(bool(failed))
