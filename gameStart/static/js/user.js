@@ -156,6 +156,7 @@ var UserHandler = (function() {
                 userInfo.hide();
                 actionMenu.show();
                 createRoomForm.hide();
+                roomsAction.hide();
             };
 
             var onFailure = function(response) {
@@ -209,6 +210,7 @@ var UserHandler = (function() {
                 createRoomForm.show();
                 actionMenu.hide();
                 roomsAction.hide();
+                $('.logout').hide();
                 roomId = data.roomId;
             };
             var onFailure = function(error) {
@@ -242,6 +244,7 @@ var UserHandler = (function() {
                 signupForm.hide();
                 roomsAction.show();
                 actionMenu.show();
+                $('.logout').show();
                 players.html('');
             };
             var onFailure = function(error) {
@@ -303,9 +306,11 @@ var UserHandler = (function() {
 
                         }
                         createRoomForm.show();
+                        actionMenu.hide();
                         //joinRoomButton.hide();
                         //createRoomButton.hide();
                         roomsAction.hide();
+                        $('.logout').hide();
                         console.log("join ok");
                              
                     };
@@ -319,6 +324,7 @@ var UserHandler = (function() {
                    
                     $('#cssmenu').hide();
                 }
+                actionMenu.show();
             };
             var onFailure = function(error) {
                 console.log(error);
