@@ -1,3 +1,11 @@
+######################
+# Author: Yifan Hong #
+######################
+
+#
+# Tests for models.py
+#
+
 from django.test import TestCase
 from models import *
 from hashing_passwords import *
@@ -144,3 +152,5 @@ class RoomTestCase(TestCase):
             includeCreatorProfile = True,
             includeMembers = True,
             includeMemberProfile = True)
+        # This is just an experiment test; so no asserts here.
+        # print d

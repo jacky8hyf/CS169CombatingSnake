@@ -1,7 +1,13 @@
+######################
+# Author: Yifan Hong #
+######################
+
 from django.db import models
 from utils import *
 from hashing_passwords import *
 from uuid import uuid4
+import re
+from errors import errors
 
 # Create your models here.
 
@@ -37,7 +43,7 @@ class User(BaseModel):
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
-    session_id = models.CharField(max_length = 32, default = None, null = True)
+    session_id = models.CharField(max_length = 32, default = None, null = True, unique = True)
 
     @property
     def password(self):
@@ -51,6 +57,26 @@ class User(BaseModel):
         return self.userId
 
     @classmethod
+    def sanity_check_profile_args(cls, d):
+        fieldlenstr = lambda x: str(cls._meta.get_field(x).max_length)
+        # Implementation notes: Yes we can use a simple length and content check,
+        # but a regex is more general to define
+        def check(key, pat, errfunc):
+            if key in d and d[key] and not re.compile(pat).match(d[key]):
+                raise errfunc(d[key])
+        check('username',
+            '^\w{4,' + fieldlenstr('username') + '}$',
+            lambda x: errors.USERNAME_NOT_VALID('{} must be from 4 to {} alphanumeric characters'
+                .format(x, fieldlenstr('username'))))
+        check('password',
+            '^.{4,}$',
+            lambda x: errors.PASSWORD_NOT_VALID('must be more than 4 characters'))
+        check('nickname',
+            '^.{,' + fieldlenstr('nickname') + '}$',
+            lambda x: errors.NICKNAME_NOT_VALID('{} must be less than {} characters'
+                .format(x, fieldlenstr('nickname'))))
+
+    @classmethod
     def from_dict(cls, d):
         '''
         Create a User from a dictionary. Only username, password and nickname
@@ -62,9 +88,11 @@ class User(BaseModel):
         }, optional = {
             'nickname': basestring
         });
+        cls.sanity_check_profile_args(d)
         obj = cls();
         for key in d:
             setattr(obj, key, d[key])
+
         return obj
 
     @classmethod
@@ -91,6 +119,7 @@ class User(BaseModel):
             'password': basestring,
             'nickname': basestring
         });
+        self.sanity_check_profile_args(d)
         for key in d:
             setattr(self, key, d[key])
         return self
@@ -134,11 +163,15 @@ class User(BaseModel):
         return d
 
 class Room(BaseModel):
+
+    STATUS_PLAYING = 1
+    STATUS_WAITING = 0
+
     # In views.py, use strId instead.
     roomId = models.AutoField(primary_key=True)
     capacity = models.IntegerField(default = 8)
     # 0: waiting; 1: playing. More enum values may be added.
-    status = models.SmallIntegerField(default = 0)
+    status = models.SmallIntegerField(default = STATUS_WAITING)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     @property
     def primary_key(self):
@@ -169,9 +202,36 @@ class Room(BaseModel):
         return cls.objects.all()
 
     def destroy_if_created_by(self, user):
+        '''
+        Delete myself if created by user. Return None because there is no point
+        of chaining.
+        '''
         if self.creator != user:
             return
         self.delete() # this will sets all member users' inroom attribute to null
 
+    def reassign_creator_if_created_by(self, user):
+        if self.creator != user:
+            return
+        pass # FIXME need to reassign the creator of the room
+
+    def switch_status(self, newStatus):
+        '''
+        Switch status to a new status. Return self to allow chaining.
+        '''
+        self.status = newStatus
+        return self
+
+    def raise_if_cannot_join(self, user):
+        '''
+        Determine if a user can join the room. Raise an appropriate exception
+        if the user cannot join the room. Return self to allow chaining.
+        '''
+        # currently all users can join waiting room with spaces
+        if self.status != Room.STATUS_WAITING:
+            raise errors.ROOM_PLAYING
+        if len(self.all_members) >= self.capacity - 1: # -1 for the creator
+            raise errors.ROOM_FULL
+        return self
 
 
