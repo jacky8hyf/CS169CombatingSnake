@@ -54,8 +54,11 @@ class UsersView(View):
         jsonbody = parse_json(request.body)
         try:
             user = User.from_dict(jsonbody).login().save();
-        except IntegrityError:
-            return errors.USERNAME_TAKEN
+        except IntegrityError as e:
+            string = str(e)
+            if 'UNIQUE' in string and 'username' in string: # try to identify the error
+                return errors.USERNAME_TAKEN
+            return errors.INTERNAL_SERVER_ERROR('{}: {}'.format(type(e).__name__, string))
         return OKResponse(userId = user.strId, sessionId = user.session_id)
 
 class UsersLoginView(View):
@@ -66,7 +69,10 @@ class UsersLoginView(View):
         ''' log user in '''
         args = sanitize_dict(parse_json(request.body), {'username':basestring, 'password':basestring})
         username, password = args['username'], args['password']
-        user = User.find_by_username(username)
+        try:
+            user = User.find_by_username(username)
+        except User.DoesNotExist:
+            return errors.USERNAME_NOT_VALID('cannot find {}'.format(username))
         if not user.check_password(password):
             return errors.INCORRECT_PASSWORD
         user.login().save()
@@ -80,7 +86,6 @@ class UsersLoginView(View):
         except errors.SnakeError as e:
             if e != errors.NOT_LOGGED_IN:
                 raise e
-            print '[WARNING] cannot logout', e
             # as per the doc, logging out a non-existent session id has no effect
         return OKResponse()
 
@@ -164,12 +169,9 @@ class SingleRoomSingleMemberView(View):
         user = fetch_user(request)
         if memberId != user.strId:
             return errors.PERMISSION_DENIED
-        room = Room.find_by_id(str(roomId))
-        if len(room.all_members) < room.capacity - 1: # -1 for the creator
-            user.enter_room(room).save()
-            return OKResponse()
-        else:
-            return errors.ROOM_FULL
+        room = Room.find_by_id(str(roomId)).raise_if_cannot_join(user)
+        user.enter_room(room).save()
+        return OKResponse()
 
     @transaction.atomic
     def delete(self, request, roomId, memberId, *args, **kwargs):
@@ -178,6 +180,6 @@ class SingleRoomSingleMemberView(View):
             return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
-        room.destroy_if_created_by(user).save()
+        room.destroy_if_created_by(user)
         return OKResponse()
 

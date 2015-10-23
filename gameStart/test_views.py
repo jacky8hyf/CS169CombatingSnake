@@ -6,6 +6,7 @@ from django.core.exceptions import *
 import json
 
 from utils import SESSION_ID_HEADER
+from errors import errors
 
 class RestTestCase(TestCase):
     def setUp(self):
@@ -91,7 +92,8 @@ class UsersViewTestCase(RestTestCase):
     def testRegLogin2(self):
         self.assertResponseSuccess(self.post('/users', {'username':'user','password':'pass'}))
         self.sessionId = self.assertResponseSuccess(self.put('/users/login', {'username':'user','password':'pass'}))['sessionId']
-        self.assertResponseFail(self.put('/users/login', {'username':'user','password':'qass'}))
+        d = self.assertResponseFail(self.put('/users/login', {'username':'user','password':'qass'}))
+        self.assertEquals(errors.INCORRECT_PASSWORD.err, d['err'], 'Allows login with incorrect password')
         self.assertIsNotNone(User.find_by_session_id(self.sessionId))
         self.assertResponseSuccess(self.delete('/users/login'))
         self.assertResponseFail(self.put('/users/login', {'username':'user','password':'qass'}))
@@ -99,6 +101,11 @@ class UsersViewTestCase(RestTestCase):
         with self.assertRaises(ObjectDoesNotExist):
             User.find_by_session_id(self.sessionId)
         self.assertResponseSuccess(self.put('/users/login', {'username':'user','password':'pass'}))['sessionId']
+
+    def testDuplicateUsernameReg(self):
+        self.assertResponseSuccess(self.post('/users', {'username':'user','password':'pass'}))
+        d = self.assertResponseFail(self.post('/users', {'username':'user','password':'pass'}))
+        self.assertEquals(errors.USERNAME_TAKEN.err, d['err'])
 
     def testUpdateProfile(self):
         pass # TODO tests for PUT /users/:userId
@@ -123,17 +130,39 @@ class UsersViewTestCase(RestTestCase):
         body = self.assertResponseFail(self.get('/users/a'))
         self.assertEquals(errors.DOES_NOT_EXIST(None).err, body['err'])
 
+    def testLoginNoUsername(self):
+        resp = self.put('/users/login', {'username':'meow', 'password':'pwassdf'})
+        body = self.assertResponseFail(resp)
+        self.assertEquals(errors.USERNAME_NOT_VALID(None).err, body['err'])
+
+    def testRegInvalidUsername(self):
+        body = self.assertResponseFail(self.post('/users', {'username':'!!!!!!!!!','password':'pass'}))
+        self.assertEquals(errors.USERNAME_NOT_VALID(None).err, body['err'])
+
+    def testRegInvalidPassword(self):
+        body = self.assertResponseFail(self.post('/users', {'username':'username','password':'1'}))
+        self.assertEquals(errors.PASSWORD_NOT_VALID(None).err, body['err'])
+
+    def testRegInvalidNickname(self):
+        body = self.assertResponseFail(self.post('/users', {'username':'username','password':'pass', 'nickname':'g' * 65}))
+        self.assertEquals(errors.NICKNAME_NOT_VALID(None).err, body['err'])
+
 class RoomsViewTestCase(RestTestCase):
     def setUp(self):
         RestTestCase.setUp(self)
-        self.user = self.alice = self.assertResponseSuccess(self.post('/users', {'username':'alice','password':'pass','nickname':'alice'}));
-        self.bob = self.assertResponseSuccess(self.post('/users', {'username':'bob','password':'pass','nickname':'bob'}));
+        self.user = self.alice = self.createUser('iamalice')
+        self.bob = self.createUser('iambob')
         self.iAmAlice()
+
+    def createUser(self, name):
+        return self.assertResponseSuccess(self.post('/users', {'username':name,'password':'pass','nickname':name}));
 
     def iAmAlice(self):
         self.sessionId = self.alice['sessionId']
     def iAmBob(self):
         self.sessionId = self.bob['sessionId']
+    def iAm(self, user):
+        self.sessionId = user['sessionId']
 
     def testCreateBy(self):
         d = self.assertResponseSuccess(self.post('/rooms'))
@@ -199,7 +228,7 @@ class RoomsViewTestCase(RestTestCase):
         d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'creator-profile': True}))
         self.assertIn('creator',d)
         self.assertIn('nickname',d['creator'])
-        self.assertEquals('alice', d['creator']['nickname'])
+        self.assertEquals('iamalice', d['creator']['nickname'])
 
         d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))
         self.assertIn('members', d)
@@ -214,7 +243,7 @@ class RoomsViewTestCase(RestTestCase):
         self.assertIsInstance(members, list)
         self.assertEquals(1, len(members))
         self.assertEquals(self.bob['userId'], d['members'][0]['userId'])
-        self.assertEquals('bob', d['members'][0]['nickname'])
+        self.assertEquals('iambob', d['members'][0]['nickname'])
 
 
     def testUrls(self):
@@ -225,5 +254,26 @@ class RoomsViewTestCase(RestTestCase):
         body = self.assertResponseFail(self.get('/rooms/a'))
         self.assertEquals(errors.DOES_NOT_EXIST(None).err, body['err'])
 
+    def testJoinFullRoom(self):
+        self.iAmAlice()
+        room = self.assertResponseSuccess(self.post('/rooms'))
+        roomId = room['roomId']
 
+        users = [self.createUser('user' + str(i)) for i in range(room['capacity'] - 1)]
+        for u in users: # -1 for creator
+            self.iAm(u)
+            self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + u['userId']))
+        self.iAmBob()
+        d = self.assertResponseFail(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        self.assertEquals(errors.ROOM_FULL.err, d['err'])
 
+    def testJoinPlayingRoom(self):
+        self.iAmAlice()
+        room = self.assertResponseSuccess(self.post('/rooms'))
+        roomId = room['roomId']
+
+        Room.find_by_id(roomId).switch_status(Room.STATUS_PLAYING).save()
+
+        self.iAmBob()
+        d = self.assertResponseFail(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        self.assertEquals(errors.ROOM_PLAYING.err, d['err'])
