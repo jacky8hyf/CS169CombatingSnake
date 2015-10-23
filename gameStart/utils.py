@@ -1,5 +1,8 @@
 import json
 from errors import errors
+
+SESSION_ID_HEADER = 'HTTP_X_SNAKE_SESSION_ID'
+
 def parse_json(body):
     try:
         return json.loads(body)
