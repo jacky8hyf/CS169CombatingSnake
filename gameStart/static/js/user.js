@@ -242,6 +242,7 @@ var UserHandler = (function() {
                 signupForm.hide();
                 roomsAction.show();
                 actionMenu.show();
+                players.html('');
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -281,7 +282,8 @@ var UserHandler = (function() {
                     var onFinalSuccess = function(e){
                         createRoomForm.find('.room_id').text("Room " + available_room.roomId);
                         var player1 = $(playerHtmlTemplate);
-                        player1.find('.name').text(available_room.creator.userId);
+                        //player1.find('.name').text(available_room.creator.userId);
+                        player1.find('.name').text(usernameGlobal);
                         //player1.find('.ready').val(1);
                         players.append(player1);
 
@@ -301,8 +303,9 @@ var UserHandler = (function() {
 
                         }
                         createRoomForm.show();
-                        joinRoomButton.hide();
-                        createRoomButton.hide();
+                        //joinRoomButton.hide();
+                        //createRoomButton.hide();
+                        roomsAction.hide();
                         console.log("join ok");
                              
                     };
