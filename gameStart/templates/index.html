@@ -66,7 +66,9 @@
 
 <button type="button" class="create_button">Create Room</button>
 
-
+<div class = "roomcreate_container">
+{% block createroom %}{% include 'roomCreatePage.html' %}{% endblock %}
+</div>
 <!-- create room -->
 <div class="create_room">
      {% block roompage %}{% include 'roompage.html' %}{% endblock %}

@@ -93,19 +93,35 @@
 	bottom: 0;
 	margin-left: 80%;
 }*/
-.room-create{
+.game-start-leave{
 	width: 100%;
 	float: left;
 	bottom:0;
 	position: absolute;
 }
-.room-create .form_field{
+.game-start-leave .form_field{
 	width: 40%;
 	float: left;
 }
 .submit-leave{
-	margin-left: 20px;
+	margin-left: 5%;
+	margin-right: 8%;
 }
 .submit-start{
-	margin-right: 20px;
+	margin-left: 8%;
+	margin-right: 5%;
+}
+.game-start-leave .form_field input[type="submit"]{
+	background-color: #265108;
+	color: #eee;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.game-start-leave .form_field input[type="submit"]:focus, .game-start-leave .form_field input[type="submit"]:hover {
+	background-color: #1F3311;
+}
+
+.game-start-leave .form_field{
+	width:50%;
+	float: left;
 }
