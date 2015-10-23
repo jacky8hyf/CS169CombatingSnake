@@ -112,3 +112,6 @@ crashlytics-build.properties
 # For macs
 ._*
 *DS_Store*
+
+# SQLite database
+db.sqlite3
