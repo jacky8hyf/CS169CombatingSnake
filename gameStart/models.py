@@ -39,11 +39,18 @@ class BaseModel(models.Model):
 class User(BaseModel):
     # In views.py, use strId instead.
     userId = models.AutoField(primary_key=True)
-    username = models.CharField(max_length = 100, unique = True)
-    pwhash = models.CharField(max_length = 100)
-    nickname = models.CharField(max_length = 100)
+    # username = models.CharField(max_length = 64, unique = True)
+    # pwhash = models.CharField(max_length = 69)
+    # nickname = models.CharField(max_length = 64)
+    # session_id = models.CharField(max_length = 32, default = None, null = True, unique = True)
+    username = models.TextField(unique = True)
+    pwhash = models.TextField()
+    nickname = models.TextField()
+    session_id = models.TextField(default = None, null = True, unique = True)
+
+
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
-    session_id = models.CharField(max_length = 100, default = None, null = True, unique = True)
+
 
     @property
     def password(self):
