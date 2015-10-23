@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='session_id',
-            field=models.CharField(default=None, max_length=32, unique=True, null=True),
+            field=models.CharField(default=None, max_length=255, unique=True, null=True),
         ),
     ]
