@@ -36,6 +36,12 @@
 	margin-right: 10px;
 	overflow: auto;
 }
+.players{
+	height: 85%;
+	border:solid;
+	border-width: 2px;
+	border-color: red;
+}
 .room_id{
 	margin-bottom: 20px;
 	color: #CC9900;

@@ -14,6 +14,11 @@ var UserHandler = (function() {
     var createRoomForm;
     var createRoomButton;
 
+    var joinRoomButton;
+    var roomSize = 8;
+    var players;    //list of players inside the room
+    var playerHtmlTemplate;
+
     /**
      * HTTP GET request
      * @param  {string}   url       URL path
@@ -214,6 +219,10 @@ var UserHandler = (function() {
         createRoomForm = $(".create_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
+
+        joinRoomButton=$(".submit-roomjoin");
+        playerHtmlTemplate=(".right_panel .player")[0].outerHTML;
+        players = $(".right_panel");
         //createRoomForm.hide();
 
         attachLoginHandler();
