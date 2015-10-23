@@ -40,7 +40,7 @@
 	height: 85%;
 	border:solid;
 	border-width: 2px;
-	border-color: red;
+	//border-color: red;
 }
 .room_id{
 	margin-bottom: 20px;
