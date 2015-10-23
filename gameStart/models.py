@@ -39,7 +39,7 @@ class User(BaseModel):
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
-    session_id = models.CharField(max_length = 32, default = None, null = True)
+    session_id = models.CharField(max_length = 32, default = None, null = True, unique = True)
 
     @property
     def password(self):
