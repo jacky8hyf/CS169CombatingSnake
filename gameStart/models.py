@@ -40,10 +40,9 @@ class User(BaseModel):
     # In views.py, use strId instead.
     userId = models.AutoField(primary_key=True)
     username = models.CharField(max_length = 64, unique = True)
-    pwhash = models.CharField(max_length = 64)
+    pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
-    session_id = models.CharField(max_length = 64, default = None, null = True, unique = True)
-
+    session_id = models.CharField(max_length = 32, default = None, null = True, unique = True)
 
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
 
