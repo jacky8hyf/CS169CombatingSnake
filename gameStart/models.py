@@ -43,10 +43,10 @@ class User(BaseModel):
     # pwhash = models.CharField(max_length = 69)
     # nickname = models.CharField(max_length = 64)
     # session_id = models.CharField(max_length = 32, default = None, null = True, unique = True)
-    username = models.TextField(unique = True)
-    pwhash = models.TextField()
-    nickname = models.TextField()
-    session_id = models.TextField(default = None, null = True, unique = True)
+    username = models.TextField(max_length = 64, unique = True)
+    pwhash = models.TextField(max_length = 64)
+    nickname = models.TextField(max_length = 64)
+    session_id = models.TextField(max_length = 64, default = None, null = True, unique = True)
 
 
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
