@@ -198,26 +198,77 @@ var UserHandler = (function() {
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
 			e.preventDefault();
+            var members = 1;
             var room = {};
             var onSuccess = function(data) {
                 var player = $(playerHtmlTemplate);
-                //player.find('.ready').val(1);
                 player.find('.name').text(usernameGlobal);
+                //player.find('.name').text(userId);
                 players.append(player);
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
                 //createRoomForm.find(".player .name").text(data.creator.nickname);
                 createRoomForm.find(".player .name").text(usernameGlobal);
+                //createRoomForm.find(".player .name").text(userId);
                 createRoomForm.show();
                 actionMenu.hide();
                 roomsAction.hide();
                 $('.logout').hide();
                 roomId = data.roomId;
+
+
+                var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
+                    //make a poll and wait
+                var poll = function poll(){
+                    console.log("inside poll");
+                        setTimeout(function(){
+                            var onFinalSuccess = function(data) {
+                                if(data.members.length > 0){
+                                    players.html('');
+                                    
+                                    var player1 = $(playerHtmlTemplate);
+                                    var creator = data.creator.nickname;
+                        
+                                    player1.find('.name').text(creator);
+                                    players.append(player1);
+
+                                    for(i=0; i< data.members.length; i++){
+                                        var player = $(playerHtmlTemplate);
+                                        player.find('.name').text(data.members[i].nickname);
+                                        players.append(player);
+                                        members+=1;
+                                        if (members == 8){
+                                            return;
+                                        }
+                                    }
+                                
+                                }
+                            };
+                            var onFinalFailure = function(e){
+                                console.log(e);
+                            };
+                            makeGetRequest(url1, onFinalSuccess, onFinalFailure);
+                            poll();     
+            
+
+                    },3000);
+
+                }();
+                poll();    
+
+                
+                
+
             };
             var onFailure = function(error) {
                 console.log(error);
             };
             var url = "/rooms";
-            makePostRequest(url, room, onSuccess, onFailure);
+            makePostRequest(url, room, onSuccess, onFailure);    
+            
+            
+
+            
+                   
         });
     };
 
@@ -282,29 +333,41 @@ var UserHandler = (function() {
                 if(available_room != null){
                     var url = "/rooms/" + available_room.roomId + "/members/" + userId;
                     console.log("find available_room");
+                    var members = 1;
                     var onFinalSuccess = function(e){
                         createRoomForm.find('.room_id').text("Room " + available_room.roomId);
                         var player1 = $(playerHtmlTemplate);
-                        //player1.find('.name').text(available_room.creator.userId);
-                        player1.find('.name').text(usernameGlobal);
-                        //player1.find('.ready').val(1);
+                        var creator = available_room.creator.nickname;
+                        player1.find('.name').text(creator);
                         players.append(player1);
 
                         if(available_room.hasOwnProperty("members")){
                             for(i=0; i< available_room.members.length; i++){
-                                var player = $(playerHtmlTemplate);
-                                player.find('.name').text(data.members[i].userId);
-                                player.find('.ready').val(1);
-                                players.append(player);
+                                if(available_room.members[i].nickname != creator){
+                                    var player = $(playerHtmlTemplate);
+                                    player.find('.name').text(available_room.members[i].nickname);
+                                    members += 1;
+                                    players.append(player);
+
+                                }
+                                
                             }
                         }
                         else{
                             var player2 = $(playerHtmlTemplate);
                             player2.find('.name').text(usernameGlobal);
-                            //player2.find('.ready').val(1);
                             players.append(player2);
+                            members += 1;
 
                         }
+                     /*   if(creator != usernameGlobal){
+                            var player3 = $(playerHtmlTemplate);
+                            player3.find('.name').text(usernameGlobal);
+                            players.append(player3);
+                            members += 1;
+
+                        }*/
+
                         createRoomForm.show();
                         actionMenu.hide();
                         //joinRoomButton.hide();
@@ -312,6 +375,53 @@ var UserHandler = (function() {
                         roomsAction.hide();
                         $('.logout').hide();
                         console.log("join ok");
+
+
+                        ////////////////////
+                        var url1 = "/rooms/"+ available_room.roomId+"?creator-profile=true&members=true&member-profile=true";
+                        //make a poll and wait
+                        var poll = function poll(){
+                            setTimeout(function(){
+                                var onFinalSuccess1 = function(data) {
+                                    if(data.members.length > 0){
+                                        players.html('');
+                                        var player1 = $(playerHtmlTemplate);
+                                        var creator = data.creator.nickname;
+                            
+                                        player1.find('.name').text(creator);
+                                        players.append(player1);
+
+                                        for(i=0; i< data.members.length; i++){
+                                            if(data.members[i].nickname != creator){
+                                                var player = $(playerHtmlTemplate);
+                                                player.find('.name').text(data.members[i].nickname);
+                                                players.append(player);
+                                                members+=1;
+                                                if (members == 8){
+                                                    return;
+                                                } 
+
+                                            }
+                                            
+                                        }
+                                    
+                                    }
+                                };
+                                var onFinalFailure1 = function(e){
+                                    console.log(e);
+                                };
+                                makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
+                                poll();     
+                
+
+                        },3000);
+
+                    }();
+                    poll();    
+
+
+
+
                              
                     };
 
@@ -329,7 +439,7 @@ var UserHandler = (function() {
             var onFailure = function(error) {
                 console.log(error);
             };
-            var url = "/rooms";
+            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
             makeGetRequest(url, onSuccess, onFailure);
         });
     };
