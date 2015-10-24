@@ -144,6 +144,8 @@ class User(BaseModel):
         '''
         inroom setter. Return self to allow chaining.
         '''
+        if room.creator == self:
+            return self
         self.inroom = room
         return self
 
@@ -233,8 +235,8 @@ class Room(BaseModel):
             raise errors.ROOM_PLAYING
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator
             raise errors.ROOM_FULL
-        if self.creator and self.creator == user:
-            raise errors.CREATOR_CANNOT_JOIN
+        # if self.creator and self.creator == user:
+        #     raise errors.CREATOR_CANNOT_JOIN
         return self
 
 
