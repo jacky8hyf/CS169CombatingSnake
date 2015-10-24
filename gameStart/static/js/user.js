@@ -218,8 +218,8 @@ var UserHandler = (function() {
 
                 var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
                     //make a poll and wait
-                var poll = function poll(){
-                    console.log("inside poll");
+                var poll = (function poll(){
+                   // console.log("inside poll");
                         setTimeout(function(){
                             var onFinalSuccess = function(data) {
                                 if(data.members.length > 0){
@@ -252,8 +252,8 @@ var UserHandler = (function() {
 
                     },3000);
 
-                }();
-                poll();    
+                })();
+               // poll();    
 
                 
                 
@@ -311,13 +311,13 @@ var UserHandler = (function() {
 
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
-            e.preventDefault()
+            e.preventDefault();
             var onSuccess = function(data) {
                 /* loop through room list to find the first available room and 
                 assign it to the user, then make a post request to inform the server
                 size-1 for creator
                 */
-                console.log("enter onSuccess");
+                //console.log("enter onSuccess");
                 var available_room;
                 for (room in data.rooms){
                     if(!room.hasOwnProperty("members")){
@@ -332,7 +332,7 @@ var UserHandler = (function() {
                 //if find available room
                 if(available_room != null){
                     var url = "/rooms/" + available_room.roomId + "/members/" + userId;
-                    console.log("find available_room");
+                  //  console.log("find available_room");
                     var members = 1;
                     var onFinalSuccess = function(e){
                         createRoomForm.find('.room_id').text("Room " + available_room.roomId);
@@ -378,9 +378,10 @@ var UserHandler = (function() {
 
 
                         ////////////////////
-                        var url1 = "/rooms/"+ available_room.roomId+"?creator-profile=true&members=true&member-profile=true";
+                        var url1 = "/rooms/"+ available_room.roomId+ "?creator-profile=true&members=true&member-profile=true";
                         //make a poll and wait
-                        var poll = function poll(){
+                        var poll = (function poll(){
+                           // console.log("weijie is here");
                             setTimeout(function(){
                                 var onFinalSuccess1 = function(data) {
                                     if(data.members.length > 0){
@@ -400,11 +401,8 @@ var UserHandler = (function() {
                                                 if (members == 8){
                                                     return;
                                                 } 
-
                                             }
-                                            
                                         }
-                                    
                                     }
                                 };
                                 var onFinalFailure1 = function(e){
@@ -413,16 +411,12 @@ var UserHandler = (function() {
                                 makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
                                 poll();     
                 
+                            },3000);
 
-                        },3000);
+                        })();
 
-                    }();
-                    poll();    
+                       // poll(); 
 
-
-
-
-                             
                     };
 
                     var onFinalFailure = function(e){
