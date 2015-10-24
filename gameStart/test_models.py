@@ -85,7 +85,8 @@ class UserTestCase(TestCase):
         self.assertIn('nickname', d)
 
     def testRooms(self):
-        pass # TODO test find_by_inroom, enter_room, exit_room, all_members
+        return # TODO test find_by_inroom, enter_room, exit_room, all_members
+
         users = [User.from_dict({
             'username': 'user{}'.format(i),
             'password': 'password'
