@@ -253,6 +253,14 @@ class RoomsViewTestCase(RestTestCase):
         self.assertEquals(self.bob['userId'], d['members'][0]['userId'])
         self.assertEquals('iambob', d['members'][0]['nickname'])
 
+        d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members':False, 'creator-profile':False,'member-profile': False}))
+        self.assertNotIn('members', d)
+        self.assertNotIn('nickname',d['creator'])
+
+        d = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members':True, 'creator-profile':False,'member-profile': False}))
+        self.assertNotIn('nickname', d['members'][0])
+        self.assertNotIn('nickname',d['creator'])
+
 
     def testUrls(self):
         resp = self.put('/rooms/a/members/b')

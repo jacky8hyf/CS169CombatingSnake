@@ -8,10 +8,12 @@ from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import *
 from django.db import IntegrityError, transaction
+import json, traceback
 
 from models import User, Room
 from errors import errors
 from utils import *
+
 
 @csrf_exempt
 def homePage(request):
@@ -42,6 +44,15 @@ def OKResponse(*args, **kwargs):
     for arg in args:
         d.update(arg)
     return JsonResponse(d)
+
+def getBooleanParam(request, key):
+    val = request.GET.get(key, None)
+    if not val: return False
+    try:
+        return True if json.loads(val.lower()) else False
+    except ValueError:
+        traceback.print_exc();
+        return False
 
 ### actual routes
 
@@ -103,7 +114,7 @@ class SingleUserView(View):
 
     def get(self, request, userId, *args, **kwargs):
         ''' get user profile'''
-        includeProfile = request.GET.get('profile', False)
+        includeProfile = getBooleanParam(request, 'profile')
         user = User.find_by_id(str(userId))
         return OKResponse(user.to_dict(includeProfile = includeProfile))
 
@@ -123,9 +134,9 @@ class RoomsView(View):
         '''
         Get all rooms
         '''
-        includeCreatorProfile = request.GET.get('creator-profile', False)
-        includeMemberProfile = request.GET.get('member-profile', False)
-        includeMembers = includeMemberProfile or request.GET.get('members', False)
+        includeCreatorProfile = getBooleanParam(request, 'creator-profile')
+        includeMemberProfile = getBooleanParam(request, 'member-profile')
+        includeMembers = includeMemberProfile or getBooleanParam(request, 'members')
 
         rooms = Room.all_rooms()
         return OKResponse(rooms = [room.to_dict(
@@ -138,9 +149,9 @@ class SingleRoomView(View):
     /rooms/:roomId
     '''
     def get(self, request, roomId, *args, **kwargs):
-        includeCreatorProfile = request.GET.get('creator-profile', False)
-        includeMemberProfile = request.GET.get('member-profile', False)
-        includeMembers = includeMemberProfile or request.GET.get('members', False)
+        includeCreatorProfile = getBooleanParam(request, 'creator-profile')
+        includeMemberProfile = getBooleanParam(request, 'member-profile')
+        includeMembers = includeMemberProfile or getBooleanParam(request, 'members')
 
         room = Room.find_by_id(str(roomId))
         return OKResponse(room.to_dict(
@@ -153,7 +164,7 @@ class SingleRoomMembersView(View):
     /rooms/:roomId/members/
     '''
     def get(self, request, roomId, *args, **kwargs):
-        includeMemberProfile = request.GET.get('member-profile', False)
+        includeMemberProfile = getBooleanParam(request, 'member-profile')
         room = Room.find_by_id(str(roomId))
         return OKResponse(room.to_dict(
             membersOnly = True,
