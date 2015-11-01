@@ -348,9 +348,7 @@ var UserHandler = (function() {
                                     player.find('.name').text(available_room.members[i].nickname);
                                     members += 1;
                                     players.append(player);
-
                                 }
-                                
                             }
                         }
                         else{
@@ -358,7 +356,6 @@ var UserHandler = (function() {
                             player2.find('.name').text(usernameGlobal);
                             players.append(player2);
                             members += 1;
-
                         }
                      /*   if(creator != usernameGlobal){
                             var player3 = $(playerHtmlTemplate);
@@ -411,18 +408,10 @@ var UserHandler = (function() {
                                     console.log(e);
                                 };
                                 makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
-                                poll();     
-                
-
+                                poll();
                         },3000);
-
                     }();
-                    poll();    
-
-
-
-
-                             
+                    poll();
                     };
 
                     var onFinalFailure = function(e){
