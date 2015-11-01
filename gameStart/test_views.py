@@ -297,5 +297,4 @@ class RoomsViewTestCase(RestTestCase):
     def testJoinMyOwnRoom(self):
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
-        d = self.assertResponseFail(self.put('/rooms/' + roomId + '/members/' + self.user['userId']))
-        self.assertEquals(errors.CREATOR_CANNOT_JOIN.err, d['err'])
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.user['userId']))
