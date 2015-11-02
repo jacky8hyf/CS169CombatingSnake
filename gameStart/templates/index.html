@@ -16,6 +16,7 @@
     <script type = "text/javascript" src="../static/js/user.js"></script>
     <!--script type = "text/javascript" src="../static/scripts/create_room.js"></script-->
     <script type="text/javascript">
+        var is_login = false;
         $(function(){
             Frontpage.start();
             UserHandler.start();
@@ -31,7 +32,7 @@
         <img src = "../static/images/CombatingSnakes.png">
         <div class="userInfo">
             <div class="usernameInfo">Welcome, Username!</div>
-            <div class="form_field">
+            <div class="form_field form_fill">
                 <input type="submit" value="Log out" class="logout generic-button">
             </div>
         </div>
@@ -41,7 +42,7 @@
     <ul>
         <li class='active'><a href='#'>Home</a></li>
         <li class='rule-button'><a href='#'>Game Rules</a></li>
-        <li class='gamestart-button'><a href='#'>Start Game</a></li>
+        <!--<li class='gamestart-button'><a href='#'>Start Game</a></li>-->
         <li class="leader-button"><a href='#'>Leaderboard</a></li>
         <li class='intro-button'><a href='#'>Credits</a></li>
     </ul>
@@ -57,15 +58,15 @@
     {% block leaderboard %}{% include 'leaderboard.html' %}{% endblock %}
 </section>
 
-<div class = "login_container">
+<div class = "login_container form_container">
     {% block login %}{% include 'login.html' %}{% endblock %}
 </div>
 
-<div class = "signup_container">
+<div class = "signup_container form_container">
     {% block signup %}{% include 'signup.html' %}{% endblock %}
 </div>
 
-<div class = "roomcreate_container">
+<div class = "roomcreate_container form_container">
     {% block createroom %}{% include 'roomCreatePage.html' %}{% endblock %}
 </div>
 

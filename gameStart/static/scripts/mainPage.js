@@ -6,7 +6,7 @@ var Frontpage = (function() {
 	var login;
 	var leaderboard;
 	var signup;
-	var fadeInTime = 1000;
+	var fadeInTime = 500;
 	var userInfo;
 	var roomAction;
 	var createRoom;
@@ -25,7 +25,11 @@ var Frontpage = (function() {
 		$('.active').click(function(e){
 			e.preventDefault();
 			hideAll();
-			$('.login_container').fadeIn(fadeInTime);
+			if(is_login) {
+				roomAction.fadeIn(fadeInTime);
+			} else {
+				$('.login_container').fadeIn(fadeInTime);
+			}
 		});
 	};
 	var attachGameRuleHandler = function(e) {
@@ -39,14 +43,14 @@ var Frontpage = (function() {
 		$('.intro-button').click(function(e){
 			e.preventDefault();
 			hideAll();
-			$('.intro').fadeIn(1000);
+			$('.intro').fadeIn(fadeInTime);
 		});
 	};
 	var attachLeaderboardHandler = function(e){
 		$('.leader-button').click(function(e){
 			e.preventDefault();
 			hideAll();
-			$('.leaderboard').fadeIn(1000);
+			$('.leaderboard').fadeIn(fadeInTime);
 		});
 	};
 	var attachStartGameHandler = function(e){

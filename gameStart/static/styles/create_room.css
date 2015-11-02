@@ -4,8 +4,8 @@
 	margin-right: 2%;
 	margin-left: 2%;
 	margin-bottom: 2%;
-	background-color:rgba(0,0,0,0.5);
-	height: 1000px;
+	background-color:rgba(0,0,0,0.8);
+	height: 80%;
 }
 .gameboard{
 	display: block;
@@ -37,7 +37,7 @@
 	overflow: auto;
 }
 .players{
-	height: 85%;
+	height: 75%;
 	border:solid;
 	border-width: 2px;
 	//border-color: red;
@@ -45,7 +45,7 @@
 .room_id{
 	margin-bottom: 20px;
 	color: #CC9900;
-	font-size: 40px;
+	font-size: 30px;
 }
 .player{
 	border:solid;
@@ -60,18 +60,42 @@
 	max-width: 100%;
 	max-height: 100%;
 }
-.player .ready{
-	display: block;
-	float:right;
-	margin-top: 10px;
-
+.player .form_fill {
+	float: right;
+	max-width: 100%;
+	max-height: 100%;
 }
+.player .form_fill input[type="submit"] {
+	font-size: 80%;
+	border-radius: 6px;
+	padding: 0.5rem;
+}
+
 .player .name{
 	float:left;
-	font-size: 30px;
+	font-size: 20px;
 	color: white;
 }
-	
+
+.player .health{
+	margin-left:15%;
+	float:left;
+	font-size: 20px;
+	color: white;
+}
+
+.red{
+	background-color:rgba(128,0,0,0.5);
+}
+.blue{
+	background-color:rgba(0,0,128,0.5);
+}
+.orange{
+	background-color:rgba(255,127,0,0.5);
+}
+.black{
+	background-color:rgba(0,0,0,0.5);
+}
 /*.leave{
 	display: block;
 	float: left;
@@ -133,4 +157,15 @@
 .game-start-leave .form_field{
 	width:50%;
 	float: left;
+}
+table{
+	height:100%;
+	width:100%;
+}
+.cell {
+	width: 100%;
+	height: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #234A05;
 }

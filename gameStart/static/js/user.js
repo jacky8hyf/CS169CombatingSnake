@@ -19,8 +19,16 @@ var UserHandler = (function() {
 
     var joinRoomButton;
     var roomSize = 8;
-    var players;    //list of players inside the room
+    var players;    // list of players inside the room
     var playerHtmlTemplate;
+
+    // Handle player color
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'black']
+
+    // Handle gameboard
+    var nRows = 21;
+    var nCols = 38;
+    var old_snakes_state = {};   // list of the positions of all old snakes
 
     /**
      * HTTP GET request
@@ -102,6 +110,7 @@ var UserHandler = (function() {
     };
 
     var onSuccessLogin = function(data) {
+        is_login = true;
         sessionId = data.sessionId;
         userId = data.userId;
         loginForm.find('div.error div.login_error').text(" ");
@@ -152,6 +161,7 @@ var UserHandler = (function() {
             e.preventDefault()
 
             var onSuccess = function(data) {
+                is_login = false;
                 loginForm.show();
                 userInfo.hide();
                 actionMenu.show();
@@ -201,8 +211,12 @@ var UserHandler = (function() {
             var members = 1;
             var room = {};
             var onSuccess = function(data) {
+                setBoard();
+
+
                 var player = $(playerHtmlTemplate);
                 player.find('.name').text(usernameGlobal);
+                player.addClass(color_lookup[players.size()]);
                 //player.find('.name').text(userId);
                 players.append(player);
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
@@ -213,6 +227,15 @@ var UserHandler = (function() {
                 actionMenu.hide();
                 roomsAction.hide();
                 $('.logout').hide();
+
+                // Place holder for getting the snakes' positions from the server
+                var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
+
+                drawSnakes(snakes);     // draw out all snakes
+                alert("hi");
+                snakes = {1: [[12,21], [11,3]], 2: [[14,4], [15,4]]};
+                drawSnakes(snakes);     // draw out all snakes
+                
                 roomId = data.roomId;
 
 
@@ -250,7 +273,7 @@ var UserHandler = (function() {
                             poll();     
             
 
-                    },3000);
+                    },1000);
 
                 })();
                // poll();    
@@ -339,6 +362,7 @@ var UserHandler = (function() {
                         var player1 = $(playerHtmlTemplate);
                         var creator = available_room.creator.nickname;
                         player1.find('.name').text(creator);
+                        player1.addClass(color_lookup[1]);
                         players.append(player1);
 
                         if(available_room.hasOwnProperty("members")){
@@ -346,6 +370,7 @@ var UserHandler = (function() {
                                 if(available_room.members[i].nickname != creator){
                                     var player = $(playerHtmlTemplate);
                                     player.find('.name').text(available_room.members[i].nickname);
+                                    player.addClass(color_lookup[i+2]);
                                     members += 1;
                                     players.append(player);
 
@@ -390,12 +415,14 @@ var UserHandler = (function() {
                                         var creator = data.creator.nickname;
                             
                                         player1.find('.name').text(creator);
+                                        player1.addClass(color_lookup[1]);
                                         players.append(player1);
 
                                         for(i=0; i< data.members.length; i++){
                                             if(data.members[i].nickname != creator){
                                                 var player = $(playerHtmlTemplate);
                                                 player.find('.name').text(data.members[i].nickname);
+                                                player.addClass(color_lookup[i+2]);
                                                 players.append(player);
                                                 members+=1;
                                                 if (members == 8){
@@ -411,7 +438,7 @@ var UserHandler = (function() {
                                 makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
                                 poll();     
                 
-                            },3000);
+                            },1000);
 
                         })();
 
@@ -437,6 +464,50 @@ var UserHandler = (function() {
             makeGetRequest(url, onSuccess, onFailure);
         });
     };
+
+
+    var drawSnakes = function(snakes) {
+        removeSnakes();
+        for (var key in snakes){
+            var snake_body = snakes[key];
+            for (var i = 0; i < snake_body.length; i++) {
+                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                $("#" + id).toggleClass(color_lookup[key]);
+            }
+        }
+        old_snakes_state = snakes;
+    };
+
+    var removeSnakes = function() {
+        for (var key in old_snakes_state){
+            var snake_body = old_snakes_state[key];
+            for (var i = 0; i < snake_body.length; i++) {
+                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                $("#" + id).toggleClass(color_lookup[key]);
+            }
+        }
+    };
+
+    //drawSnake = function() {
+    //    for (var i = 0; i < snakeBody.length; i++) {
+    //        id = "r" + snakeBody[i].x + "c" + snakeBody[i].y;
+    //        $("#" + id).toggleClass("snake");
+    //    }
+    //}
+    var setBoard = function() {
+        var table = "<table>";
+        for(var i=0; i < nRows; i ++) {
+            table += "<tr>";
+            for(var j=0; j < nCols; j ++) {
+                var cellClass = "cell";
+                id = "r" + i + "c" + j;
+                table += "<td><div class='"+cellClass+ "' id='" + id +"'></div></td>";
+            }
+            table += "</tr>";
+        }
+        $('.gameboard').html(table);
+    };
+
     /**
      * Start the app by displaying the most recent smiles and attaching event handlers.
      * @return {None}
