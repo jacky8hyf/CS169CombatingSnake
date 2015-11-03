@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import dj_database_url
+
+HEROKU_LOCAL = os.environ.get('HEROKU_LOCAL')
+HEROKU_SERVER = os.environ.get('HEROKU_SERVER')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,7 +42,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'gameStart'
+    'ws4redis',
+    'gameStart',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -72,9 +77,10 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'combatingSnake.wsgi.application'
-
+if HEROKU_SERVER:
+    WSGI_APPLICATION = 'combatingSnake.wsgi.application'
+else:
+    WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -94,12 +100,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Yifan removed the following lines because it overrides the configs above
-# Parse database configuration from $DATABASE_URL
-import dj_database_url
-HEROKU_LOCAL = os.environ.get('HEROKU_LOCAL')
-HEROKU_SERVER = os.environ.get('HEROKU_SERVER')
 
 if HEROKU_LOCAL:
     DATABASES = {'default': dj_database_url.config(default = 'postgres:///postgres')} # TODO when running locally should set up the database and do HEROKU_LOCAL=true heroku local
@@ -127,6 +127,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# Redis. http://django-websocket-redis.readthedocs.org/en/latest/installation.html
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_SUBSCRIBER = 'gameStart.subscriber.RedisSubscriber'
+WS4REDIS_PREFIX = 'ws'
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_PREFIX = 'session'
 
 # Add this code to see error logs in the console
 LOGGING = {
