@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'djwebsockets',
     'gameStart'
 )
 
@@ -127,6 +128,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+WEBSOCKET_HOST = '0.0.0.0'
+WEBSOCKET_PORT = 8081
 
 # Add this code to see error logs in the console
 LOGGING = {

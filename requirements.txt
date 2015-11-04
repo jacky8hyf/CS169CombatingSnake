@@ -8,3 +8,4 @@ psycopg2==2.6.1
 static3==0.6.1
 wheel==0.24.0
 djwebsockets==0.8.3
+websockets==2.6
