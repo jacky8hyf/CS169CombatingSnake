@@ -129,8 +129,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-WEBSOCKET_HOST = '0.0.0.0'
-WEBSOCKET_PORT = 8081
+WEBSOCKET_HOST = os.environ.get('WEBSOCKET_HOST') # if it does not exist, default to localhost
+WEBSOCKET_PORT = os.environ.get('WEBSOCKET_PORT') # if it does not exist, default to 8081
 
 # Add this code to see error logs in the console
 LOGGING = {
