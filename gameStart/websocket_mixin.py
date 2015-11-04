@@ -2,8 +2,11 @@ from djwebsockets.decorator import Namespace
 from djwebsockets.mixins.wsgi import WSGIMixin
 
 
-@Namespace("/ws")
+@Namespace("/not-working")
 class WebSocketMixin:
+    '''
+    This is not working. Kept here just for a reference
+    '''
     rooms = {}
 
     @classmethod
@@ -41,9 +44,11 @@ class WebSocketMixin:
 
 @Namespace("/echo")
 class EchoHandler:
+    '''
+    A simple echo server.
+    '''
     @classmethod
     def on_connect(cls, socket, path):
-        print(socket.socket.__dict__)
         socket.send("Welcome")
     @classmethod
     def on_message(cls, socket, message):
