@@ -1,130 +1,122 @@
-# -*- coding: utf-8 -*-
-"""
-    pbkdf2
-    ~~~~~~
+''' Password based key-derivation function - PBKDF2 '''
 
-    This module implements pbkdf2 for Python.  It also has some basic
-    tests that ensure that it works.  The implementation is straightforward
-    and uses stdlib only stuff and can be easily be copy/pasted into
-    your favourite application.
+# Copyright (c) 2011, Stefano Palazzo <stefano.palazzo@gmail.com>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-    Use this as replacement for bcrypt that does not need a c implementation
-    of a modified blowfish crypto algo.
-
-    Example usage:
-
-    >>> pbkdf2_hex('what i want to hash', 'the random salt')
-    'fa7cc8a2b0a932f8e6ea42f9787e9d36e592e0c222ada6a9'
-
-    How to use this:
-
-    1.  Use a constant time string compare function to compare the stored hash
-        with the one you're generating::
-
-            def safe_str_cmp(a, b):
-                if len(a) != len(b):
-                    return False
-                rv = 0
-                for x, y in izip(a, b):
-                    rv |= ord(x) ^ ord(y)
-                return rv == 0
-
-    2.  Use `os.urandom` to generate a proper salt of at least 8 byte.
-        Use a unique salt per hashed password.
-
-    3.  Store ``algorithm$salt:costfactor$hash`` in the database so that
-        you can upgrade later easily to a different algorithm if you need
-        one.  For instance ``PBKDF2-256$thesalt:10000$deadbeef...``.
-
-
-    :copyright: (c) Copyright 2011 by Armin Ronacher.
-    :license: BSD, see LICENSE for more details.
-"""
 import hmac
 import hashlib
-from struct import Struct
-from operator import xor
-from itertools import izip, starmap
+import os
+import struct
 
 
-_pack_int = Struct('>I').pack
+def pbkdf2(digestmod, password: 'bytes', salt, count, dk_length) -> 'bytes':
+    '''
+    PBKDF2, from PKCS #5 v2.0:
+        http://tools.ietf.org/html/rfc2898
 
+    For proper usage, see NIST Special Publication 800-132:
+        http://csrc.nist.gov/publications/PubsSPs.html
 
-def pbkdf2_hex(data, salt, iterations=1000, keylen=24, hashfunc=None):
-    """Like :func:`pbkdf2_bin` but returns a hex encoded string."""
-    return pbkdf2_bin(data, salt, iterations, keylen, hashfunc).encode('hex')
+    The arguments for this function are:
 
+        digestmod
+            a crypographic hash constructor, such as hashlib.sha256
+            which will be used as an argument to the hmac function.
+            Note that the performance difference between sha1 and
+            sha256 is not very big. New applications should choose
+            sha256 or better.
 
-def pbkdf2_bin(data, salt, iterations=1000, keylen=24, hashfunc=None):
-    """Returns a binary digest for the PBKDF2 hash algorithm of `data`
-    with the given `salt`.  It iterates `iterations` time and produces a
-    key of `keylen` bytes.  By default SHA-1 is used as hash function,
-    a different hashlib `hashfunc` can be provided.
-    """
-    hashfunc = hashfunc or hashlib.sha1
-    mac = hmac.new(data, None, hashfunc)
-    def _pseudorandom(x, mac=mac):
-        h = mac.copy()
-        h.update(x)
-        return map(ord, h.digest())
-    buf = []
-    for block in xrange(1, -(-keylen // mac.digest_size) + 1):
-        rv = u = _pseudorandom(salt + _pack_int(block))
-        for i in xrange(iterations - 1):
-            u = _pseudorandom(''.join(map(chr, u)))
-            rv = starmap(xor, izip(rv, u))
-        buf.extend(rv)
-    return ''.join(map(chr, buf))[:keylen]
+        password
+            The arbitrary-length password (passphrase) (bytes)
+
+        salt
+            A bunch of random bytes, generated using a cryptographically
+            strong random number generator (such as os.urandom()). NIST
+            recommend the salt be _at least_ 128bits (16 bytes) long.
+
+        count
+            The iteration count. Set this value as large as you can
+            tolerate. NIST recommend that the absolute minimum value
+            be 1000. However, it should generally be in the range of
+            tens of thousands, or however many cause about a half-second
+            delay to the user.
+
+        dk_length
+            The lenght of the desired key in bytes. This doesn't need
+            to be the same size as the hash functions digest size, but
+            it makes sense to use a larger digest hash function if your
+            key size is large.
+
+    '''
+    def pbkdf2_function(pw, salt, count, i):
+        # in the first iteration, the hmac message is the salt
+        # concatinated with the block number in the form of \x00\x00\x00\x01
+        r = u = hmac.new(pw, salt + struct.pack(">i", i), digestmod).digest()
+        for i in range(2, count + 1):
+            # in subsequent iterations, the hmac message is the
+            # previous hmac digest. The key is always the users password
+            # see the hmac specification for notes on padding and stretching
+            u = hmac.new(pw, u, digestmod).digest()
+            # this is the exclusive or of the two byte-strings
+            r = bytes(i ^ j for i, j in zip(r, u))
+        return r
+    dk, h_length = b'', digestmod().digest_size
+    # we generate as many blocks as are required to
+    # concatinate to the desired key size:
+    blocks = (dk_length // h_length) + (1 if dk_length % h_length else 0)
+    for i in range(1, blocks + 1):
+        dk += pbkdf2_function(password, salt, count, i)
+    # The length of the key wil be dk_length to the nearest
+    # hash block size, i.e. larger than or equal to it. We
+    # slice it to the desired length befor returning it.
+    return dk[:dk_length]
 
 
 def test():
-    failed = []
-    def check(data, salt, iterations, keylen, expected):
-        rv = pbkdf2_hex(data, salt, iterations, keylen)
-        if rv != expected:
-            print 'Test failed:'
-            print '  Expected:   %s' % expected
-            print '  Got:        %s' % rv
-            print '  Parameters:'
-            print '    data=%s' % data
-            print '    salt=%s' % salt
-            print '    iterations=%d' % iterations
-            print
-            failed.append(1)
+    '''
+    PBKDF2 HMAC-SHA1 Test Vectors:
+        http://tools.ietf.org/html/rfc6070
 
-    # From RFC 6070
-    check('password', 'salt', 1, 20,
-          '0c60c80f961f0e71f3a9b524af6012062fe037a6')
-    check('password', 'salt', 2, 20,
-          'ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957')
-    check('password', 'salt', 4096, 20,
-          '4b007901b765489abead49d926f721d065a429c1')
-    check('passwordPASSWORDpassword', 'saltSALTsaltSALTsaltSALTsaltSALTsalt',
-          4096, 25, '3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038')
-    check('pass\x00word', 'sa\x00lt', 4096, 16,
-          '56fa6aa75548099dcc37d7f03425e0c3')
-    # This one is from the RFC but it just takes for ages
-    ##check('password', 'salt', 16777216, 20,
-    ##      'eefe3d61cd4da4e4e9945b3d6ba2158c2634e984')
-
-    # From Crypt-PBKDF2
-    check('password', 'ATHENA.MIT.EDUraeburn', 1, 16,
-          'cdedb5281bb2f801565a1122b2563515')
-    check('password', 'ATHENA.MIT.EDUraeburn', 1, 32,
-          'cdedb5281bb2f801565a1122b25635150ad1f7a04bb9f3a333ecc0e2e1f70837')
-    check('password', 'ATHENA.MIT.EDUraeburn', 2, 16,
-          '01dbee7f4a9e243e988b62c73cda935d')
-    check('password', 'ATHENA.MIT.EDUraeburn', 2, 32,
-          '01dbee7f4a9e243e988b62c73cda935da05378b93244ec8f48a99e61ad799d86')
-    check('password', 'ATHENA.MIT.EDUraeburn', 1200, 32,
-          '5c08eb61fdf71e4e4ec3cf6ba1f5512ba7e52ddbc5e5142f708a31e2e62b1e13')
-    check('X' * 64, 'pass phrase equals block size', 1200, 32,
-          '139c30c0966bc32ba55fdbf212530ac9c5ec59f1a452f5cc9ad940fea0598ed1')
-    check('X' * 65, 'pass phrase exceeds block size', 1200, 32,
-          '9ccad6d468770cd51b10e6a68721be611a8b4d282601db3b36be9246915ec82a')
-
-    raise SystemExit(bool(failed))
+    '''
+    # One of the test vectors has been removed because it takes
+    # too long to calculate. This was a test vector of 2^24 iterations.
+    # Since there is no difference between integers and long integers
+    # in python3, this will work as well as the others.
+    rfc6070_test_vectors = (
+        (b"password", b"salt", 1, 20),
+        (b"password", b"salt", 2, 20),
+        (b"password", b"salt", 4096, 20),
+        (b"passwordPASSWORDpassword",
+            b"saltSALTsaltSALTsaltSALTsaltSALTsalt", 4096, 25),
+        (b"pass\0word", b"sa\0lt", 4096, 16),
+    )
+    rfc6070_results = (
+        b"\x0c\x60\xc8\x0f\x96\x1f\x0e\x71\xf3\xa9\xb5\x24\xaf\x60\x12\x06"
+            b"\x2f\xe0\x37\xa6",
+        b"\xea\x6c\x01\x4d\xc7\x2d\x6f\x8c\xcd\x1e\xd9\x2a\xce\x1d\x41\xf0"
+            b"\xd8\xde\x89\x57",
+        b"\x4b\x00\x79\x01\xb7\x65\x48\x9a\xbe\xad\x49\xd9\x26\xf7\x21\xd0"
+            b"\x65\xa4\x29\xc1",
+        b"\x3d\x2e\xec\x4f\xe4\x1c\x84\x9b\x80\xc8\xd8\x36\x62\xc0\xe4\x4a"
+            b"\x8b\x29\x1a\x96\x4c\xf2\xf0\x70\x38",
+        b"\x56\xfa\x6a\xa7\x55\x48\x09\x9d\xcc\x37\xd7\xf0\x34\x25\xe0\xc3",
+    )
+    for v, r in zip(rfc6070_test_vectors, rfc6070_results):
+        assert pbkdf2(hashlib.sha1, *v) == r, v
 
 
 if __name__ == '__main__':
     test()
+    print("all tests passed")
+

@@ -1,10 +1,12 @@
 import json
-from errors import errors
+from .errors import errors
 
 SESSION_ID_HEADER = 'HTTP_X_SNAKE_SESSION_ID'
 
 def parse_json(body):
     try:
+        if isinstance(body, bytes):
+            body = body.decode("utf-8")
         return json.loads(body)
     except ValueError:
         raise errors.MALFORMED_JSON(body)

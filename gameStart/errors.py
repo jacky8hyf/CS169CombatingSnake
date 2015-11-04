@@ -4,7 +4,7 @@ from django.db import models as django_models
 
 import inspect
 
-import models as snake_models
+import gameStart.models
 
 def e(err, msg, status_code = 400):
 	js = JsonResponse();
@@ -23,6 +23,9 @@ class SnakeError(Exception, JsonResponse):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return self.err
 
 class SnakeErrors:
 
@@ -72,8 +75,9 @@ class ErrorMiddleware(object):
     def process_exception(self, request, exception):
         if not exception:
             return None
-        for name, t in inspect.getmembers(snake_models,
-            lambda c: inspect.isclass(c) and issubclass(c, django_models.Model)):
+        lst = inspect.getmembers(gameStart.models,
+            lambda c: inspect.isclass(c) and issubclass(c, django_models.Model))
+        for name, t in lst:
             if hasattr(t, 'DoesNotExist') and isinstance(exception, t.DoesNotExist):
                 return errors.DOES_NOT_EXIST(t.__name__)
         if isinstance(exception, SnakeError):

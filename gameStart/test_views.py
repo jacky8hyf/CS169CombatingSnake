@@ -9,12 +9,12 @@
 # https://docs.djangoproject.com/en/1.8/topics/testing/tools/
 from django.test import TestCase
 from django.test import Client
-from models import *
+from .models import *
 from django.core.exceptions import *
 import json
 
-from utils import SESSION_ID_HEADER
-from errors import errors
+from .utils import SESSION_ID_HEADER
+from .errors import errors
 
 class RestTestCase(TestCase):
     def setUp(self):
@@ -58,7 +58,7 @@ class RestTestCase(TestCase):
             'response is not successful with status code {} and content{}{}'
                 .format(response.status_code,response.content,
                     ': {}'.format(msg) if msg else ''))
-        return json.loads(response.content)
+        return json.loads(response.content.decode("utf-8"))
 
     def assertResponseFail(self, response, msg = None):
         '''
@@ -68,7 +68,7 @@ class RestTestCase(TestCase):
             'response is successful with status code {} and content{}{}'
                 .format(response.status_code,response.content,
                     ': {}'.format(msg) if msg else ''))
-        d = json.loads(response.content)
+        d = json.loads(response.content.decode("utf-8"))
         self.assertIn('err', d)
         return d
 
@@ -89,7 +89,7 @@ class UsersViewTestCase(RestTestCase):
         self.sessionId = d['sessionId']
         d = self.assertResponseSuccess(self.delete('/users/login'))
         with self.assertRaises(ObjectDoesNotExist):
-            print User.find_by_session_id(self.sessionId).session_id
+            print(User.find_by_session_id(self.sessionId).session_id)
 
         self.assertResponseSuccess(self.delete('/users/login'), 'logging out again should not fail')
         self.sessionId = 'Invalid id'

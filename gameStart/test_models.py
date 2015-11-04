@@ -7,8 +7,8 @@
 #
 
 from django.test import TestCase
-from models import *
-from hashing_passwords import *
+from .models import *
+from .hashing_passwords import *
 from django.core.exceptions import *
 from django.db import IntegrityError
 from django.db.models import When, F, Q, Count, Sum

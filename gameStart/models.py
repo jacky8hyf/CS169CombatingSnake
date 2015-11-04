@@ -3,11 +3,11 @@
 ######################
 
 from django.db import models
-from utils import *
-from hashing_passwords import *
+from .utils import *
+from .hashing_passwords import *
 from uuid import uuid4
 import re
-from errors import errors
+from .errors import errors
 
 # Create your models here.
 
@@ -32,7 +32,7 @@ class BaseModel(models.Model):
 
     @classmethod
     def find_by_id(cls, id):
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = int(id, 16)
         return cls.objects.get(pk = id)
 
@@ -85,10 +85,10 @@ class User(BaseModel):
         is allowed to be set.
         '''
         d = sanitize_dict(d, required = {
-            'username': basestring,
-            'password': basestring
+            'username': str,
+            'password': str
         }, optional = {
-            'nickname': basestring
+            'nickname': str
         });
         cls.sanity_check_profile_args(d)
         obj = cls();
@@ -118,8 +118,8 @@ class User(BaseModel):
         is allowed to be updated. Return self to allow chaining.
         '''
         d = sanitize_dict(d, optional = {
-            'password': basestring,
-            'nickname': basestring
+            'password': str,
+            'nickname': str
         });
         self.sanity_check_profile_args(d)
         for key in d:

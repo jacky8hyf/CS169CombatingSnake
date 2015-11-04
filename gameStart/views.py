@@ -10,9 +10,9 @@ from django.core.exceptions import *
 from django.db import IntegrityError, transaction
 import json, traceback
 
-from models import User, Room
-from errors import errors
-from utils import *
+from .models import User, Room
+from .errors import errors
+from .utils import *
 
 
 @csrf_exempt
@@ -47,6 +47,8 @@ def OKResponse(*args, **kwargs):
 
 def getBooleanParam(request, key):
     val = request.GET.get(key, None)
+    if isinstance(val, bytes):
+        val = val.decode("utf-8")
     if not val: return False
     try:
         return True if json.loads(val.lower()) else False
@@ -78,7 +80,7 @@ class UsersLoginView(View):
     '''
     def put(self, request, *args, **kwargs):
         ''' log user in '''
-        args = sanitize_dict(parse_json(request.body), {'username':basestring, 'password':basestring})
+        args = sanitize_dict(parse_json(request.body), {'username':str, 'password':str})
         username, password = args['username'], args['password']
         try:
             user = User.find_by_username(username)
