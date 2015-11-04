@@ -7,11 +7,13 @@ def get_wsgi_application():
     try:
         host = settings.WEBSOCKET_HOST
     except Exception as exec:
-        host = "localhost"
+        pass
+    if not host: host = "localhost"
     try:
         port = settings.WEBSOCKET_PORT
     except Exception as exec:
-        port = "8001"
+        pass
+    if not port: port = "8001"
 
     wsgihandler = django_wsgi()
     ws_server = server.WebSocketServer(host, port)

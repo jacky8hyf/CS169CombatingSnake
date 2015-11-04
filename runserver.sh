@@ -1,1 +1,1 @@
-WEBSOCKET_HOST=0.0.0.0 WEBSOCKET_PORT=8080 python3 manage.py runserver 0.0.0.0:8080
+WEBSOCKET_HOST=0.0.0.0 WEBSOCKET_PORT=8081 python3 manage.py runserver 0.0.0.0:8080
