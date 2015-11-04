@@ -2,8 +2,8 @@ from djwebsockets.decorator import Namespace
 from djwebsockets.mixins.wsgi import WSGIMixin
 
 
-@Namespace("/ws")
-class WebSocketMixin:
+@Namespace("/chatroom")
+class ChatRoom(WSGIMixin):
     rooms = {}
 
     @classmethod
@@ -26,28 +26,17 @@ class WebSocketMixin:
         room.remove(socket)
         cls.publish(room, msg)
 
-    @classmethod
-    def get_room(cls, path):
-        if path not in cls.rooms:
-            cls.rooms[path] = []
-        room = cls.rooms[path]
-        return room
+    @staticmethod
+    def get_room(path):
+        room = ChatRoom.get(path)
+        if room is not None:
+            return room
+        else:
+            ChatRoom[path] = []
+            return ChatRoom[path]
 
     @staticmethod
     def publish(room, message):
         for socket in room:
             socket.send(message)
 
-
-@Namespace("/echo")
-class EchoHandler:
-    @classmethod
-    def on_connect(cls, socket, path):
-        print(socket.socket.__dict__)
-        socket.send("Welcome")
-    @classmethod
-    def on_message(cls, socket, message):
-        socket.send(message)
-    @classmethod
-    def on_close(cls, socket):
-        socket.send("Bye")

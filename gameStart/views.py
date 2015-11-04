@@ -14,7 +14,6 @@ from .models import User, Room
 from .errors import errors
 from .utils import *
 
-
 @csrf_exempt
 def homePage(request):
     return render(request, 'index.html')
