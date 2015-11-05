@@ -241,22 +241,23 @@ var UserHandler = (function() {
                 //create a socket connection to server here and remove polling block
                 //var inbox = new ReconnectingWebSocket("ws://"+ location.host + "/receive");
                 //var outbox = new ReconnectingWebSocket("ws://"+ location.host + "/submit");
-                var urlstr = "ws://" + location.host + "/rooms/" + roomId;
+                var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 var inbox = new ReconnectingWebSocket(urlstr);
+                var ts = Date.now();
+                var msg = "join " + JSON.stringify({userId:userId, ts:10, auth:"aaaaaa"});
+                inbox.onopen = function(e){
+                    inbox.send(msg);
+                }
+
                 inbox.onmessage = function(message) {
                     //check if message type is join room: then add to players list
 
                     if(members > roomSize-1){
                         return;
                     }
-                    var data = JSON.parse(message.data);
-                    var player = $(playerHtmlTemplate);
-                    player.find('.name').text(data.nickname);
-                    players.append(player);
-                    members += 1;
 
+                    console.log(message);
                 }
-
             /*    
                 var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
                     //make a poll and wait
@@ -416,20 +417,26 @@ var UserHandler = (function() {
                             return;
                         }
                         ///replace this with socket stuff
-                        var urlstr = "ws://" + location.host + "/rooms/" + available_room.roomId;
+                       var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
                         var inbox = new ReconnectingWebSocket(urlstr);
-                       // var outbox = new ReconnectingWebSocket("ws://"+ location.host + "/submit");
+                        var ts = Date.now();
+                        var hashStr = sessionId + ":" + userId + ":" + ts;
+                        //var auth = SHA256("sessionId:userId:ts");  auth = hashlib.sha256(str).hexdigest();
+                    //    var auth = hashlib.sha256(hashStr).hexdigest();
+                        var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:"aaaaa"});
+
+                        inbox.onopen = function(e){
+                            inbox.send(msg);
+                        }
+
                         inbox.onmessage = function(message) {
                             //check if message type is join room: then add to players list
 
                             if(members > roomSize-1){
-                                return;
+                                return ;
                             }
-                            var data = JSON.parse(message.data);
-                            var player = $(playerHtmlTemplate);
-                            player.find('.name').text(data.nickname);
-                            players.append(player);
-                            members += 1;
+                            console.log(message.data);
+
 
                         }
 
