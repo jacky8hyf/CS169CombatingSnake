@@ -166,3 +166,6 @@ MASTER_KEY = os.environ.get('MASTER_KEY')
 if not MASTER_KEY:
     MASTER_KEY = "fake_master_key"
 
+MAX_MEMBERS_IN_ROOM = 8
+STATUS_PLAYING = 1
+STATUS_WAITING = 0

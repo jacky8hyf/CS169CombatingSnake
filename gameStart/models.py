@@ -7,6 +7,7 @@ from utils import *
 from hashing_passwords import *
 from uuid import uuid4
 import re
+from combatingSnake.settings import *
 from errors import errors
 
 # Create your models here.
@@ -167,12 +168,9 @@ class User(BaseModel):
 
 class Room(BaseModel):
 
-    STATUS_PLAYING = 1
-    STATUS_WAITING = 0
-
     # In views.py, use strId instead.
     roomId = models.AutoField(primary_key=True)
-    capacity = models.IntegerField(default = 8)
+    capacity = models.IntegerField(default = MAX_MEMBERS_IN_ROOM)
     # 0: waiting; 1: playing. More enum values may be added.
     status = models.SmallIntegerField(default = STATUS_WAITING)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -236,4 +234,4 @@ class Room(BaseModel):
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator
             raise errors.ROOM_FULL
         return self
-    
+
