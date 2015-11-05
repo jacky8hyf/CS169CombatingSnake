@@ -238,7 +238,26 @@ var UserHandler = (function() {
                 
                 roomId = data.roomId;
 
+                //create a socket connection to server here and remove polling block
+                //var inbox = new ReconnectingWebSocket("ws://"+ location.host + "/receive");
+                //var outbox = new ReconnectingWebSocket("ws://"+ location.host + "/submit");
+                var urlstr = "ws://" + location.host + "/rooms/" + roomId;
+                var inbox = new ReconnectingWebSocket(urlstr);
+                inbox.onmessage = function(message) {
+                    //check if message type is join room: then add to players list
 
+                    if(members > roomSize-1){
+                        return;
+                    }
+                    var data = JSON.parse(message.data);
+                    var player = $(playerHtmlTemplate);
+                    player.find('.name').text(data.nickname);
+                    players.append(player);
+                    members += 1;
+
+                }
+
+            /*    
                 var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
                     //make a poll and wait
                 var poll = (function poll(){
@@ -278,7 +297,7 @@ var UserHandler = (function() {
                 })();
                // poll();    
 
-                
+             */   
                 
 
             };
@@ -358,6 +377,7 @@ var UserHandler = (function() {
                   //  console.log("find available_room");
                     var members = 1;
                     var onFinalSuccess = function(e){
+                        //add room id and room creator
                         createRoomForm.find('.room_id').text("Room " + available_room.roomId);
                         var player1 = $(playerHtmlTemplate);
                         var creator = available_room.creator.nickname;
@@ -365,6 +385,7 @@ var UserHandler = (function() {
                         player1.addClass(color_lookup[1]);
                         players.append(player1);
 
+                        //add room_members
                         if(available_room.hasOwnProperty("members")){
                             for(i=0; i< available_room.members.length; i++){
                                 if(available_room.members[i].nickname != creator){
@@ -376,19 +397,12 @@ var UserHandler = (function() {
                                 }
                             }
                         }
-                        else{
-                            var player2 = $(playerHtmlTemplate);
-                            player2.find('.name').text(usernameGlobal);
-                            players.append(player2);
-                            members += 1;
-                        }
-                     /*   if(creator != usernameGlobal){
-                            var player3 = $(playerHtmlTemplate);
-                            player3.find('.name').text(usernameGlobal);
-                            players.append(player3);
-                            members += 1;
-
-                        }*/
+                 
+                        //add the join requester
+                        var player2 = $(playerHtmlTemplate);
+                        player2.find('.name').text(usernameGlobal);
+                        players.append(player2);
+                        members += 1;
 
                         createRoomForm.show();
                         actionMenu.hide();
@@ -398,11 +412,33 @@ var UserHandler = (function() {
                         $('.logout').hide();
                         console.log("join ok");
 
+                        if(members > roomSize-1){
+                            return;
+                        }
+                        ///replace this with socket stuff
+                        var urlstr = "ws://" + location.host + "/rooms/" + available_room.roomId;
+                        var inbox = new ReconnectingWebSocket(urlstr);
+                       // var outbox = new ReconnectingWebSocket("ws://"+ location.host + "/submit");
+                        inbox.onmessage = function(message) {
+                            //check if message type is join room: then add to players list
 
-                        ////////////////////
-                        var url1 = "/rooms/"+ available_room.roomId+ "?creator-profile=true&members=true&member-profile=true";
+                            if(members > roomSize-1){
+                                return;
+                            }
+                            var data = JSON.parse(message.data);
+                            var player = $(playerHtmlTemplate);
+                            player.find('.name').text(data.nickname);
+                            players.append(player);
+                            members += 1;
+
+                        }
+
+
+
+                        
+                       // var url1 = "/rooms/"+ available_room.roomId+ "?creator-profile=true&members=true&member-profile=true";
                         //make a poll and wait
-                        var poll = (function poll(){
+                /*        var poll = (function poll(){
                            // console.log("weijie is here");
                             setTimeout(function(){
                                 var onFinalSuccess1 = function(data) {
@@ -437,7 +473,7 @@ var UserHandler = (function() {
                 
                             },1000);
 
-                        })();
+                        })();*/
                     };
 
                     var onFinalFailure = function(e){
