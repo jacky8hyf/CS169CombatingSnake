@@ -36,6 +36,7 @@ class SnakeErrors:
     ROOM_PLAYING =          SnakeError(-493, 'Game in progress',         400);
     NOT_LOGGED_IN =         SnakeError(-489, 'Not logged in',            403);
     PERMISSION_DENIED =     SnakeError(-403, 'Permission denied',        403); # generic permission denied
+    TIMEOUT =               SnakeError(-487, 'Timeout',                  400);
 
     USERNAME_NOT_VALID = lambda self, arg: \
         SnakeError(-499, 'Username is not valid{}'.format(': {}'.format(arg) if arg else ''), 400);

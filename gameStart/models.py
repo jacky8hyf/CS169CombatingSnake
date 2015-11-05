@@ -236,5 +236,4 @@ class Room(BaseModel):
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator
             raise errors.ROOM_FULL
         return self
-
-
+    

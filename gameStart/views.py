@@ -1,6 +1,8 @@
 ######################
 # Author: Yifan Hong #
 ######################
+from hashlib import sha256
+from time import time
 
 from django.shortcuts import render
 from django.http import *
@@ -32,6 +34,13 @@ def fetch_user(request):
         return User.find_by_session_id(sessionId)
     except ObjectDoesNotExist:
         raise errors.NOT_LOGGED_IN
+
+def validate_master_key(request):
+    '''
+    Return true if request has valid master key, false otherwise.
+    '''
+    # FIXME
+    pass
 
 def OKResponse(*args, **kwargs):
     '''
@@ -118,6 +127,22 @@ class SingleUserView(View):
         user = User.find_by_id(str(userId))
         return OKResponse(user.to_dict(includeProfile = includeProfile))
 
+class SingleUserAuthenticateView(View):
+    '''
+    /users/:userId/authenticate
+    '''
+    def post(self, request, userId, *args, **kwargs):
+        args = sanitize_dict(parse_json(request.body), {'ts':int, 'auth':basestring})
+        ts, auth = args['ts'], args['auth']
+        if abs(ts - time() * 1000) > 600000: # out of 10 mins
+            return errors.TIMEOUT
+        sessionId = User.find_by_id(userId).session_id
+        if auth != sha256("{}:{}:{}".format(sessionId, userId, ts)):
+            return errors.PERMISSION_DENIED
+        return OKResponse()
+
+
+
 class RoomsView(View):
     '''
     /rooms path
@@ -159,6 +184,17 @@ class SingleRoomView(View):
             includeMembers = includeMembers,
             includeMemberProfile = includeMemberProfile))
 
+    @transaction.atomic
+    def put(self, request, roomId, *args, **kwargs):
+        args = sanitize_dict(parse_json(request.body), {'status':int, 'proposer':basestring})
+        status, proposerId = args['status'], args['proposer']
+        room = Room.find_by_id(roomId)
+        if room.creator.userId != proposerId:
+            return errors.PERMISSION_DENIED
+        room.switch_status(status).save()
+        return OKResponse()
+
+
 class SingleRoomMembersView(View):
     '''
     /rooms/:roomId/members/
@@ -177,20 +213,46 @@ class SingleRoomSingleMemberView(View):
 
     @transaction.atomic
     def put(self, request, roomId, memberId, *args, **kwargs):
-        user = fetch_user(request)
-        if memberId != user.strId:
-            return errors.PERMISSION_DENIED
+
+        returnRoom = getBooleanParam(request, 'return-room')
+
+        if validate_master_key(request):
+            user = User.find_by_id(memberId)
+        else:
+            user = fetch_user(request)
+            if memberId != user.strId:
+                return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId)).raise_if_cannot_join(user)
         user.enter_room(room).save()
-        return OKResponse()
+
+        if not returnRoom:
+            return OKResponse()
+        else:
+            return OKResponse(Room.find_by_id(str(roomId)).to_dict(
+                includeCreatorProfile = True,
+                includeMembers = True,
+                includeMemberProfile = True))
 
     @transaction.atomic
     def delete(self, request, roomId, memberId, *args, **kwargs):
-        user = fetch_user(request)
-        if memberId != user.strId:
-            return errors.PERMISSION_DENIED
+
+        returnRoom = getBooleanParam(request, 'return-room')
+
+        if validate_master_key(request):
+            user = User.find_by_id(memberId)
+        else:
+            user = fetch_user(request)
+            if memberId != user.strId:
+                return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
         room.destroy_if_created_by(user)
-        return OKResponse()
+
+        if not returnRoom:
+            return OKResponse()
+        else:
+            return OKResponse(Room.find_by_id(str(roomId)).to_dict(
+                includeCreatorProfile = True,
+                includeMembers = True,
+                includeMemberProfile = True))
 

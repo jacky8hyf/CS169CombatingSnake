@@ -161,3 +161,8 @@ LOGGING = {
     }
 }
 
+# master key between two apps
+MASTER_KEY = os.environ.get('MASTER_KEY')
+if not MASTER_KEY:
+    MASTER_KEY = "fake_master_key"
+
