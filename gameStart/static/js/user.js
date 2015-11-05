@@ -208,7 +208,6 @@ var UserHandler = (function() {
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
 			e.preventDefault();
-            var members = 1;
             var room = {};
             var onSuccess = function(data) {
                 setBoard();
@@ -244,73 +243,37 @@ var UserHandler = (function() {
                 var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 var inbox = new ReconnectingWebSocket(urlstr);
                 var ts = Date.now();
-                var msg = "join " + JSON.stringify({userId:userId, ts:10, auth:"aaaaaa"});
+                var hashStr = sessionId + ":" + userId + ":" + ts;
+                var auth = CryptoJS.SHA256(hashStr);
+                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 inbox.onopen = function(e){
                     inbox.send(msg);
                 }
-
+               // var members = 1;
                 inbox.onmessage = function(message) {
                     //check if message type is join room: then add to players list
+                    console.log(message.data);
+                    players.html('');   //clear players list
 
-                    if(members > roomSize-1){
-                        return;
+                    var player = $(playerHtmlTemplate);
+                    player.find('.name').text(message.data.creator.nickname);
+                    players.append(player);
+                    player.addClass(color_lookup[players.size()]);
+                    
+                    for(i = 0; i < message.data.members.length, i < 7; i++){
+                        var player = $(playerHtmlTemplate);
+                        player.find('.name').text(message.data.members[i].nickname);
+                        players.append(player);
                     }
 
-                    console.log(message);
                 }
-            /*    
-                var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
-                    //make a poll and wait
-                var poll = (function poll(){
-                   // console.log("inside poll");
-                        setTimeout(function(){
-                            var onFinalSuccess = function(data) {
-                                if(data.members.length > 0){
-                                    players.html('');
-                                    
-                                    var player1 = $(playerHtmlTemplate);
-                                    var creator = data.creator.nickname;
-                        
-                                    player1.find('.name').text(creator);
-                                    players.append(player1);
-
-                                    for(i=0; i< data.members.length; i++){
-                                        var player = $(playerHtmlTemplate);
-                                        player.find('.name').text(data.members[i].nickname);
-                                        players.append(player);
-                                        members+=1;
-                                        if (members == 8){
-                                            return;
-                                        }
-                                    }
-                                
-                                }
-                            };
-                            var onFinalFailure = function(e){
-                                console.log(e);
-                            };
-                            makeGetRequest(url1, onFinalSuccess, onFinalFailure);
-                            poll();     
             
-
-                    },1000);
-
-                })();
-               // poll();    
-
-             */   
-                
-
             };
             var onFailure = function(error) {
                 console.log(error);
             };
             var url = "/rooms";
-            makePostRequest(url, room, onSuccess, onFailure);    
-            
-            
-
-            
+            makePostRequest(url, room, onSuccess, onFailure);         
                    
         });
     };
@@ -356,11 +319,7 @@ var UserHandler = (function() {
         $('body').on('click','.submit-roomjoin', function(e){
             e.preventDefault();
             var onSuccess = function(data) {
-                /* loop through room list to find the first available room and 
-                assign it to the user, then make a post request to inform the server
-                size-1 for creator
-                */
-                //console.log("enter onSuccess");
+                //find available room for joining
                 var available_room;
                 for (room in data.rooms){
                     if(!room.hasOwnProperty("members")){
@@ -372,126 +331,41 @@ var UserHandler = (function() {
                         break;
                     }
                 }
-                //if find available room
                 if(available_room != null){
-                    var url = "/rooms/" + available_room.roomId + "/members/" + userId;
-                  //  console.log("find available_room");
-                    var members = 1;
-                    var onFinalSuccess = function(e){
-                        //add room id and room creator
-                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
-                        var player1 = $(playerHtmlTemplate);
-                        var creator = available_room.creator.nickname;
-                        player1.find('.name').text(creator);
-                        player1.addClass(color_lookup[1]);
-                        players.append(player1);
-
-                        //add room_members
-                        if(available_room.hasOwnProperty("members")){
-                            for(i=0; i< available_room.members.length; i++){
-                                if(available_room.members[i].nickname != creator){
-                                    var player = $(playerHtmlTemplate);
-                                    player.find('.name').text(available_room.members[i].nickname);
-                                    player.addClass(color_lookup[i+2]);
-                                    members += 1;
-                                    players.append(player);
-                                }
-                            }
-                        }
-                 
-                        //add the join requester
-                        var player2 = $(playerHtmlTemplate);
-                        player2.find('.name').text(usernameGlobal);
-                        players.append(player2);
-                        members += 1;
-
-                        createRoomForm.show();
-                        actionMenu.hide();
-                        //joinRoomButton.hide();
-                        //createRoomButton.hide();
-                        roomsAction.hide();
-                        $('.logout').hide();
-                        console.log("join ok");
-
-                        if(members > roomSize-1){
-                            return;
-                        }
-                        ///replace this with socket stuff
-                       var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                        var inbox = new ReconnectingWebSocket(urlstr);
-                        var ts = Date.now();
-                        var hashStr = sessionId + ":" + userId + ":" + ts;
-                        //var auth = SHA256("sessionId:userId:ts");  auth = hashlib.sha256(str).hexdigest();
-                    //    var auth = hashlib.sha256(hashStr).hexdigest();
-                        var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:"aaaaa"});
-
-                        inbox.onopen = function(e){
-                            inbox.send(msg);
-                        }
-
-                        inbox.onmessage = function(message) {
-                            //check if message type is join room: then add to players list
-
-                            if(members > roomSize-1){
-                                return ;
-                            }
-                            console.log(message.data);
-
-
-                        }
-
-
-
-                        
-                       // var url1 = "/rooms/"+ available_room.roomId+ "?creator-profile=true&members=true&member-profile=true";
-                        //make a poll and wait
-                /*        var poll = (function poll(){
-                           // console.log("weijie is here");
-                            setTimeout(function(){
-                                var onFinalSuccess1 = function(data) {
-                                    if(data.members.length > 0){
-                                        players.html('');
-                                        var player1 = $(playerHtmlTemplate);
-                                        var creator = data.creator.nickname;
-                            
-                                        player1.find('.name').text(creator);
-                                        player1.addClass(color_lookup[1]);
-                                        players.append(player1);
-
-                                        for(i=0; i< data.members.length; i++){
-                                            if(data.members[i].nickname != creator){
-                                                var player = $(playerHtmlTemplate);
-                                                player.find('.name').text(data.members[i].nickname);
-                                                player.addClass(color_lookup[i+2]);
-                                                players.append(player);
-                                                members+=1;
-                                                if (members == 8){
-                                                    return;
-                                                } 
-                                            }
-                                        }
-                                    }
-                                };
-                                var onFinalFailure1 = function(e){
-                                    console.log(e);
-                                };
-                                makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
-                                poll();
-                
-                            },1000);
-
-                        })();*/
-                    };
-
-                    var onFinalFailure = function(e){
-                        console.log(e);
+                    var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+                    var inbox = new ReconnectingWebSocket(urlstr);
+                    var ts = Date.now();
+                    var hashStr = sessionId + ":" + userId + ":" + ts;
+                    var auth = CryptoJS.SHA256(hashStr);
+                    var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    //send hello message
+                    inbox.onopen = function(e){
+                        inbox.send(msg);
                     }
-                    var room={};
-                    console.log(url);
-                    makePutRequest(url, room, onFinalSuccess, onFinalFailure);
-                   
-                    $('#cssmenu').hide();
+
+                    inbox.onmessage = function(message) {
+                        console.log(message.data);
+                        if(message.data.members.length > roomSize-1){
+                            return ;
+                        }
+                        
+                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                        var player = $(playerHtmlTemplate);
+                        player.find('.name').text(available_room.creator.nickname);
+                        player.addClass(color_lookup[1]);
+                        players.append(player);
+
+                        //add room_members  
+                        for(i=0; i< message.data.members.length, i < roomSize - 1; i++){
+                            var player = $(playerHtmlTemplate);
+                            player.find('.name').text(message.data.members[i].nickname);
+                            player.addClass(color_lookup[i+2]);
+                            players.append(player);    
+                        }    
+                    }
                 }
+
+                $('#cssmenu').hide();    
                 actionMenu.show();
             };
             var onFailure = function(error) {
@@ -501,7 +375,6 @@ var UserHandler = (function() {
             makeGetRequest(url, onSuccess, onFailure);
         });
     };
-
 
     var drawSnakes = function(snakes) {
         removeSnakes();
