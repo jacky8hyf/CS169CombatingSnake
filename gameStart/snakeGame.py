@@ -1,11 +1,15 @@
 __author__ = 'TrevorTa'
-import random
 
+
+#TODO: NEED TO IMPLEMENT MAX LENGTH(HEALTH). CURRENTLY THE SNAKE CAN GROW TO ANY SIZE
 
 class Board:
     # ==================== SERVER UTILITIES ============================
     # Notes: players are numbered from 1 to numPlayers.
-    #
+    # Create a board:
+    #   board = Board(width, height, numPlayers)
+    #   board.initializeBoard() # add (numPlayers) random snakes of length 1
+    #                             and (numPlayers - 1) foods
     def getGameState(self):
         """
         Return the game state to client. Game state includes positions of the snakes
@@ -28,18 +32,21 @@ class Board:
         Move all snakes on the board according to each snake's current direction.
         Called at each time tick.
         """
-        for i in range(1, self.numPlayers + 1):
-            self.moveSnake(i)
+        snakesToRemove = []
+        for i in self.snakes: # select each snakeID
+            self.moveSnake(i, snakesToRemove)
+        for i in snakesToRemove: # remove all the snakes that have length 0
+            self.removeSnake(i)
 
     def changeDirection(self, player, direction):
         """
         Change direction of player to direction
         :param player: playerID (1 to numPlayers)
-        :param direction: Direction.UP/DOWN/LEFT/RIGHT
+        :param direction: Direction.UP/DOWN/LEFT/RIGHT (do not allow STAY)
         """
         self.snakes[player].changeDirection(direction)
 
-    # ==========================================================================
+    # ======================= IMPLEMENTATION ===================================
     def __init__(self, w, h, players):
         """
         Initialize the game
@@ -55,6 +62,8 @@ class Board:
         self.h = h
         self.numPlayers = players
         self.numFoods = players - 1 # set the number of foods to be numPlayers - 1
+
+    def initializeBoard(self):
         self.initializeSnakes()
         self.initializeFoods()
 
@@ -69,7 +78,7 @@ class Board:
             for c in range(self.w):
                 row.append(" ")
             board.append(row)
-        for i in range(1, self.numPlayers + 1):
+        for i in self.snakes: # select each snakeID
             snake = self.snakes[i]
             for (r,c) in snake.body:
                 board[r][c] = str(i)
@@ -110,15 +119,18 @@ class Board:
 
     def isPointOutOfBound(self, point):
         row = point[0] # the current row
-        if row < 0 or row >= self.w:
+        if row < 0 or row >= self.h:
             return True # the snake is out of bound
-        col = point[0] # the current col
-        if col < 0 or col >= self.c:
+        col = point[1] # the current col
+        if col < 0 or col >= self.w:
             return True # the snake is out of bound
         return False
 
+    def removeSnake(self, player):
+        if player in self.snakes:
+            del self.snakes[player]
 
-    def moveSnake(self, player):
+    def moveSnake(self, player, snakesToRemove):
         """
         Move snake. This is the most complicated function since it will take care all
         snake logics, include eating food, attacking opponent, check bounds
@@ -130,8 +142,11 @@ class Board:
         # check if the snake hits the wall
         if self.isPointOutOfBound(newHead):
             snake.removeTail() # if the snake hits the wall, remove its tail
+            if snake.length() == 0:
+                #self.removeSnake(player)
+                snakesToRemove.append(player)
             return
-        overlappedSnake = self.isPointOnSnake(newHead)
+        overlappedSnake = self.isPointOnSnake(newHead) # id of the overlapped snake
         if overlappedSnake == 0: # no snake at this new point
             if self.isPointOnFood(newHead):
                 snake.eatFood(newHead) # grow longer
@@ -141,8 +156,13 @@ class Board:
                 snake.move() # move normally otherwise
         else: # the new point has a snake
             otherSnake = self.snakes[overlappedSnake]
-            if otherSnake.body[0] == newHead:
+            if otherSnake.body[0] == newHead: # attack on the head, both snakes got hurt
                 snake.removeTail()
+                if snake.length() == 0:
+                    snakesToRemove.append(player)
+                otherSnake.removeTail()
+                if otherSnake.length() == 0:
+                    snakesToRemove.append(overlappedSnake)
             else: # attack body of the other snake, the other snake got hurt
                 otherSnake.removeTail()
                 snake.move()
@@ -172,11 +192,10 @@ class Board:
         return 0
 
     def generateRandomPoint(self):
+        import random
         x = random.randint(0, self.w - 1)
         y = random.randint(0, self.h - 1)
         return [x, y]
-
-
 
 class Snake:
     def __init__(self, bodies, direction):
@@ -189,6 +208,9 @@ class Snake:
         self.verifyBody(bodies)
         self.body = bodies
         self.direction = direction
+
+    def length(self):
+        return len(self.body)
 
     def verifyBody(self, bodies):
         pass # TODO: IMPLEMENT
@@ -267,8 +289,3 @@ class Direction:
     @staticmethod
     def newPoint(currentPoint, direction):
         return [currentPoint[0] + direction[0], currentPoint[1] + direction[1]]
-
-
-if False:
-    board = Board(3, 3, 4)
-    board.drawBoard()

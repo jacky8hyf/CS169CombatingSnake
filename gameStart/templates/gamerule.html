@@ -1,17 +1,25 @@
 <html>
 <body>
-<h3>Initial Health and Damage:</h3>
-<p>Each snake has its health initially set to 100 hp. Also, A snake has initial damage set to 20.</p>
+<h4>Initial:</h4>
+<ol>
+    <li>Max length of a snake is 10 (max health is 100)</li>
+    <li>Initial length is 1</li>
+    <li>Number of foods is (number of players - 1)</li>
+</ol>
 
-<h3>Different Kinds of Food:</h3>
-<p>Healing Food: snake will increase its health when eating this kind of food. The healing will stop at the snake’s current maximum health.
-Damage Booster: snake will increase its attack damage permanently when eating Damage Booster. (The value boosted will be generated randomly between 1-10)Length Booster: snake will increase in length when eating this kind of food.
-Freezing Pellet: a snake which gets the pellet will slow the opponent snakes for a certain amount of time. </p>
+<h4>Attack:</h4>
+<p>
+   Every time a snake is hit by head of another snake its length will be reduced by 1 a and health reduced by 10 respectively.
+</p>
 
-<h3>Snake level:</h3>
-<p>A snake can level up when it hits certain length with its body, which will permanently increase its maximum health and has its damage increased by a certain percentage.</p>
+<h4>Edge cases:</h4>
+<ol>
+    <li>"head-to-head": when two snakes hit on each other with their heads, their healths should both reduce by 10 (length reduced by 1 respectively)</li>
+    <li>“hit-on-wall”: when a snake hits a wall, the snake will reduce health by 10 (length by 1) for each time step until user change the direction.</li>
+</ol>
 
-<h3>Attack mechanic:</h3>
-<p>Each snake will have its weak spot and the opponent snakes need to attack that spot in order to deal damage. The location of the weak spot is generated randomly on the starting game, and it will be generated randomly right after the snake gets attacked. Snakes can cross over each other.</p>
+<h4>Food-health model:</h4>
+<p>The total number of food in the board should be (number of users - 1) so as to force competition. Once a food is taken another one will be generated randomly into the board. Once a snake takes in a food the length will be increased by 1 (health increased by 10 until it reaches the maximum health).
+</p>
 </body>
 </html>
