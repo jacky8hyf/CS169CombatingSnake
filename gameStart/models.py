@@ -229,7 +229,7 @@ class Room(BaseModel):
         if the user cannot join the room. Return self to allow chaining.
         '''
         # currently all users can join waiting room with spaces
-        if self.status != Room.STATUS_WAITING:
+        if self.status != STATUS_WAITING:
             raise errors.ROOM_PLAYING
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator
             raise errors.ROOM_FULL

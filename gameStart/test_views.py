@@ -13,6 +13,7 @@ from models import *
 from django.core.exceptions import *
 import json
 
+from combatingSnake.settings import *
 from utils import SESSION_ID_HEADER
 from errors import errors
 
@@ -288,7 +289,7 @@ class RoomsViewTestCase(RestTestCase):
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
 
-        Room.find_by_id(roomId).switch_status(Room.STATUS_PLAYING).save()
+        Room.find_by_id(roomId).switch_status(STATUS_PLAYING).save()
 
         self.iAmBob()
         d = self.assertResponseFail(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
