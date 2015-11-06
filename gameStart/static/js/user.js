@@ -257,11 +257,11 @@ var UserHandler = (function() {
 
                 roomId = data.roomId;
                 //create a socket connection to server here and remove polling block
-                var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
+                var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 var inbox = new ReconnectingWebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
-                var auth = CryptoJS.SHA256(hashStr);
+                var auth = sha256(hashStr);
                 var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 inbox.onopen = function(e){
                     inbox.send(msg);
@@ -287,7 +287,6 @@ var UserHandler = (function() {
             };
             var url = "/rooms";
             makePostRequest(url, room, onSuccess, onFailure);
-
         });
     };
 
@@ -309,11 +308,11 @@ var UserHandler = (function() {
                     }
                 }
                 if(available_room != null){
-                    var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+                    var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
                     var inbox = new ReconnectingWebSocket(urlstr);
                     var ts = Date.now();
                     var hashStr = sessionId + ":" + userId + ":" + ts;
-                    var auth = CryptoJS.SHA256(hashStr);
+                    var auth = sha256(hashStr);
                     var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
                     inbox.onopen = function(e){
