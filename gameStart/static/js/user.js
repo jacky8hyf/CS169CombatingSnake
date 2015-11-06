@@ -263,11 +263,16 @@ var UserHandler = (function() {
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
                 var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var i = 0;
                 inbox.onopen = function(e){
-                    inbox.send(msg);
+                    if (i < 5) {
+                        inbox.send(msg);
+                        i++;
+                    }
                 }
 
                 inbox.onmessage = function(message) {
+                    console.log(message);
                     console.log(message.data);
                     players.html('');   //clear players list
                     var player = $(playerHtmlTemplate);
