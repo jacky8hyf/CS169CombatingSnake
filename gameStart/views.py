@@ -12,6 +12,7 @@ from django.core.exceptions import *
 from django.db import IntegrityError, transaction
 import json, traceback
 
+from combatingSnake.settings import *
 from models import User, Room
 from errors import errors
 from utils import *
@@ -39,8 +40,7 @@ def validate_master_key(request):
     '''
     Return true if request has valid master key, false otherwise.
     '''
-    # FIXME
-    pass
+    return request.META.get(MASTER_KEY_HEADER) == MASTER_KEY
 
 def OKResponse(*args, **kwargs):
     '''
@@ -127,6 +127,13 @@ class SingleUserView(View):
         user = User.find_by_id(str(userId))
         return OKResponse(user.to_dict(includeProfile = includeProfile))
 
+    def delete(self, request, userId, *args, **kwargs):
+        ''' delete a user. For testing purposes only; so requires master_key. '''
+        if not validate_master_key(request):
+            return errors.PERMISSION_DENIED
+        User.find_by_id(str(userId)).delete()
+        return OKResponse()
+
 class SingleUserAuthenticateView(View):
     '''
     /users/:userId/authenticate
@@ -137,11 +144,11 @@ class SingleUserAuthenticateView(View):
         if abs(ts - time() * 1000) > 600000: # out of 10 mins
             return errors.TIMEOUT
         sessionId = User.find_by_id(userId).session_id
-        if auth != sha256("{}:{}:{}".format(sessionId, userId, ts)):
+        rawAuth = "{}:{}:{}".format(sessionId, userId, ts)
+        expectedAuth = sha256(rawAuth).hexdigest()
+        if auth != expectedAuth:
             return errors.PERMISSION_DENIED
         return OKResponse()
-
-
 
 class RoomsView(View):
     '''
@@ -189,7 +196,9 @@ class SingleRoomView(View):
         args = sanitize_dict(parse_json(request.body), {'status':int, 'proposer':basestring})
         status, proposerId = args['status'], args['proposer']
         room = Room.find_by_id(roomId)
-        if room.creator.userId != proposerId:
+        print('Room {} is created by {} and proposed to start by {}'
+            .format(room.roomId, room.creator.strId, proposerId))
+        if room.creator.strId != proposerId:
             return errors.PERMISSION_DENIED
         room.switch_status(status).save()
         return OKResponse()

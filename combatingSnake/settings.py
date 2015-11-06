@@ -161,6 +161,9 @@ LOGGING = {
     }
 }
 
+
+SESSION_ID_HEADER = 'HTTP_X_SNAKE_SESSION_ID'
+MASTER_KEY_HEADER = 'HTTP_X_SNAKE_MASTER_KEY'
 # master key between two apps
 MASTER_KEY = os.environ.get('MASTER_KEY')
 if not MASTER_KEY:
