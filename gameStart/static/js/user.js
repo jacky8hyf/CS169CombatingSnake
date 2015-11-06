@@ -264,26 +264,37 @@ var UserHandler = (function() {
                 var auth = sha256(hashStr);
                 var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
+                var notReceive = true;
                 inbox.onopen = function(e){
-                    if (i < 5) {
+                    if (i < 20 && notReceive) {
                         inbox.send(msg);
                         i++;
                     }
                 }
 
                 inbox.onmessage = function(message) {
-                    console.log(message);
-                    console.log(message.data);
-                    players.html('');   //clear players list
-                    var player = $(playerHtmlTemplate);
-                    player.find('.name').text(message.data.creator.nickname);
-                    players.append(player);
-                    player.addClass(color_lookup[players.size()]);
-
-                    for(i = 0; i < message.data.members.length, i < 7; i++){
+                    if (message.data.indexOf("room") != 0) {
+                        return;
+                    }
+                    var cmd = message.data.substring(0, message.data.indexOf(" "));
+                    var dict = message.data.substring(message.data.indexOf(" ") + 1);
+                    dict = JSON.parse(dict);
+                    if (cmd == "join") {
+                        notReceive = false;
+                        console.log(cmd);
+                        console.log(dict);
+                        players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
-                        player.find('.name').text(message.data.members[i].nickname);
+                        player.find('.name').text(dict.creator.nickname);
                         players.append(player);
+                        player.addClass(color_lookup[players.size()]);
+
+                        for(i = 0; i < dict.members.length, i < 7; i++){
+                            var player = $(playerHtmlTemplate);
+                            player.find('.name').text(dict.members[i].nickname);
+                            players.append(player);
+                        }
+
                     }
                 }
             };
