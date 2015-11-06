@@ -274,15 +274,17 @@ var UserHandler = (function() {
                 inbox.onmessage = function(message) {
                     console.log(message);
                     console.log(message.data);
+                    var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+
                     players.html('');   //clear players list
                     var player = $(playerHtmlTemplate);
-                    player.find('.name').text(message.data.creator.nickname);
+                    player.find('.name').text(roominfo.creator.nickname);
                     players.append(player);
                     player.addClass(color_lookup[players.size()]);
 
-                    for(i = 0; i < message.data.members.length, i < 7; i++){
+                    for(i = 0; i < roominfo.members.length, i < 7; i++){
                         var player = $(playerHtmlTemplate);
-                        player.find('.name').text(message.data.members[i].nickname);
+                        player.find('.name').text(roominfo.members[i].nickname);
                         players.append(player);
                     }
                 }
@@ -326,7 +328,9 @@ var UserHandler = (function() {
 
                     inbox.onmessage = function(message) {
                         console.log(message.data);
-                        if(message.data.members.length > roomSize-1){
+                        var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+
+                        if(roominfo.members.length > roomSize-1){
                             return ;
                         }
 
@@ -337,9 +341,9 @@ var UserHandler = (function() {
                         players.append(player);
 
                         //add room_members
-                        for(i=0; i< message.data.members.length, i < roomSize - 1; i++){
+                        for(i=0; i< roominfo.members.length, i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
-                            player.find('.name').text(message.data.members[i].nickname);
+                            player.find('.name').text(roominfo.members[i].nickname);
                             player.addClass(color_lookup[i+2]);
                             players.append(player);
                         }
