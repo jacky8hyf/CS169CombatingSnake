@@ -289,7 +289,7 @@ var UserHandler = (function() {
                         players.append(player);
                         player.addClass(color_lookup[players.size()]);
 
-                        for(i = 0; i < dict.members.length, i < 7; i++){
+                        for(i = 0; i < dict.members.length && i < 7; i++){
                             var player = $(playerHtmlTemplate);
                             player.find('.name').text(dict.members[i].nickname);
                             players.append(player);
