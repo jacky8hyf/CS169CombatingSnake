@@ -273,7 +273,7 @@ var UserHandler = (function() {
                 }
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("room") != 0) {
+                    if (message.data.indexOf("join") != 0) {
                         return;
                     }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
