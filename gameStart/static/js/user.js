@@ -30,6 +30,10 @@ var UserHandler = (function() {
     var nCols = 38;
     var old_snakes_state = {};   // list of the positions of all old snakes
 
+    // WebSocket logics
+    var inbox = null;
+    var gameStarted = false;
+
     /**
      * HTTP GET request
      * @param  {string}   url       URL path
@@ -212,17 +216,13 @@ var UserHandler = (function() {
             var room = {};
             var onSuccess = function(data) {
                 setBoard();
-
-
                 var player = $(playerHtmlTemplate);
                 player.find('.name').text(usernameGlobal);
                 player.addClass(color_lookup[players.size()]);
-                //player.find('.name').text(userId);
                 players.append(player);
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
-                //createRoomForm.find(".player .name").text(data.creator.nickname);
                 createRoomForm.find(".player .name").text(usernameGlobal);
-                //createRoomForm.find(".player .name").text(userId);
+
                 createRoomForm.show();
                 actionMenu.hide();
                 roomsAction.hide();
@@ -232,131 +232,43 @@ var UserHandler = (function() {
                 var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
 
                 drawSnakes(snakes);     // draw out all snakes
-                alert("hi");
                 snakes = {1: [[12,21], [11,3]], 2: [[14,4], [15,4]]};
                 drawSnakes(snakes);     // draw out all snakes
                 
                 roomId = data.roomId;
-
                 //create a socket connection to server here and remove polling block
-                //var inbox = new ReconnectingWebSocket("ws://"+ location.host + "/receive");
-                //var outbox = new ReconnectingWebSocket("ws://"+ location.host + "/submit");
                 var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 var inbox = new ReconnectingWebSocket(urlstr);
                 var ts = Date.now();
-                var msg = "join " + JSON.stringify({userId:userId, ts:10, auth:"aaaaaa"});
+                var auth = sha256(sessionId + ":" + userId + ":" + ts);
+                console.log("auth: " + auth);
+                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth: auth});
                 inbox.onopen = function(e){
+                    console.log("inside inbox on open");
                     inbox.send(msg);
-                }
+                };
 
                 inbox.onmessage = function(message) {
                     //check if message type is join room: then add to players list
-
+                    console.log("inside inbox on message");
+                    console.log(message);
                     if(members > roomSize-1){
                         return;
                     }
-
-                    console.log(message);
-                }
-            /*    
-                var url1 = "/rooms/"+ roomId+"?creator-profile=true&members=true&member-profile=true";
-                    //make a poll and wait
-                var poll = (function poll(){
-                   // console.log("inside poll");
-                        setTimeout(function(){
-                            var onFinalSuccess = function(data) {
-                                if(data.members.length > 0){
-                                    players.html('');
-                                    
-                                    var player1 = $(playerHtmlTemplate);
-                                    var creator = data.creator.nickname;
-                        
-                                    player1.find('.name').text(creator);
-                                    players.append(player1);
-
-                                    for(i=0; i< data.members.length; i++){
-                                        var player = $(playerHtmlTemplate);
-                                        player.find('.name').text(data.members[i].nickname);
-                                        players.append(player);
-                                        members+=1;
-                                        if (members == 8){
-                                            return;
-                                        }
-                                    }
-                                
-                                }
-                            };
-                            var onFinalFailure = function(e){
-                                console.log(e);
-                            };
-                            makeGetRequest(url1, onFinalSuccess, onFinalFailure);
-                            poll();     
-            
-
-                    },1000);
-
-                })();
-               // poll();    
-
-             */   
-                
-
+                };
             };
             var onFailure = function(error) {
                 console.log(error);
             };
             var url = "/rooms";
             makePostRequest(url, room, onSuccess, onFailure);    
-            
-            
-
-            
-                   
         });
     };
-
-
-    var attachLeaveRoomHandler = function(e) {
-        $('div.game-start-leave').on('click','.submit-leave', function(e){
-            e.preventDefault()
-            var onSuccess = function(data) {
-                loginForm.find('div.error div.login_error').text(" ");
-                signupForm.find('div.error div.signup_error').text(" ");
-                $('div.userInfo').show();
-                $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
-
-                $('div.form_field #signup_username').val("");
-                $('div.form_field #signup_nickname').val("");
-                $('div.form_field #signup_password').val("");
-                $('div.form_field #signup_password_retype').val("");
-
-                $('div.form_field #login_username').val("");
-                $('div.form_field #login_password').val("");
-
-                createRoomForm.hide();
-                loginForm.hide();
-                signupForm.hide();
-                roomsAction.show();
-                actionMenu.show();
-                $('.logout').show();
-                players.html('');
-            };
-            var onFailure = function(error) {
-                console.log(error);
-            };
-            //DELETE /rooms/:roomId/members/:memberId
-            var url = "/rooms/" + roomId + "/members/" + userId;
-            makeDeleteRequest(url, onSuccess, onFailure);
-        });
-    };
-
-
 
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
             e.preventDefault();
-            var onSuccess = function(data) {
-                /* loop through room list to find the first available room and 
+                /* loop through room list to find the first available room and
                 assign it to the user, then make a post request to inform the server
                 size-1 for creator
                 */
@@ -398,7 +310,7 @@ var UserHandler = (function() {
                                 }
                             }
                         }
-                 
+
                         //add the join requester
                         var player2 = $(playerHtmlTemplate);
                         player2.find('.name').text(usernameGlobal);
@@ -417,16 +329,19 @@ var UserHandler = (function() {
                             return;
                         }
                         ///replace this with socket stuff
-                       var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                        var inbox = new ReconnectingWebSocket(urlstr);
+                        var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+                        inbox = new ReconnectingWebSocket(urlstr);
                         var ts = Date.now();
                         var hashStr = sessionId + ":" + userId + ":" + ts;
-                        //var auth = SHA256("sessionId:userId:ts");  auth = hashlib.sha256(str).hexdigest();
-                    //    var auth = hashlib.sha256(hashStr).hexdigest();
+
+                        //var auth = SHA256("sessionId:userId:ts");
+                        //auth = hashlib.sha256(str).hexdigest();
+                        //var auth = hashlib.sha256(hashStr).hexdigest();
+
                         var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:"aaaaa"});
 
                         inbox.onopen = function(e){
-                            inbox.send(msg);
+                            inbox.send(msg); // send the first message to join the room
                         }
 
                         inbox.onmessage = function(message) {
@@ -436,72 +351,80 @@ var UserHandler = (function() {
                                 return ;
                             }
                             console.log(message.data);
-
-
                         }
-
-
-
-                        
-                       // var url1 = "/rooms/"+ available_room.roomId+ "?creator-profile=true&members=true&member-profile=true";
-                        //make a poll and wait
-                /*        var poll = (function poll(){
-                           // console.log("weijie is here");
-                            setTimeout(function(){
-                                var onFinalSuccess1 = function(data) {
-                                    if(data.members.length > 0){
-                                        players.html('');
-                                        var player1 = $(playerHtmlTemplate);
-                                        var creator = data.creator.nickname;
-                            
-                                        player1.find('.name').text(creator);
-                                        player1.addClass(color_lookup[1]);
-                                        players.append(player1);
-
-                                        for(i=0; i< data.members.length; i++){
-                                            if(data.members[i].nickname != creator){
-                                                var player = $(playerHtmlTemplate);
-                                                player.find('.name').text(data.members[i].nickname);
-                                                player.addClass(color_lookup[i+2]);
-                                                players.append(player);
-                                                members+=1;
-                                                if (members == 8){
-                                                    return;
-                                                } 
-                                            }
-                                        }
-                                    }
-                                };
-                                var onFinalFailure1 = function(e){
-                                    console.log(e);
-                                };
-                                makeGetRequest(url1, onFinalSuccess1, onFinalFailure1);
-                                poll();
-                
-                            },1000);
-
-                        })();*/
                     };
 
-                    var onFinalFailure = function(e){
-                        console.log(e);
-                    }
-                    var room={};
-                    console.log(url);
-                    makePutRequest(url, room, onFinalSuccess, onFinalFailure);
-                   
                     $('#cssmenu').hide();
                 }
                 actionMenu.show();
+        });
+    };
+
+
+    var attachLeaveRoomHandler = function(e) {
+        $('div.game-start-leave').on('click','.submit-leave', function(e){
+            e.preventDefault()
+            var onSuccess = function(data) {
+                loginForm.find('div.error div.login_error').text(" ");
+                signupForm.find('div.error div.signup_error').text(" ");
+                $('div.userInfo').show();
+                $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
+
+                $('div.form_field #signup_username').val("");
+                $('div.form_field #signup_nickname').val("");
+                $('div.form_field #signup_password').val("");
+                $('div.form_field #signup_password_retype').val("");
+
+                $('div.form_field #login_username').val("");
+                $('div.form_field #login_password').val("");
+
+                createRoomForm.hide();
+                loginForm.hide();
+                signupForm.hide();
+                roomsAction.show();
+                actionMenu.show();
+                $('.logout').show();
+                players.html('');
             };
             var onFailure = function(error) {
                 console.log(error);
             };
-            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
-            makeGetRequest(url, onSuccess, onFailure);
+            //DELETE /rooms/:roomId/members/:memberId
+            var url = "/rooms/" + roomId + "/members/" + userId;
+            makeDeleteRequest(url, onSuccess, onFailure);
         });
     };
 
+    // Send "start" to webSocket when user hit "StartGame"
+    var attachStartGame = function(e) {
+        $('body').on('click','.submit-start', function(e){
+            e.preventDefault();
+            if (inbox != null) {
+                inbox.send("start");
+            }
+        });
+    }
+
+    var sendKeyStroke = function(e) {
+        if (inbox != null && gameStarted) {
+            var msg;
+            switch(e.keyCode) {
+                case 38:      // UP: 38
+                    msg = "u";
+                    break;
+                case 40:      // DOWN: 40
+                    msg = "d";
+                    break;
+                case 39:      // LEFT: 37
+                    msg = "l";
+                    break;
+                case 37:      // RIGHT: 39
+                    msg = "r";
+                    break;
+            }
+            inbox.send(msg);
+        }
+    }
 
     var drawSnakes = function(snakes) {
         removeSnakes();
@@ -525,12 +448,6 @@ var UserHandler = (function() {
         }
     };
 
-    //drawSnake = function() {
-    //    for (var i = 0; i < snakeBody.length; i++) {
-    //        id = "r" + snakeBody[i].x + "c" + snakeBody[i].y;
-    //        $("#" + id).toggleClass("snake");
-    //    }
-    //}
     var setBoard = function() {
         var table = "<table>";
         for(var i=0; i < nRows; i ++) {
