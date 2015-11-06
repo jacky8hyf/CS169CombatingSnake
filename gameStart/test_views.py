@@ -14,7 +14,6 @@ from django.core.exceptions import *
 import json
 
 from combatingSnake.settings import *
-from utils import SESSION_ID_HEADER
 from errors import errors
 
 class RestTestCase(TestCase):

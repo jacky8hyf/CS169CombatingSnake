@@ -209,158 +209,6 @@ var UserHandler = (function() {
         });
     };
 
-    var attachCreateRoomHandler = function(e) {
-        $('body').on('click','.create_button', function(e){
-			e.preventDefault();
-            var members = 1;
-            var room = {};
-            var onSuccess = function(data) {
-                setBoard();
-                var player = $(playerHtmlTemplate);
-                player.find('.name').text(usernameGlobal);
-                player.addClass(color_lookup[players.size()]);
-                players.append(player);
-                createRoomForm.find(".room_id").text('Room ' + data.roomId);
-                createRoomForm.find(".player .name").text(usernameGlobal);
-
-                createRoomForm.show();
-                actionMenu.hide();
-                roomsAction.hide();
-                $('.logout').hide();
-
-                // Place holder for getting the snakes' positions from the server
-                var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
-
-                drawSnakes(snakes);     // draw out all snakes
-                snakes = {1: [[12,21], [11,3]], 2: [[14,4], [15,4]]};
-                drawSnakes(snakes);     // draw out all snakes
-                
-                roomId = data.roomId;
-                //create a socket connection to server here and remove polling block
-                var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
-                var inbox = new ReconnectingWebSocket(urlstr);
-                var ts = Date.now();
-                var auth = sha256(sessionId + ":" + userId + ":" + ts);
-                console.log("auth: " + auth);
-                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth: auth});
-                inbox.onopen = function(e){
-                    console.log("inside inbox on open");
-                    inbox.send(msg);
-                };
-
-                inbox.onmessage = function(message) {
-                    //check if message type is join room: then add to players list
-                    console.log("inside inbox on message");
-                    console.log(message);
-                    if(members > roomSize-1){
-                        return;
-                    }
-                };
-            };
-            var onFailure = function(error) {
-                console.log(error);
-            };
-            var url = "/rooms";
-            makePostRequest(url, room, onSuccess, onFailure);    
-        });
-    };
-
-    var attachJoinRoomHandler = function(e) {
-        $('body').on('click','.submit-roomjoin', function(e){
-            e.preventDefault();
-                /* loop through room list to find the first available room and
-                assign it to the user, then make a post request to inform the server
-                size-1 for creator
-                */
-                //console.log("enter onSuccess");
-                var available_room;
-                for (room in data.rooms){
-                    if(!room.hasOwnProperty("members")){
-                        available_room = data.rooms[room];
-                        break;
-                    }
-                    else if((room.members).length < roomSize-1){
-                        available_room = data.rooms[room];
-                        break;
-                    }
-                }
-                //if find available room
-                if(available_room != null){
-                    var url = "/rooms/" + available_room.roomId + "/members/" + userId;
-                  //  console.log("find available_room");
-                    var members = 1;
-                    var onFinalSuccess = function(e){
-                        //add room id and room creator
-                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
-                        var player1 = $(playerHtmlTemplate);
-                        var creator = available_room.creator.nickname;
-                        player1.find('.name').text(creator);
-                        player1.addClass(color_lookup[1]);
-                        players.append(player1);
-
-                        //add room_members
-                        if(available_room.hasOwnProperty("members")){
-                            for(i=0; i< available_room.members.length; i++){
-                                if(available_room.members[i].nickname != creator){
-                                    var player = $(playerHtmlTemplate);
-                                    player.find('.name').text(available_room.members[i].nickname);
-                                    player.addClass(color_lookup[i+2]);
-                                    members += 1;
-                                    players.append(player);
-                                }
-                            }
-                        }
-
-                        //add the join requester
-                        var player2 = $(playerHtmlTemplate);
-                        player2.find('.name').text(usernameGlobal);
-                        players.append(player2);
-                        members += 1;
-
-                        createRoomForm.show();
-                        actionMenu.hide();
-                        //joinRoomButton.hide();
-                        //createRoomButton.hide();
-                        roomsAction.hide();
-                        $('.logout').hide();
-                        console.log("join ok");
-
-                        if(members > roomSize-1){
-                            return;
-                        }
-                        ///replace this with socket stuff
-                        var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                        inbox = new ReconnectingWebSocket(urlstr);
-                        var ts = Date.now();
-                        var hashStr = sessionId + ":" + userId + ":" + ts;
-
-                        //var auth = SHA256("sessionId:userId:ts");
-                        //auth = hashlib.sha256(str).hexdigest();
-                        //var auth = hashlib.sha256(hashStr).hexdigest();
-
-                        var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:"aaaaa"});
-
-                        inbox.onopen = function(e){
-                            inbox.send(msg); // send the first message to join the room
-                        }
-
-                        inbox.onmessage = function(message) {
-                            //check if message type is join room: then add to players list
-
-                            if(members > roomSize-1){
-                                return ;
-                            }
-                            console.log(message.data);
-                        }
-                    };
-
-                    $('#cssmenu').hide();
-                }
-                actionMenu.show();
-        });
-    };
-
-
     var attachLeaveRoomHandler = function(e) {
         $('div.game-start-leave').on('click','.submit-leave', function(e){
             e.preventDefault()
@@ -374,7 +222,6 @@ var UserHandler = (function() {
                 $('div.form_field #signup_nickname').val("");
                 $('div.form_field #signup_password').val("");
                 $('div.form_field #signup_password_retype').val("");
-
                 $('div.form_field #login_username').val("");
                 $('div.form_field #login_password').val("");
 
@@ -395,6 +242,117 @@ var UserHandler = (function() {
         });
     };
 
+
+    var attachCreateRoomHandler = function(e) {
+        $('body').on('click','.create_button', function(e){
+			e.preventDefault();
+            var room = {};
+            var onSuccess = function(data) {
+                setBoard();
+                createRoomForm.find(".room_id").text('Room ' + data.roomId);
+                createRoomForm.show();
+                actionMenu.hide();
+                roomsAction.hide();
+                $('.logout').hide();
+
+                roomId = data.roomId;
+                //create a socket connection to server here and remove polling block
+                var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
+                var inbox = new ReconnectingWebSocket(urlstr);
+                var ts = Date.now();
+                var hashStr = sessionId + ":" + userId + ":" + ts;
+                var auth = CryptoJS.SHA256(hashStr);
+                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                inbox.onopen = function(e){
+                    inbox.send(msg);
+                }
+
+                inbox.onmessage = function(message) {
+                    console.log(message.data);
+                    players.html('');   //clear players list
+                    var player = $(playerHtmlTemplate);
+                    player.find('.name').text(message.data.creator.nickname);
+                    players.append(player);
+                    player.addClass(color_lookup[players.size()]);
+
+                    for(i = 0; i < message.data.members.length, i < 7; i++){
+                        var player = $(playerHtmlTemplate);
+                        player.find('.name').text(message.data.members[i].nickname);
+                        players.append(player);
+                    }
+                }
+            };
+            var onFailure = function(error) {
+                console.log(error);
+            };
+            var url = "/rooms";
+            makePostRequest(url, room, onSuccess, onFailure);
+
+        });
+    };
+
+
+    var attachJoinRoomHandler = function(e) {
+        $('body').on('click','.submit-roomjoin', function(e){
+            e.preventDefault();
+            var onSuccess = function(data) {
+                //find available room for joining
+                var available_room;
+                for (room in data.rooms){
+                    if(!room.hasOwnProperty("members")){
+                        available_room = data.rooms[room];
+                        break;
+                    }
+                    else if((room.members).length < roomSize-1){
+                        available_room = data.rooms[room];
+                        break;
+                    }
+                }
+                if(available_room != null){
+                    var urlstr = "ws://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+                    var inbox = new ReconnectingWebSocket(urlstr);
+                    var ts = Date.now();
+                    var hashStr = sessionId + ":" + userId + ":" + ts;
+                    var auth = CryptoJS.SHA256(hashStr);
+                    var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    //send hello message
+                    inbox.onopen = function(e){
+                        inbox.send(msg);
+                    }
+
+                    inbox.onmessage = function(message) {
+                        console.log(message.data);
+                        if(message.data.members.length > roomSize-1){
+                            return ;
+                        }
+
+                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                        var player = $(playerHtmlTemplate);
+                        player.find('.name').text(available_room.creator.nickname);
+                        player.addClass(color_lookup[1]);
+                        players.append(player);
+
+                        //add room_members
+                        for(i=0; i< message.data.members.length, i < roomSize - 1; i++){
+                            var player = $(playerHtmlTemplate);
+                            player.find('.name').text(message.data.members[i].nickname);
+                            player.addClass(color_lookup[i+2]);
+                            players.append(player);
+                        }
+                    }
+                }
+
+                $('#cssmenu').hide();
+                actionMenu.show();
+            };
+            var onFailure = function(error) {
+                console.log(error);
+            };
+            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
+            makeGetRequest(url, onSuccess, onFailure);
+        });
+    };
+
     // Send "start" to webSocket when user hit "StartGame"
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
@@ -402,6 +360,9 @@ var UserHandler = (function() {
             if (inbox != null) {
                 inbox.send("start");
             }
+            // Place holder for getting the snakes' positions from the server
+            var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
+            drawSnakes(snakes);     // draw out all snakes
         });
     }
 
