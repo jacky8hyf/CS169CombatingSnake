@@ -298,6 +298,10 @@ var UserHandler = (function() {
                     if (cmd == "g") { //game command
                         console.log(dict);
                         console.log(cmd);
+                        // Place holder for getting the snakes' positions from the server
+                        var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
+                        drawSnakes(snakes);     // draw out all snakes
+
                     }
                     console.log("others");
                     console.log(dict);
@@ -331,7 +335,7 @@ var UserHandler = (function() {
                 }
                 if(available_room != null){
                     var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                    var inbox = new ReconnectingWebSocket(urlstr);
+                    inbox = new ReconnectingWebSocket(urlstr);
                     var ts = Date.now();
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
@@ -388,15 +392,17 @@ var UserHandler = (function() {
             e.preventDefault();
             if (inbox != null) {
                 inbox.send("start");
+            } else {
+                console.log("inbox is still null");
+                inbox.send("start");
             }
-            // Place holder for getting the snakes' positions from the server
-            var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
-            drawSnakes(snakes);     // draw out all snakes
+
+            gameStarted = true;
         });
     }
 
     var sendKeyStroke = function(e) {
-        if (inbox != null && gameStarted) {
+        if (gameStarted) {
             var msg;
             switch(e.keyCode) {
                 case 38:      // UP: 38
