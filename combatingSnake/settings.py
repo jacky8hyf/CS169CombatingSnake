@@ -51,7 +51,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-
     'gameStart.errors.ErrorMiddleware', # Custom error handling by throwing exceptions
 )
 
@@ -90,6 +89,7 @@ USE_L10N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -113,6 +113,10 @@ else: # django - use sqlite3 # where it goes when python manage.py runserver or 
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Enforces HTTPS
+if HEROKU_SERVER:
+    SECURE_SSL_REDIRECT = True
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
