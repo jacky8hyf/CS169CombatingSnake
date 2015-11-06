@@ -212,16 +212,12 @@ var UserHandler = (function() {
             var onSuccess = function(data) {
                 setBoard();
 
-
-                var player = $(playerHtmlTemplate);
-                player.find('.name').text(usernameGlobal);
-                player.addClass(color_lookup[players.size()]);
-                //player.find('.name').text(userId);
-                players.append(player);
+        //        var player = $(playerHtmlTemplate);
+        ///        player.find('.name').text(usernameGlobal);
+        //        player.addClass(color_lookup[players.size()]);
+        //        players.append(player);
                 createRoomForm.find(".room_id").text('Room ' + data.roomId);
-                //createRoomForm.find(".player .name").text(data.creator.nickname);
-                createRoomForm.find(".player .name").text(usernameGlobal);
-                //createRoomForm.find(".player .name").text(userId);
+        //        createRoomForm.find(".player .name").text(usernameGlobal);
                 createRoomForm.show();
                 actionMenu.hide();
                 roomsAction.hide();
@@ -251,8 +247,11 @@ var UserHandler = (function() {
                 }
                // var members = 1;
                 inbox.onmessage = function(message) {
-                    //check if message type is join room: then add to players list
                     console.log(message.data);
+
+                 //   if(message.data.indexOf('error')!=-1){
+                 //       inbox.close();
+                 //   }
                     players.html('');   //clear players list
 
                     var player = $(playerHtmlTemplate);
