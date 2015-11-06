@@ -273,13 +273,13 @@ var UserHandler = (function() {
                 }
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("join") != 0) {
+                    if (message.data.indexOf("room") != 0) {
                         return;
                     }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
                     var dict = message.data.substring(message.data.indexOf(" ") + 1);
                     dict = JSON.parse(dict);
-                    if (cmd == "join") {
+                    if (cmd == "room") {
                         notReceive = false;
                         console.log(cmd);
                         console.log(dict);
