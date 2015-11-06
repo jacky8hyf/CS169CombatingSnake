@@ -273,7 +273,7 @@ var UserHandler = (function() {
                 }
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("room") != 0) {
+                    if (message.data.indexOf("err") != -1) {
                         return;
                     }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
@@ -294,8 +294,14 @@ var UserHandler = (function() {
                             player.find('.name').text(dict.members[i].nickname);
                             players.append(player);
                         }
-
                     }
+                    if (cmd == "g") { //game command
+                        console.log(dict);
+                        console.log(cmd);
+                    }
+                    console.log("others");
+                    console.log(dict);
+                    console.log(cmd);
                 }
             };
             var onFailure = function(error) {
@@ -348,6 +354,8 @@ var UserHandler = (function() {
                         actionMenu.hide();
                         roomsAction.hide();
                         $('.logout').hide();
+
+                        players.html ('')
                         var player = $(playerHtmlTemplate);
                         player.find('.name').text(available_room.creator.nickname);
                         player.addClass(color_lookup[1]);
@@ -469,6 +477,8 @@ var UserHandler = (function() {
         attachCreateRoomHandler();
         attachJoinRoomHandler();
         attachLeaveRoomHandler();
+        attachStartGame();
+        sendKeyStroke();
     };
 
     // PUBLIC METHODS
