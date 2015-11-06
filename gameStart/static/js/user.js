@@ -344,6 +344,10 @@ var UserHandler = (function() {
                         }
 
                         createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                        createRoomForm.show();
+                        actionMenu.hide();
+                        roomsAction.hide();
+                        $('.logout').hide();
                         var player = $(playerHtmlTemplate);
                         player.find('.name').text(available_room.creator.nickname);
                         player.addClass(color_lookup[1]);
