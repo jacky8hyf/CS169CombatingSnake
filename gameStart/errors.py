@@ -6,6 +6,9 @@ import inspect
 
 import models as snake_models
 
+class RoomEmptyError(Exception):
+    pass
+
 def e(err, msg, status_code = 400):
 	js = JsonResponse();
 	js.status_code = status_code;

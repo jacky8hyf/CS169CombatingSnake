@@ -7,8 +7,9 @@ from utils import *
 from hashing_passwords import *
 from uuid import uuid4
 import re
+import random
 from combatingSnake.settings import *
-from errors import errors
+from errors import errors, RoomEmptyError
 
 # Create your models here.
 
@@ -157,7 +158,6 @@ class User(BaseModel):
         '''
         if self.inroom == room:
             self.inroom = None
-        # FIXME consider deleting room here??? it should be done after self.save
         return self
 
     def to_dict(self, includeProfile = False):
@@ -202,19 +202,25 @@ class Room(BaseModel):
     def all_rooms(cls):
         return cls.objects.all()
 
-    def destroy_if_created_by(self, user):
-        '''
-        Delete myself if created by user. Return None because there is no point
-        of chaining.
-        '''
-        if self.creator != user:
-            return
-        self.delete() # this will sets all member users' inroom attribute to null
+    # def destroy_if_created_by(self, user):
+    #     '''
+    #     Delete myself if created by user. Return None because there is no point
+    #     of chaining.
+    #     '''
+    #     if self.creator != user:
+    #         return
+    #     self.delete() # this will sets all member users' inroom attribute to null
 
     def reassign_creator_if_created_by(self, user):
         if self.creator != user:
-            return
-        pass # FIXME need to reassign the creator of the room
+            return self
+        members = self.all_members
+        if members:
+            self.creator = random.choice(members)
+        else:
+            self.delete()
+            raise RoomEmptyError()
+        return self
 
     def switch_status(self, newStatus):
         '''
@@ -229,6 +235,8 @@ class Room(BaseModel):
         if the user cannot join the room. Return self to allow chaining.
         '''
         # currently all users can join waiting room with spaces
+        if self.creator == user or user in self.all_members:
+            return self
         if self.status != STATUS_WAITING:
             raise errors.ROOM_PLAYING
         if len(self.all_members) >= self.capacity - 1: # -1 for the creator

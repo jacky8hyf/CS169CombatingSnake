@@ -14,7 +14,7 @@ import json, traceback
 
 from combatingSnake.settings import *
 from models import User, Room
-from errors import errors
+from errors import errors, RoomEmptyError
 from utils import *
 
 
@@ -80,6 +80,18 @@ class UsersView(View):
                 return errors.USERNAME_TAKEN
             return errors.INTERNAL_SERVER_ERROR('{}: {}'.format(type(e).__name__, string))
         return OKResponse(userId = user.strId, sessionId = user.session_id)
+
+    def delete(self, request, *args, **kwargs):
+        '''
+        Delete all users. For testing purposes only.
+        '''
+        if HEROKU_SERVER:
+            raise errors.PERMISSION_DENIED
+        if not validate_master_key(request):
+            raise errors.PERMISSION_DENIED
+        User.objects.all().delete()
+        return OKResponse()
+
 
 class UsersLoginView(View):
     '''
@@ -193,12 +205,18 @@ class SingleRoomView(View):
 
     @transaction.atomic
     def put(self, request, roomId, *args, **kwargs):
-        args = sanitize_dict(parse_json(request.body), {'status':int, 'proposer':basestring})
-        status, proposerId = args['status'], args['proposer']
+        '''
+        If argument 'status' is playing, requires a 'proposer'. If argument 'status'
+        is waiting, just ends the game blindly.
+        '''
+        if not validate_master_key(request):
+            return errors.PERMISSION_DENIED
+        args = sanitize_dict(parse_json(request.body), {'status':int}, {'proposer':basestring})
+        status, proposerId = args.get('status'), args.get('proposer')
         room = Room.find_by_id(roomId)
         print('Room {} is created by {} and proposed to start by {}'
             .format(room.roomId, room.creator.strId, proposerId))
-        if room.creator.strId != proposerId:
+        if status == STATUS_PLAYING and room.creator.strId != proposerId:
             return errors.PERMISSION_DENIED
         room.switch_status(status).save()
         return OKResponse()
@@ -255,7 +273,10 @@ class SingleRoomSingleMemberView(View):
                 return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
-        room.destroy_if_created_by(user)
+        try:
+            room.reassign_creator_if_created_by(user).save()
+        except RoomEmptyError:
+            return OKResponse() # even if return-room is true
 
         if not returnRoom:
             return OKResponse()
