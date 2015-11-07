@@ -23,7 +23,7 @@ var UserHandler = (function() {
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'black']
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'black'];
 
     // Handle gameboard
     var nRows = 21;
@@ -133,7 +133,7 @@ var UserHandler = (function() {
         loginForm.hide();
         signupForm.hide();
         roomsAction.show();
-    }
+    };
 
     /**
      * Add event handlers for submitting the create form.
@@ -141,7 +141,7 @@ var UserHandler = (function() {
      */
     var attachLoginHandler = function(e) {
         loginForm.on('click', '.submit-login', function(e) {
-            e.preventDefault()
+            e.preventDefault();
             var errorElem = loginForm.find('div.error div.login_error');
             var username = loginForm.find('div.form_field #login_username').val();
             usernameGlobal = username;
@@ -162,7 +162,7 @@ var UserHandler = (function() {
 
     var attachLogoutHandler = function(e) {
         $('div.userInfo').on('click', '.logout', function(e) {
-            e.preventDefault()
+            e.preventDefault();
 
             var onSuccess = function(data) {
                 is_login = false;
@@ -185,7 +185,7 @@ var UserHandler = (function() {
 
     var attachSignupHandler = function(e) {
         signupForm.on('click', '.submit-signup', function(e) {
-            e.preventDefault()
+            e.preventDefault();
             var errorElem = signupForm.find('div.error div.signup_error');
             var username = signupForm.find('div.form_field #signup_username').val();
             usernameGlobal = username;
@@ -204,15 +204,38 @@ var UserHandler = (function() {
             var onFailure = function(response) {
                 var data = response.responseJSON;
                 errorElem.text(data.msg);
-            }
+            };
             makePostRequest("/users/", user, onSuccessLogin, onFailure);
         });
     };
 
     var attachLeaveRoomHandler = function(e) {
         $('div.game-start-leave').on('click','.submit-leave', function(e){
-            e.preventDefault()
-            var onSuccess = function(data) {
+            e.preventDefault();
+            inbox.send("quit");
+            inbox.close();
+            
+            loginForm.find('div.error div.login_error').text(" ");
+            signupForm.find('div.error div.signup_error').text(" ");
+            $('div.userInfo').show();
+            $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
+
+            $('div.form_field #signup_username').val("");
+            $('div.form_field #signup_nickname').val("");
+            $('div.form_field #signup_password').val("");
+            $('div.form_field #signup_password_retype').val("");
+            $('div.form_field #login_username').val("");
+            $('div.form_field #login_password').val("");
+
+            createRoomForm.hide();
+            loginForm.hide();
+            signupForm.hide();
+            roomsAction.show();
+            actionMenu.show();
+            $('.logout').show();
+            players.html('');
+
+        /*    var onSuccess = function(data) {
                 loginForm.find('div.error div.login_error').text(" ");
                 signupForm.find('div.error div.signup_error').text(" ");
                 $('div.userInfo').show();
@@ -238,7 +261,7 @@ var UserHandler = (function() {
             };
             //DELETE /rooms/:roomId/members/:memberId
             var url = "/rooms/" + roomId + "/members/" + userId;
-            makeDeleteRequest(url, onSuccess, onFailure);
+            makeDeleteRequest(url, onSuccess, onFailure);*/
         });
     };
 
@@ -258,7 +281,8 @@ var UserHandler = (function() {
                 roomId = data.roomId;
                 //create a socket connection to server here and remove polling block
                 var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
-                var inbox = new ReconnectingWebSocket(urlstr);
+                //inbox = new ReconnectingWebSocket(urlstr);
+                inbox = new WebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
@@ -270,10 +294,10 @@ var UserHandler = (function() {
                         inbox.send(msg);
                         i++;
                     }
-                }
+                };
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("room") != 0) {
+                    if (message.data.indexOf("err") != -1) {
                         return;
                     }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
@@ -294,9 +318,19 @@ var UserHandler = (function() {
                             player.find('.name').text(dict.members[i].nickname);
                             players.append(player);
                         }
+                    }
+                    if (cmd == "g") { //game command
+                        console.log(dict);
+                        console.log(cmd);
+                        // Place holder for getting the snakes' positions from the server
+                        var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
+                        drawSnakes(snakes);     // draw out all snakes
 
                     }
-                }
+                    console.log("others");
+                    console.log(dict);
+                    console.log(cmd);
+                };
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -325,7 +359,8 @@ var UserHandler = (function() {
                 }
                 if(available_room != null){
                     var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                    var inbox = new ReconnectingWebSocket(urlstr);
+                    //inbox = new ReconnectingWebSocket(urlstr);
+                    inbox = new WebSocket(urlstr);
                     var ts = Date.now();
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
@@ -333,7 +368,7 @@ var UserHandler = (function() {
                     //send hello message
                     inbox.onopen = function(e){
                         inbox.send(msg);
-                    }
+                    };
 
                     inbox.onmessage = function(message) {
                         console.log(message.data);
@@ -348,6 +383,8 @@ var UserHandler = (function() {
                         actionMenu.hide();
                         roomsAction.hide();
                         $('.logout').hide();
+
+                        players.html ('')
                         var player = $(playerHtmlTemplate);
                         player.find('.name').text(available_room.creator.nickname);
                         player.addClass(color_lookup[1]);
@@ -381,11 +418,9 @@ var UserHandler = (function() {
             if (inbox != null) {
                 inbox.send("start");
             }
-            // Place holder for getting the snakes' positions from the server
-            var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
-            drawSnakes(snakes);     // draw out all snakes
+            gameStarted = true;
         });
-    }
+    };
 
     var sendKeyStroke = function(e) {
         if (inbox != null && gameStarted) {
@@ -406,7 +441,7 @@ var UserHandler = (function() {
             }
             inbox.send(msg);
         }
-    }
+    };
 
     var drawSnakes = function(snakes) {
         removeSnakes();
@@ -469,6 +504,8 @@ var UserHandler = (function() {
         attachCreateRoomHandler();
         attachJoinRoomHandler();
         attachLeaveRoomHandler();
+        attachStartGame();
+        sendKeyStroke();
     };
 
     // PUBLIC METHODS
