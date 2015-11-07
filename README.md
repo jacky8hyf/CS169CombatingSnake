@@ -11,7 +11,7 @@ Visit the [Combating Snake website](https://combating-snake.herokuapp.com/) to t
 3. `source venv/bin/activate`
 4. `[sudo] pip install -r requirements.txt`
 
-## Run it ``locally''
+## Run it "locally"
 Simply run `heroku local`! Still, it will use
 ws://combating-snake-chat-backend.herokuapp.com as the Websockets backend, which
 in turn will actually connect to the deployed Heroku app to look for data. So you
