@@ -29,6 +29,7 @@ var UserHandler = (function() {
     var nRows = 21;
     var nCols = 38;
     var old_snakes_state = {};   // list of the positions of all old snakes
+    var old_foods = [];   // list of the positions of all old snakes
 
     // WebSocket logics
     var inbox = null;
@@ -300,6 +301,11 @@ var UserHandler = (function() {
                     if (message.data.indexOf("err") != -1) {
                         return;
                     }
+                    if (message.data.indexOf(" ") == -1) { // message: start
+                        if (message.data == "start") {
+                            gameStarted = true;
+                        }
+                    }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
                     var dict = message.data.substring(message.data.indexOf(" ") + 1);
                     dict = JSON.parse(dict);
@@ -318,14 +324,16 @@ var UserHandler = (function() {
                             player.find('.name').text(dict.members[i].nickname);
                             players.append(player);
                         }
-                    }
-                    if (cmd == "g") { //game command
+                    } else if (cmd == "g") { //game command
                         console.log(dict);
                         console.log(cmd);
                         // Place holder for getting the snakes' positions from the server
-                        var snakes = {1: [[1,2], [1,3], [1, 4]], 2: [[3,4], [4,4], [5,4]]};
-                        drawSnakes(snakes);     // draw out all snakes
-
+                        drawSnakes(dict); // draw out all snakes
+                        drawFoods(dict["_food"]); // draw out all snakes
+                    } else if (cmd == "end") {
+                        console.log(dict);
+                        console.log(cmd);
+                        alert("Winner is " + dict.nickname);
                     }
                     console.log("others");
                     console.log(dict);
@@ -372,6 +380,29 @@ var UserHandler = (function() {
 
                     inbox.onmessage = function(message) {
                         console.log(message.data);
+                        if (message.data.indexOf("err") != -1) {
+                            return;
+                        }
+                        if (message.data.indexOf(" ") == -1) { // message: start
+                            if (message.data == "start") {
+                                gameStarted = true;
+                            }
+                        }
+                        var cmd = message.data.substring(0, message.data.indexOf(" "));
+                        var dict = message.data.substring(message.data.indexOf(" ") + 1);
+                        dict = JSON.parse(dict);
+                        if (cmd == "g") { //game command
+                            console.log(dict);
+                            console.log(cmd);
+                            // Place holder for getting the snakes' positions from the server
+                            drawSnakes(dict); // draw out all snakes
+                            drawFoods(dict["_food"]); // draw out all snakes
+                        } else if (cmd == "end") {
+                            console.log(dict);
+                            console.log(cmd);
+                            alert("Winner is " + dict.nickname);
+                        }
+
                         var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
 
                         if(roominfo.members.length > roomSize-1){
@@ -446,13 +477,33 @@ var UserHandler = (function() {
     var drawSnakes = function(snakes) {
         removeSnakes();
         for (var key in snakes){
-            var snake_body = snakes[key];
-            for (var i = 0; i < snake_body.length; i++) {
-                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).toggleClass(color_lookup[key]);
+            if (key != '_food') {
+                var snake_body = snakes[key];
+                for (var i = 0; i < snake_body.length; i++) {
+                    id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                    $("#" + id).toggleClass(color_lookup[key]);
+                }
             }
         }
         old_snakes_state = snakes;
+    };
+
+    var drawFoods = function(foods) {
+        removeFoods();
+        for (var i = 0; i < foods.length; i++) {
+            var food = foods[i];
+            id = "r" + food[0] + "c" + food[1];
+            $("#" + id).toggleClass("food");
+        }
+        old_foods = snakes;
+    };
+
+    var removeFoods = function() {
+        for (var i = 0; i < old_foods.length; i++){
+            var food = foods[i];
+            id = "r" + food[0] + "c" + food[1];
+            $("#" + id).toggleClass("food");
+        }
     };
 
     var removeSnakes = function() {
@@ -464,6 +515,8 @@ var UserHandler = (function() {
             }
         }
     };
+
+
 
     var setBoard = function() {
         var table = "<table>";

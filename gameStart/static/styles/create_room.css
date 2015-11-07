@@ -84,6 +84,10 @@
 	color: white;
 }
 
+.food{
+	background-color:white;
+}
+
 .red{
 	background-color:rgba(128,0,0,0.5);
 }
