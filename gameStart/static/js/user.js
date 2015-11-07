@@ -280,7 +280,7 @@ var UserHandler = (function() {
                 roomId = data.roomId;
                 //create a socket connection to server here and remove polling block
                 var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
-                var inbox = new ReconnectingWebSocket(urlstr);
+                inbox = new ReconnectingWebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
@@ -414,17 +414,13 @@ var UserHandler = (function() {
             e.preventDefault();
             if (inbox != null) {
                 inbox.send("start");
-            } else {
-                console.log("inbox is still null");
-                inbox.send("start");
             }
-
             gameStarted = true;
         });
-    }
+    };
 
     var sendKeyStroke = function(e) {
-        if (gameStarted) {
+        if (inbox != null && gameStarted) {
             var msg;
             switch(e.keyCode) {
                 case 38:      // UP: 38
@@ -442,7 +438,7 @@ var UserHandler = (function() {
             }
             inbox.send(msg);
         }
-    }
+    };
 
     var drawSnakes = function(snakes) {
         removeSnakes();
