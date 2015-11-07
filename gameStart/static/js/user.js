@@ -23,7 +23,7 @@ var UserHandler = (function() {
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'black']
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'black'];
 
     // Handle gameboard
     var nRows = 21;
@@ -133,7 +133,7 @@ var UserHandler = (function() {
         loginForm.hide();
         signupForm.hide();
         roomsAction.show();
-    }
+    };
 
     /**
      * Add event handlers for submitting the create form.
@@ -141,7 +141,7 @@ var UserHandler = (function() {
      */
     var attachLoginHandler = function(e) {
         loginForm.on('click', '.submit-login', function(e) {
-            e.preventDefault()
+            e.preventDefault();
             var errorElem = loginForm.find('div.error div.login_error');
             var username = loginForm.find('div.form_field #login_username').val();
             usernameGlobal = username;
@@ -162,7 +162,7 @@ var UserHandler = (function() {
 
     var attachLogoutHandler = function(e) {
         $('div.userInfo').on('click', '.logout', function(e) {
-            e.preventDefault()
+            e.preventDefault();
 
             var onSuccess = function(data) {
                 is_login = false;
@@ -185,7 +185,7 @@ var UserHandler = (function() {
 
     var attachSignupHandler = function(e) {
         signupForm.on('click', '.submit-signup', function(e) {
-            e.preventDefault()
+            e.preventDefault();
             var errorElem = signupForm.find('div.error div.signup_error');
             var username = signupForm.find('div.form_field #signup_username').val();
             usernameGlobal = username;
@@ -204,15 +204,16 @@ var UserHandler = (function() {
             var onFailure = function(response) {
                 var data = response.responseJSON;
                 errorElem.text(data.msg);
-            }
+            };
             makePostRequest("/users/", user, onSuccessLogin, onFailure);
         });
     };
 
     var attachLeaveRoomHandler = function(e) {
         $('div.game-start-leave').on('click','.submit-leave', function(e){
-            e.preventDefault()
+            e.preventDefault();
             inbox.send("quit");
+            inbox.close();
             
             loginForm.find('div.error div.login_error').text(" ");
             signupForm.find('div.error div.signup_error').text(" ");
@@ -292,7 +293,7 @@ var UserHandler = (function() {
                         inbox.send(msg);
                         i++;
                     }
-                }
+                };
 
                 inbox.onmessage = function(message) {
                     if (message.data.indexOf("err") != -1) {
@@ -328,7 +329,7 @@ var UserHandler = (function() {
                     console.log("others");
                     console.log(dict);
                     console.log(cmd);
-                }
+                };
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -365,7 +366,7 @@ var UserHandler = (function() {
                     //send hello message
                     inbox.onopen = function(e){
                         inbox.send(msg);
-                    }
+                    };
 
                     inbox.onmessage = function(message) {
                         console.log(message.data);
