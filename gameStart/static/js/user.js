@@ -488,6 +488,16 @@ var UserHandler = (function() {
         old_snakes_state = snakes;
     };
 
+    var removeSnakes = function() {
+        for (var key in old_snakes_state){
+            var snake_body = old_snakes_state[key];
+            for (var i = 0; i < snake_body.length; i++) {
+                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                $("#" + id).toggleClass(color_lookup[key]);
+            }
+        }
+    };
+
     var drawFoods = function(foods) {
         removeFoods();
         for (var i = 0; i < foods.length; i++) {
@@ -500,23 +510,11 @@ var UserHandler = (function() {
 
     var removeFoods = function() {
         for (var i = 0; i < old_foods.length; i++){
-            var food = foods[i];
+            var food = old_foods[i];
             id = "r" + food[0] + "c" + food[1];
             $("#" + id).toggleClass("food");
         }
     };
-
-    var removeSnakes = function() {
-        for (var key in old_snakes_state){
-            var snake_body = old_snakes_state[key];
-            for (var i = 0; i < snake_body.length; i++) {
-                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).toggleClass(color_lookup[key]);
-            }
-        }
-    };
-
-
 
     var setBoard = function() {
         var table = "<table>";
