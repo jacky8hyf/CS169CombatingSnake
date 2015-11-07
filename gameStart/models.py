@@ -9,7 +9,7 @@ from uuid import uuid4
 import re
 import random
 from combatingSnake.settings import *
-from errors import errors
+from errors import errors, RoomEmptyError
 
 # Create your models here.
 
@@ -218,7 +218,8 @@ class Room(BaseModel):
         if members:
             self.creator = random.choice(members)
         else:
-            self.creator = None
+            self.delete()
+            raise RoomEmptyError()
         return self
 
     def switch_status(self, newStatus):

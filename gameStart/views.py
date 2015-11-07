@@ -14,7 +14,7 @@ import json, traceback
 
 from combatingSnake.settings import *
 from models import User, Room
-from errors import errors
+from errors import errors, RoomEmptyError
 from utils import *
 
 
@@ -273,11 +273,10 @@ class SingleRoomSingleMemberView(View):
                 return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
-        room = room.reassign_creator_if_created_by(user)
-        if room.creator is None:
-            room.delete()
-            return OKResponse() # even if return-room is True
-        else: room.save()
+        try:
+            room.reassign_creator_if_created_by(user).save()
+        except RoomEmptyError:
+            return OKResponse() # even if return-room is true
 
         if not returnRoom:
             return OKResponse()
