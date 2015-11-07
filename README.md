@@ -3,7 +3,7 @@
 This is the Combating Snake repo!
 
 # Trying it out!
-Visit https://shielded-hollows-7501.herokuapp.com/ to try it out!
+Visit https://combating-snake.herokuapp.com/ to try it out!
 
 # Setting up the repository
 1. Clone the repository
