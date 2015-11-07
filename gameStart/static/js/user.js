@@ -495,7 +495,7 @@ var UserHandler = (function() {
             id = "r" + food[0] + "c" + food[1];
             $("#" + id).toggleClass("food");
         }
-        old_foods = snakes;
+        old_foods = foods;
     };
 
     var removeFoods = function() {
