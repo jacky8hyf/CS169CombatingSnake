@@ -412,7 +412,7 @@ var UserHandler = (function() {
                             players.append(player);
 
                             //add room_members
-                            for(i=0; i< roominfo.members.length, i < roomSize - 1; i++){
+                            for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
                                 var player = $(playerHtmlTemplate);
                                 player.find('.name').text(roominfo.members[i].nickname);
                                 player.addClass(color_lookup[i+2]);
