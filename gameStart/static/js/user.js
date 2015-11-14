@@ -29,7 +29,7 @@ var UserHandler = (function() {
     var nRows = 21;
     var nCols = 38;
     var old_snakes_state = {};   // list of the positions of all old snakes
-    var old_foods = [];   // list of the positions of all old snakes
+    var old_foods = [];   // list of the positions of all old foods
 
     // WebSocket logics
     var inbox = null;
@@ -293,6 +293,7 @@ var UserHandler = (function() {
                 inbox.onopen = function(e){
                     if (i < 20 && notReceive) {
                         inbox.send(msg);
+                        console.log("Retrying " + i + " times.");
                         i++;
                     }
                 };
@@ -304,6 +305,8 @@ var UserHandler = (function() {
                     if (message.data.indexOf(" ") == -1) { // message: start
                         if (message.data == "start") {
                             gameStarted = true;
+
+                            return;
                         }
                     }
                     var cmd = message.data.substring(0, message.data.indexOf(" "));
@@ -329,7 +332,7 @@ var UserHandler = (function() {
                         console.log(cmd);
                         // Place holder for getting the snakes' positions from the server
                         drawSnakes(dict); // draw out all snakes
-                        drawFoods(dict["_food"]); // draw out all snakes
+                        drawFoods(dict["_food"]); // draw out all foods
                     } else if (cmd == "end") {
                         console.log(dict);
                         console.log(cmd);
@@ -356,11 +359,7 @@ var UserHandler = (function() {
                 //find available room for joining
                 var available_room;
                 for (room in data.rooms){
-                    if(!room.hasOwnProperty("members")){
-                        available_room = data.rooms[room];
-                        break;
-                    }
-                    else if((room.members).length < roomSize-1){
+                    if(!room.hasOwnProperty("members") || (room.members.length < roomSize)){
                         available_room = data.rooms[room];
                         break;
                     }
@@ -374,10 +373,14 @@ var UserHandler = (function() {
                     var auth = sha256(hashStr);
                     var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
+                    var notReceive = true;
                     inbox.onopen = function(e){
-                        inbox.send(msg);
+                        if (i < 20 && notReceive) {
+                            inbox.send(msg);
+                            console.log("Retrying " + i + " times.");
+                            i++;
+                        }
                     };
-
                     inbox.onmessage = function(message) {
                         console.log(message.data);
                         if (message.data.indexOf("err") != -1) {
@@ -386,6 +389,7 @@ var UserHandler = (function() {
                         if (message.data.indexOf(" ") == -1) { // message: start
                             if (message.data == "start") {
                                 gameStarted = true;
+                                return;
                             }
                         }
                         var cmd = message.data.substring(0, message.data.indexOf(" "));
@@ -401,32 +405,35 @@ var UserHandler = (function() {
                             console.log(dict);
                             console.log(cmd);
                             alert("Winner is " + dict.nickname);
-                        }
+                        } else if (cmd == "room") {
+                            notReceive = false;
+                            //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+                            var roominfo = dict;
 
-                        var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+                            if(roominfo.members.length > roomSize-1){
+                                return ;
+                            }
 
-                        if(roominfo.members.length > roomSize-1){
-                            return ;
-                        }
+                            createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                            createRoomForm.show();
+                            actionMenu.hide();
+                            roomsAction.hide();
+                            $('.logout').hide();
 
-                        createRoomForm.find('.room_id').text("Room " + available_room.roomId);
-                        createRoomForm.show();
-                        actionMenu.hide();
-                        roomsAction.hide();
-                        $('.logout').hide();
-
-                        players.html ('')
-                        var player = $(playerHtmlTemplate);
-                        player.find('.name').text(available_room.creator.nickname);
-                        player.addClass(color_lookup[1]);
-                        players.append(player);
-
-                        //add room_members
-                        for(i=0; i< roominfo.members.length, i < roomSize - 1; i++){
+                            players.html ('');
                             var player = $(playerHtmlTemplate);
-                            player.find('.name').text(roominfo.members[i].nickname);
-                            player.addClass(color_lookup[i+2]);
+                            player.find('.name').text(available_room.creator.nickname);
+                            player.addClass(color_lookup[1]);
                             players.append(player);
+
+                            //add room_members
+                            for(i=0; i< roominfo.members.length, i < roomSize - 1; i++){
+                                var player = $(playerHtmlTemplate);
+                                player.find('.name').text(roominfo.members[i].nickname);
+                                player.addClass(color_lookup[i+2]);
+                                players.append(player);
+                            }
+
                         }
                     }
                 }
