@@ -213,30 +213,11 @@ var UserHandler = (function() {
     var attachLeaveRoomHandler = function(e) {
         $('div.game-start-leave').on('click','.submit-leave', function(e){
             e.preventDefault();
-            inbox.send("quit");
-            inbox.close();
-            
-            loginForm.find('div.error div.login_error').text(" ");
-            signupForm.find('div.error div.signup_error').text(" ");
-            $('div.userInfo').show();
-            $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
 
-            $('div.form_field #signup_username').val("");
-            $('div.form_field #signup_nickname').val("");
-            $('div.form_field #signup_password').val("");
-            $('div.form_field #signup_password_retype').val("");
-            $('div.form_field #login_username').val("");
-            $('div.form_field #login_password').val("");
+            var onSuccess = function(data) {
+                inbox.send("quit");
+                inbox.close();
 
-            createRoomForm.hide();
-            loginForm.hide();
-            signupForm.hide();
-            roomsAction.show();
-            actionMenu.show();
-            $('.logout').show();
-            players.html('');
-
-        /*    var onSuccess = function(data) {
                 loginForm.find('div.error div.login_error').text(" ");
                 signupForm.find('div.error div.signup_error').text(" ");
                 $('div.userInfo').show();
@@ -262,7 +243,7 @@ var UserHandler = (function() {
             };
             //DELETE /rooms/:roomId/members/:memberId
             var url = "/rooms/" + roomId + "/members/" + userId;
-            makeDeleteRequest(url, onSuccess, onFailure);*/
+            makeDeleteRequest(url, onSuccess, onFailure);
         });
     };
 
@@ -305,7 +286,6 @@ var UserHandler = (function() {
                     if (message.data.indexOf(" ") == -1) { // message: start
                         if (message.data == "start") {
                             gameStarted = true;
-
                             return;
                         }
                     }
@@ -434,7 +414,6 @@ var UserHandler = (function() {
                                 player.addClass(color_lookup[i+2]);
                                 players.append(player);
                             }
-
                         }
                     }
                 }
