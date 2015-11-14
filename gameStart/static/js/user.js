@@ -345,7 +345,7 @@ var UserHandler = (function() {
                 for (room in data.rooms){
                     if(!room.hasOwnProperty("members") || (room.members.length < roomSize)){
                         available_room = data.rooms[room];
-                        break;
+                        //break; // FIXME: COMMENT THIS OUT TO JOIN THE LATEST ROOM, NOT THE OLDEST ROOM
                     }
                 }
                 if(available_room != null){
