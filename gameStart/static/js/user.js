@@ -306,9 +306,10 @@ var UserHandler = (function() {
                         players.append(player);
                         player.addClass(color_lookup[players.size()]);
 
-                        for(i = 0; i < dict.members.length && i < 7; i++){
+                        for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
                             player.find('.name').text(dict.members[i].nickname);
+                            player.addClass(color_lookup[i+2]);
                             players.append(player);
                         }
                     } else if (cmd == "g") { //game command
@@ -340,6 +341,7 @@ var UserHandler = (function() {
         $('body').on('click','.submit-roomjoin', function(e){
             e.preventDefault();
             var onSuccess = function(data) {
+                setBoard();
                 //find available room for joining
                 var available_room;
                 for (room in data.rooms){
