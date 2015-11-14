@@ -373,6 +373,7 @@ var UserHandler = (function() {
                     var auth = sha256(hashStr);
                     var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
+                    var i = 0;
                     var notReceive = true;
                     inbox.onopen = function(e){
                         if (i < 20 && notReceive) {
