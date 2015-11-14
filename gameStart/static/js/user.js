@@ -210,6 +210,28 @@ var UserHandler = (function() {
         });
     };
 
+    var leaveRoomResult = function() {
+        loginForm.find('div.error div.login_error').text(" ");
+        signupForm.find('div.error div.signup_error').text(" ");
+        $('div.userInfo').show();
+        $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
+
+        $('div.form_field #signup_username').val("");
+        $('div.form_field #signup_nickname').val("");
+        $('div.form_field #signup_password').val("");
+        $('div.form_field #signup_password_retype').val("");
+        $('div.form_field #login_username').val("");
+        $('div.form_field #login_password').val("");
+
+        createRoomForm.hide();
+        loginForm.hide();
+        signupForm.hide();
+        roomsAction.show();
+        actionMenu.show();
+        $('.logout').show();
+        players.html('');
+    };
+
     var attachLeaveRoomHandler = function(e) {
         $('div.game-start-leave').on('click','.submit-leave', function(e){
             e.preventDefault();
@@ -217,29 +239,11 @@ var UserHandler = (function() {
             var onSuccess = function(data) {
                 inbox.send("quit");
                 inbox.close();
-
-                loginForm.find('div.error div.login_error').text(" ");
-                signupForm.find('div.error div.signup_error').text(" ");
-                $('div.userInfo').show();
-                $('div.usernameInfo').text("Welcome, " + usernameGlobal + " !");
-
-                $('div.form_field #signup_username').val("");
-                $('div.form_field #signup_nickname').val("");
-                $('div.form_field #signup_password').val("");
-                $('div.form_field #signup_password_retype').val("");
-                $('div.form_field #login_username').val("");
-                $('div.form_field #login_password').val("");
-
-                createRoomForm.hide();
-                loginForm.hide();
-                signupForm.hide();
-                roomsAction.show();
-                actionMenu.show();
-                $('.logout').show();
-                players.html('');
+                leaveRoomResult();
             };
             var onFailure = function(error) {
                 console.log(error);
+                leaveRoomResult(); // FIXME: BACKEND FAILURE ON LEAVE ROOM, NEED TO GO BACK TO CREATE ROOM PAGE FOR NOW
             };
             //DELETE /rooms/:roomId/members/:memberId
             var url = "/rooms/" + roomId + "/members/" + userId;
