@@ -100,6 +100,23 @@
 .black{
 	background-color:rgba(0,0,0,0.5);
 }
+.yellow{
+	background-color:yellow;
+}
+.green{
+	background-color: green;
+}
+.purple {
+	background-color: purple;
+}
+.pink {
+	background-color: deeppink;
+}
+.aqua {
+	background-color: aqua;
+}
+
+
 /*.leave{
 	display: block;
 	float: left;
