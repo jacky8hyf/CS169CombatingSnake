@@ -276,7 +276,8 @@ var UserHandler = (function() {
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
-                    if (i < 20 && notReceive) {
+                    //if (i < 20 && notReceive) {
+                    if (i < 20) {
                         inbox.send(msg);
                         console.log("Retrying " + i + " times.");
                         i++;
@@ -355,7 +356,8 @@ var UserHandler = (function() {
                     var i = 0;
                     var notReceive = true;
                     inbox.onopen = function(e){
-                        if (i < 20 && notReceive) {
+                        //if (i < 20 && notReceive) {
+                        if (i < 20) {
                             inbox.send(msg);
                             console.log("Retrying " + i + " times.");
                             i++;
