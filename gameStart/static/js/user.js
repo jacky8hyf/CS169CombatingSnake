@@ -549,11 +549,12 @@ var UserHandler = (function() {
         attachJoinRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
-        sendKeyStroke();
+        //sendKeyStroke();
     };
 
     // PUBLIC METHODS
     return {
-        start: start
+        start: start,
+        sendKeyStroke: sendKeyStroke
     };
 })();
