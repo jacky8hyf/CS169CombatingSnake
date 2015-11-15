@@ -267,8 +267,8 @@ var UserHandler = (function() {
                 roomId = data.roomId;
                 //create a socket connection to server here and remove polling block
                 var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
-                //inbox = new ReconnectingWebSocket(urlstr);
-                inbox = new WebSocket(urlstr);
+                inbox = new ReconnectingWebSocket(urlstr);
+                //inbox = new WebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
@@ -313,19 +313,12 @@ var UserHandler = (function() {
                             players.append(player);
                         }
                     } else if (cmd == "g") { //game command
-                        console.log(dict);
-                        console.log(cmd);
                         // Place holder for getting the snakes' positions from the server
                         drawSnakes(dict); // draw out all snakes
                         drawFoods(dict["_food"]); // draw out all foods
                     } else if (cmd == "end") {
-                        console.log(dict);
-                        console.log(cmd);
                         alert("Winner is " + dict.nickname);
                     }
-                    console.log("others");
-                    console.log(dict);
-                    console.log(cmd);
                 };
             };
             var onFailure = function(error) {
@@ -352,8 +345,8 @@ var UserHandler = (function() {
                 }
                 if(available_room != null){
                     var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                    //inbox = new ReconnectingWebSocket(urlstr);
-                    inbox = new WebSocket(urlstr);
+                    inbox = new ReconnectingWebSocket(urlstr);
+                    //inbox = new WebSocket(urlstr);
                     var ts = Date.now();
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
@@ -383,8 +376,8 @@ var UserHandler = (function() {
                         var dict = message.data.substring(message.data.indexOf(" ") + 1);
                         dict = JSON.parse(dict);
                         if (cmd == "g") { //game command
-                            console.log(dict);
-                            console.log(cmd);
+                            //console.log(dict);
+                            //console.log(cmd);
                             // Place holder for getting the snakes' positions from the server
                             drawSnakes(dict); // draw out all snakes
                             drawFoods(dict["_food"]); // draw out all snakes
