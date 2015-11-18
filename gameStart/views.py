@@ -166,12 +166,15 @@ class RoomsView(View):
     '''
     /rooms path
     '''
+
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         '''
         Create room
         '''
         user = fetch_user(request)
         room = Room.create_by(user).save()
+        user.enter_room(room).save()
         return OKResponse(room.to_dict())
 
     def get(self, request, *args, **kwargs):

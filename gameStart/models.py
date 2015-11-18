@@ -109,6 +109,9 @@ class User(BaseModel):
 
     @classmethod
     def find_by_inroom(cls, room):
+        '''
+        Return everyone in the room, including the creator.
+        '''
         return cls.objects.filter(inroom = room)
 
     def check_password(self, attemptPassword):
@@ -196,6 +199,9 @@ class Room(BaseModel):
 
     @property
     def all_members(self):
+        '''
+        Return all members in the room, excluding the creator.
+        '''
         return [u for u in User.find_by_inroom(self) if u != self.creator]
 
     @classmethod
