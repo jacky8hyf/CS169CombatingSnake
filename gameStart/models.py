@@ -208,16 +208,12 @@ class Room(BaseModel):
     def all_rooms(cls):
         return cls.objects.all()
 
-    # def destroy_if_created_by(self, user):
-    #     '''
-    #     Delete myself if created by user. Return None because there is no point
-    #     of chaining.
-    #     '''
-    #     if self.creator != user:
-    #         return
-    #     self.delete() # this will sets all member users' inroom attribute to null
-
     def reassign_creator_if_created_by(self, user):
+        '''
+        If the room is created by the specified user, reassign .creator field
+        to some other members in the room. If there is no members left, delete
+        the room and raise RoomEmptyError.
+        '''
         if self.creator != user:
             return self
         members = self.all_members
