@@ -274,7 +274,7 @@ var UserHandler = (function() {
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
                 var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                var recon_msg = "reconn" + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var recon_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
@@ -361,7 +361,7 @@ var UserHandler = (function() {
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
                     var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    var recon_msg = "reconn" + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    var recon_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
                     var i = 0;
                     var notReceive = true;
