@@ -274,12 +274,19 @@ var UserHandler = (function() {
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
                 var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var recon_msg = "reconn" + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
                     //if (i < 20 && notReceive) {
                     if (i < 20) {
-                        inbox.send(msg);
+                        if(gameStarted == true){
+                            inbox.send(reconn_msg);
+                        }
+                        else if(gameStarted == false){
+                            inbox.send(msg);
+                        }
+                        
                         console.log("Retrying " + i + " times.");
                         i++;
                     }
@@ -354,13 +361,19 @@ var UserHandler = (function() {
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
                     var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    var recon_msg = "reconn" + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
                     var i = 0;
                     var notReceive = true;
                     inbox.onopen = function(e){
                         //if (i < 20 && notReceive) {
                         if (i < 20) {
-                            inbox.send(msg);
+                            if(gameStarted == true){
+                                inbox.send(reconn_msg);
+                            }
+                            else{
+                                inbox.send(msg);
+                            }
                             console.log("Retrying " + i + " times.");
                             i++;
                         }
@@ -420,10 +433,14 @@ var UserHandler = (function() {
                             }
                         }
                     }
+                    $('#cssmenu').hide();
                 }
-
-                $('#cssmenu').hide();
-                actionMenu.show();
+                else{
+                    alert("No room available now. Please create a new room!");
+                }
+                
+                //$('#cssmenu').hide();
+               // actionMenu.show();
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -438,6 +455,7 @@ var UserHandler = (function() {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
             if (inbox != null) {
+                console.log("send start to server");
                 inbox.send("start");
             }
             gameStarted = true;
