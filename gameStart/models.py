@@ -74,7 +74,7 @@ class User(BaseModel):
                 .format(x, fieldlenstr('username'))))
         check('password',
             '^.{4,}$',
-            lambda x: errors.PASSWORD_NOT_VALID('must be more than 4 characters'))
+            lambda x: errors.PASSWORD_NOT_VALID('must be at least 4 characters'))
         check('nickname',
             '^.{,' + fieldlenstr('nickname') + '}$',
             lambda x: errors.NICKNAME_NOT_VALID('{} must be less than {} characters'
