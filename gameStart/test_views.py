@@ -226,6 +226,7 @@ class RoomsViewTestCase(RestTestCase):
         self.assertEquals(self.bob['userId'], roomObj.creator.strId, 'Bob is not creator when old creator exits it')
         self.assertFalse(roomObj.all_members)
 
+        self.iAmBob()
         self.assertResponseSuccess(self.delete('/rooms/' + roomId + '/members/' + self.bob['userId']))
         with self.assertRaises(ObjectDoesNotExist):
             Room.find_by_id(roomId)

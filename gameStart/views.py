@@ -185,7 +185,7 @@ class RoomsView(View):
         includeMemberProfile = getBooleanParam(request, 'member-profile')
         includeMembers = includeMemberProfile or getBooleanParam(request, 'members')
 
-        rooms = Room.all_rooms()
+        rooms = sorted(Room.all_rooms(), key = lambda r: r.roomId)
         return OKResponse(rooms = [room.to_dict(
             includeCreatorProfile = includeCreatorProfile,
             includeMembers = includeMembers,
