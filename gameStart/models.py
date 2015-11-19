@@ -109,6 +109,9 @@ class User(BaseModel):
 
     @classmethod
     def find_by_inroom(cls, room):
+        '''
+        Return everyone in the room, including the creator.
+        '''
         return cls.objects.filter(inroom = room)
 
     def check_password(self, attemptPassword):
@@ -196,22 +199,21 @@ class Room(BaseModel):
 
     @property
     def all_members(self):
+        '''
+        Return all members in the room, excluding the creator.
+        '''
         return [u for u in User.find_by_inroom(self) if u != self.creator]
 
     @classmethod
     def all_rooms(cls):
         return cls.objects.all()
 
-    # def destroy_if_created_by(self, user):
-    #     '''
-    #     Delete myself if created by user. Return None because there is no point
-    #     of chaining.
-    #     '''
-    #     if self.creator != user:
-    #         return
-    #     self.delete() # this will sets all member users' inroom attribute to null
-
     def reassign_creator_if_created_by(self, user):
+        '''
+        If the room is created by the specified user, reassign .creator field
+        to some other members in the room. If there is no members left, delete
+        the room and raise RoomEmptyError.
+        '''
         if self.creator != user:
             return self
         members = self.all_members

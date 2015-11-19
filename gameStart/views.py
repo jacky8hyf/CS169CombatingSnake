@@ -166,12 +166,15 @@ class RoomsView(View):
     '''
     /rooms path
     '''
+
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         '''
         Create room
         '''
         user = fetch_user(request)
         room = Room.create_by(user).save()
+        user.enter_room(room).save()
         return OKResponse(room.to_dict())
 
     def get(self, request, *args, **kwargs):
@@ -182,7 +185,7 @@ class RoomsView(View):
         includeMemberProfile = getBooleanParam(request, 'member-profile')
         includeMembers = includeMemberProfile or getBooleanParam(request, 'members')
 
-        rooms = Room.all_rooms()
+        rooms = sorted(Room.all_rooms(), key = lambda r: r.roomId)
         return OKResponse(rooms = [room.to_dict(
             includeCreatorProfile = includeCreatorProfile,
             includeMembers = includeMembers,
