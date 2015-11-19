@@ -15,7 +15,7 @@ class TestUI(unittest.TestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    def test_home_button(self):
+    def test1_home_button(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_css_selector("li.active").click()
@@ -62,7 +62,7 @@ class TestUI(unittest.TestCase):
         # # ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
 
 
-    def test_gamerules_leaderboard_credits_button(self):
+    def test2_gamerules_leaderboard_credits_button(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         # check for game rules button works
@@ -120,7 +120,7 @@ class TestUI(unittest.TestCase):
         except AssertionError as e: self.verificationErrors.append(str(e))
 
 
-    def test1_signup_with_user_name_already_exist(self):
+    def test3_signup_with_user_name_already_exist(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_link_text("Sign up now").click()
@@ -157,7 +157,7 @@ class TestUI(unittest.TestCase):
         except AssertionError as e: self.verificationErrors.append(str(e))
 
 
-    def test2_signup_password_and_retypepassword_not_match(self):
+    def test4_signup_password_and_retypepassword_not_match(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_link_text("Sign up now").click()
@@ -190,7 +190,7 @@ class TestUI(unittest.TestCase):
         try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "div.signup_container.form_container"))
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test_signup_password_too_short(self):
+    def test5_signup_password_too_short(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_link_text("Sign up now").click()
@@ -217,7 +217,7 @@ class TestUI(unittest.TestCase):
         try: self.assertEqual("Password is not valid: must be at least 4 characters", driver.find_element_by_css_selector("div.signup_error").text)
         except AssertionError as e: self.verificationErrors.append(str(e))   
 
-    def test_signup_username_too_short(self):
+    def test6_signup_username_too_short(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_link_text("Sign up now").click()
@@ -248,7 +248,7 @@ class TestUI(unittest.TestCase):
         try: self.assertEqual("Username is not valid: aa must be from 4 to 64 alphanumeric characters", driver.find_element_by_css_selector("div.signup_error").text)
         except AssertionError as e: self.verificationErrors.append(str(e))  
 
-    def test_signup_user_name_too_long(self):
+    def test7_signup_user_name_too_long(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_link_text("Sign up now").click()
@@ -283,7 +283,7 @@ class TestUI(unittest.TestCase):
         try: self.assertEqual("Username is not valid: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa must be from 4 to 64 alphanumeric characters", driver.find_element_by_css_selector("div.signup_error").text)
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test3_login_user_name_not_exist(self):
+    def test8_login_user_name_not_exist(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_id("login_username").clear()
@@ -309,7 +309,7 @@ class TestUI(unittest.TestCase):
         try: self.assertEqual("Username is not valid: cannot find user snakeeeee", driver.find_element_by_css_selector("div.login_error").text)
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test4_login_incorrect_password(self):
+    def test9_login_incorrect_password(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_id("login_username").clear()
@@ -333,7 +333,7 @@ class TestUI(unittest.TestCase):
         try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.submit-login"))
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test5_correct_password(self):
+    def test10_correct_password(self):
         driver = self.driver
         driver.get(self.base_url + "/") # open new window on Firefox, 
         driver.find_element_by_id("login_username").clear() # clear text field for username
@@ -371,7 +371,7 @@ class TestUI(unittest.TestCase):
         # test for making sure the login_container is hidden
         driver.find_element_by_css_selector("input.logout.generic-button").click()
 
-    def test6_logout(self):
+    def test11_logout(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_id("login_username").clear()
@@ -405,7 +405,7 @@ class TestUI(unittest.TestCase):
         try: self.assertFalse(driver.find_element_by_css_selector("section.leaderboard.frame").is_displayed())
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test7_room_page_show_after_click_on_create_room(self):
+    def test12_room_page_show_after_click_on_create_room(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_id("login_username").clear()
@@ -531,7 +531,84 @@ class TestUI(unittest.TestCase):
         try: self.assertEqual("Welcome, snake2 !", driver.find_element_by_css_selector("div.usernameInfo").text)
         except AssertionError as e: self.verificationErrors.append(str(e))
 
-    def test8_leaveroom_button_click(self):
+    def test13_room_page_show_after_click_on_join_room(self):
+        driver = self.driver
+        driver.get(self.base_url + "/")
+        driver.find_element_by_id("login_username").clear()
+        driver.find_element_by_id("login_username").send_keys("snake2")
+        driver.find_element_by_id("login_password").clear()
+        driver.find_element_by_id("login_password").send_keys("1234")
+        driver.find_element_by_css_selector("input.submit-login").click()
+        driver.find_element_by_css_selector("input.submit-roomjoin").click()
+
+        # test for making sure the player name is shown on room page
+        for i in range(60):
+            try:
+                if not driver.find_element_by_id("cssmenu").is_displayed(): break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+        try: self.assertFalse(driver.find_element_by_id("cssmenu").is_displayed())
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the player icon shown
+        for i in range(60):
+            try:
+                if self.is_element_present(By.CSS_SELECTOR, "img.snake_icon"): break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "img.snake_icon"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the "LEAVE ROOM" button shown
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.submit-leave"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the "START GAME" button shown
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.submit-start"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the "READY" button shown
+        for i in range(60):
+            try:
+                if self.is_element_present(By.CSS_SELECTOR, "input.form-field.submit-ready"): break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+
+        # test for making sure the health field shown
+        for i in range(60):
+            try:
+                if "100" == driver.find_element_by_css_selector("div.health").text: break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+        try: self.assertEqual("100", driver.find_element_by_css_selector("div.health").text)
+        except AssertionError as e: self.verificationErrors.append(str(e))
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.form-field.submit-ready"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the room_id shown
+        for i in range(60):
+            try:
+                if self.is_element_present(By.CSS_SELECTOR, "div.room_id"): break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "div.room_id"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the gameboard shown
+        try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "div.gameboard"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the welcome message still show on the screen
+        try: self.assertEqual("Welcome, snake2 !", driver.find_element_by_css_selector("div.usernameInfo").text)
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+
+    def test14_leaveroom_button_click(self):
         driver = self.driver
         driver.get(self.base_url + "/")
         driver.find_element_by_id("login_username").clear()
@@ -541,11 +618,16 @@ class TestUI(unittest.TestCase):
         driver.find_element_by_css_selector("input.submit-login").click()
         driver.find_element_by_css_selector("input.create_button").click()
         driver.find_element_by_css_selector("input.submit-leave").click()
+        # test for "CREATE ROOM" button shown
         try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.create_button"))
         except AssertionError as e: self.verificationErrors.append(str(e))
         # ERROR: Caught exception [ERROR: Unsupported command [selectWindow | null | ]]
+
+        # test for logout button still on the page
         try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.logout.generic-button"))
         except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for "JOIN A RANDOM ROOM" button shown
         for i in range(60):
             try:
                 if self.is_element_present(By.CSS_SELECTOR, "input.submit-roomjoin"): break
@@ -554,6 +636,8 @@ class TestUI(unittest.TestCase):
         else: self.fail("time out")
         try: self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "input.logout.generic-button"))
         except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for welcome message shown
         for i in range(60):
             try:
                 if "Welcome, snake2 !" == driver.find_element_by_css_selector("div.usernameInfo").text: break
@@ -562,7 +646,19 @@ class TestUI(unittest.TestCase):
         else: self.fail("time out")
         try: self.assertEqual("Welcome, snake2 !", driver.find_element_by_css_selector("div.usernameInfo").text)
         except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the cssmenu shown
         try: self.assertTrue(self.is_element_present(By.ID, "cssmenu"))
+        except AssertionError as e: self.verificationErrors.append(str(e))
+
+        # test for making sure the designers panel is hidden
+        try: self.assertFalse(driver.find_element_by_css_selector("section.intro.frame").is_displayed())
+        except AssertionError as e: self.verificationErrors.append(str(e))
+        # test for making sure the game rules panel is hidden
+        try: self.assertFalse(driver.find_element_by_css_selector("section.gamerule.frame").is_displayed())
+        except AssertionError as e: self.verificationErrors.append(str(e))
+        # test for making sure leaderboard panel is hidden
+        try: self.assertFalse(driver.find_element_by_css_selector("section.leaderboard.frame").is_displayed())
         except AssertionError as e: self.verificationErrors.append(str(e))
 
     def is_element_present(self, how, what):
