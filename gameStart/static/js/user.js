@@ -16,6 +16,8 @@ var UserHandler = (function() {
     // Handle room requests
     var createRoomForm;
     var createRoomButton;
+    var msg;
+    var reconn_msg;
 
     var joinRoomButton;
     var roomSize = 8;
@@ -273,8 +275,8 @@ var UserHandler = (function() {
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
-                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                var reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
@@ -360,8 +362,8 @@ var UserHandler = (function() {
                     var ts = Date.now();
                     var hashStr = sessionId + ":" + userId + ":" + ts;
                     var auth = sha256(hashStr);
-                    var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    var reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                    reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                     //send hello message
                     var i = 0;
                     var notReceive = true;
