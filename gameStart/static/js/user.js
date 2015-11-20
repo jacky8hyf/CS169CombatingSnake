@@ -514,6 +514,45 @@ var UserHandler = (function() {
         }
     };
 
+    // old food: [1,3,4]
+    // new food: [1,2,4]
+
+    var inFoods = function(food, foods) {
+        for (var i = 0; i < foods.length; i++) {
+            var cur_food = foods[i];
+            if (cur_food[0] == food[0] && cur_food[1] == food[1]) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    var toggleFood = function(food) {
+        id = "r" + food[0] + "c" + food[1];
+        $("#" + id).toggleClass("food"); // toggle the food at this coordinate
+    };
+
+    var drawFoods = function(new_foods) {
+        var i;
+        for (i = 0; i < old_foods.length; i++) {
+            var old_food = old_foods[i];
+            if (!inFoods(old_foods[i], new_foods)) { // if the old food is no longer in the new_foods
+                console.log("remove old food here");
+                toggleFood(old_food); // remove old food
+            }
+        }
+        for (i = 0; i < new_foods.length; i++) {
+            var new_food = new_foods[i];
+            if (!inFoods(new_food, old_foods)) { // newly added food
+                console.log("new food here");
+                toggleFood(new_food); // addd new food
+            }
+        }
+        old_foods = new_foods;
+    };
+
+
+    /*
     var drawFoods = function(foods) {
         removeFoods();
         for (var i = 0; i < foods.length; i++) {
@@ -521,7 +560,6 @@ var UserHandler = (function() {
             id = "r" + food[0] + "c" + food[1];
             $("#" + id).toggleClass("food");
         }
-        old_foods = foods;
     };
 
     var removeFoods = function() {
@@ -531,6 +569,7 @@ var UserHandler = (function() {
             $("#" + id).toggleClass("food");
         }
     };
+    */
 
     var setBoard = function() {
         var table = "<table>";
