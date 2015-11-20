@@ -498,6 +498,7 @@ var UserHandler = (function() {
                 for (var i = 0; i < snake_body.length; i++) {
                     id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
                     $("#" + id).toggleClass(color_lookup[key]);
+                    $("#" + id).addClass("cell");
                 }
             }
         }
@@ -510,6 +511,7 @@ var UserHandler = (function() {
             for (var i = 0; i < snake_body.length; i++) {
                 id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
                 $("#" + id).toggleClass(color_lookup[key]);
+                $("#" + id).addClass("cell"); // add a cell just in case
             }
         }
     };
@@ -536,7 +538,7 @@ var UserHandler = (function() {
         id = "r" + food[0] + "c" + food[1];
         $("#" + id).removeClass("food"); // toggle the food at this coordinate
     };
-    
+
     var drawFoods = function(new_foods) {
         var i;
         for (i = 0; i < old_foods.length; i++) {
