@@ -241,6 +241,7 @@ var UserHandler = (function() {
             var onSuccess = function(data) {
                 console.log("QUIT");
                 inbox.send("quit");
+                gameStarted = false;
                 inbox.close();
                 leaveRoomResult();
             };
@@ -330,6 +331,7 @@ var UserHandler = (function() {
                         drawFoods(dict["_food"]); // draw out all foods
                     } else if (cmd == "end") {
                         alert("Winner is " + dict.nickname);
+                        gameStarted = false;
                     }
                 };
             };
