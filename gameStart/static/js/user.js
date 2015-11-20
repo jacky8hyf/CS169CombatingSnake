@@ -358,6 +358,7 @@ var UserHandler = (function() {
                     }
                 }
                 if(available_room != null){
+                    roomId = available_room.roomId;
                     var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
                     inbox = new ReconnectingWebSocket(urlstr);
                     //inbox = new WebSocket(urlstr);
