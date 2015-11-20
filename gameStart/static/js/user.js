@@ -527,25 +527,30 @@ var UserHandler = (function() {
         return false;
     };
 
-    var toggleFood = function(food) {
+    var addFood = function(food) {
         id = "r" + food[0] + "c" + food[1];
-        $("#" + id).toggleClass("food"); // toggle the food at this coordinate
+        $("#" + id).addClass("food"); // toggle the food at this coordinate
     };
 
+    var removeFood = function(food) {
+        id = "r" + food[0] + "c" + food[1];
+        $("#" + id).removeClass("food"); // toggle the food at this coordinate
+    };
+    
     var drawFoods = function(new_foods) {
         var i;
         for (i = 0; i < old_foods.length; i++) {
             var old_food = old_foods[i];
             if (!inFoods(old_foods[i], new_foods)) { // if the old food is no longer in the new_foods
                 console.log("remove old food here");
-                toggleFood(old_food); // remove old food
+                removeFood(old_food); // remove old food
             }
         }
         for (i = 0; i < new_foods.length; i++) {
             var new_food = new_foods[i];
             if (!inFoods(new_food, old_foods)) { // newly added food
                 console.log("new food here");
-                toggleFood(new_food); // addd new food
+                addFood(new_food); // addd new food
             }
         }
         old_foods = new_foods;
