@@ -478,10 +478,12 @@ var UserHandler = (function() {
                     msg = "d";
                     break;
                 case 39:      // LEFT: 37
-                    msg = "l";
+                    // msg = "l"; //FIXME: FIND OUT WHY THE DIRECTION IS OPPOSITE
+                    msg = "r";
                     break;
                 case 37:      // RIGHT: 39
-                    msg = "r";
+                    // msg = "r";
+                    msg = "l";
                     break;
             }
             inbox.send(msg);
