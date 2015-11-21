@@ -324,7 +324,7 @@ var UserHandler = (function() {
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
                             player.find('.name').text(dict.members[i].nickname);
-                            user_color_map[dict.members.userId] = color_lookup[i + 2];
+                            user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                             player.addClass(color_lookup[i + 2]);
                             players.append(player);
                         }
@@ -436,7 +436,7 @@ var UserHandler = (function() {
                             for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
                                 var player = $(playerHtmlTemplate);
                                 player.find('.name').text(roominfo.members[i].nickname);
-                                user_color_map[dict.members.userId] = color_lookup[i + 2];
+                                user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                                 player.addClass(color_lookup[i+2]);
                                 players.append(player);
                             }
