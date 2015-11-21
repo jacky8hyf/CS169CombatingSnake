@@ -316,6 +316,7 @@ var UserHandler = (function() {
                         notReceive = false;
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
+                        player.setAttribute("id", dict.creator.userId);  // add id so we can update health field later
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
                         user_color_map[dict.creator.userId] = color_lookup[players.size()];
@@ -323,6 +324,7 @@ var UserHandler = (function() {
 
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
+                            player.setAttribute("id", dict.members[i].userId);  // add id so we can update health field later
                             player.find('.name').text(dict.members[i].nickname);
                             user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                             player.addClass(color_lookup[i + 2]);
@@ -445,6 +447,7 @@ var UserHandler = (function() {
                             // Place holder for getting the snakes' positions from the server
                             drawSnakes(dict); // draw out all snakes
                             drawFoods(dict["_food"]); // draw out all snakes
+                            updateHealth(dict); // update the health field
                         } else if (cmd == "end") {
                             alert("Winner is " + dict.winner.nickname);
                             return;
@@ -465,6 +468,7 @@ var UserHandler = (function() {
 
                             players.html ('');
                             var player = $(playerHtmlTemplate);
+                            player.setAttribute("id", dict.creator.userId);  // add id so we can update health field later
                             player.find('.name').text(available_room.creator.nickname);
                             user_color_map[dict.creator.userId] = color_lookup[players.size()];
                             player.addClass(color_lookup[1]);
@@ -473,6 +477,7 @@ var UserHandler = (function() {
                             //add room_members
                             for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
                                 var player = $(playerHtmlTemplate);
+                                player.setAttribute("id", dict.members[i].userId);  // add id so we can update health field later
                                 player.find('.name').text(roominfo.members[i].nickname);
                                 user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                                 player.addClass(color_lookup[i+2]);
@@ -524,6 +529,15 @@ var UserHandler = (function() {
                     break;
             }
             inbox.send(msg);
+        }
+    }
+
+    var updateHealth = function(snakes) {
+        for (var key in snakes){
+            if (key != '_food') {
+                var snake_body = snakes[key];
+                $("#"+ key).find('.health').text(10*snake_body.length);
+            }
         }
     };
 
