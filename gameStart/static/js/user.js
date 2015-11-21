@@ -240,7 +240,6 @@ var UserHandler = (function() {
             e.preventDefault();
 
             var onSuccess = function(data) {
-                console.log("QUIT");
                 inbox.send("quit");
                 gameStarted = false;
                 inbox.close();
@@ -255,7 +254,6 @@ var UserHandler = (function() {
             makeDeleteRequest(url, onSuccess, onFailure);
         });
     };
-
 
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
@@ -273,7 +271,6 @@ var UserHandler = (function() {
                 //create a socket connection to server here and remove polling block
                 var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 inbox = new ReconnectingWebSocket(urlstr);
-                //inbox = new WebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
@@ -311,15 +308,12 @@ var UserHandler = (function() {
                     dict = JSON.parse(dict);
                     if (cmd == "room") {
                         notReceive = false;
-                        console.log(cmd);
-                        console.log(dict);
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
                         user_color_map[dict.creator.userId] = color_lookup[players.size()];
                         player.addClass(color_lookup[players.size()]);
-
 
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
@@ -333,7 +327,7 @@ var UserHandler = (function() {
                         drawSnakes(dict); // draw out all snakes
                         drawFoods(dict["_food"]); // draw out all foods
                     } else if (cmd == "end") {
-                        alert("Winner is " + dict.nickname);
+                        alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                         gameStarted = false;
                     }
                 };
@@ -384,7 +378,6 @@ var UserHandler = (function() {
                         }
                     };
                     inbox.onmessage = function(message) {
-                        console.log(message.data);
                         if (message.data.indexOf("err") != -1) {
                             return;
                         }
@@ -401,15 +394,12 @@ var UserHandler = (function() {
                         var dict = message.data.substring(message.data.indexOf(" ") + 1);
                         dict = JSON.parse(dict);
                         if (cmd == "g") { //game command
-                            //console.log(dict);
-                            //console.log(cmd);
                             // Place holder for getting the snakes' positions from the server
                             drawSnakes(dict); // draw out all snakes
                             drawFoods(dict["_food"]); // draw out all snakes
                         } else if (cmd == "end") {
-                            console.log(dict);
-                            console.log(cmd);
-                            alert("Winner is " + dict.nickname);
+                            alert("Winner is " + dict.winner.nickname);
+                            return;
                         } else if (cmd == "room") {
                             notReceive = false;
                             //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
@@ -443,13 +433,9 @@ var UserHandler = (function() {
                         }
                     };
                     $('#cssmenu').hide();
-                }
-                else{
+                } else{
                     alert("No room available now. Please create a new room!");
                 }
-                
-                //$('#cssmenu').hide();
-               // actionMenu.show();
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -464,7 +450,6 @@ var UserHandler = (function() {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
             if (inbox != null) {
-                console.log("send start to server");
                 inbox.send("start");
             }
             gameStarted = true;
@@ -501,7 +486,6 @@ var UserHandler = (function() {
                 var snake_body = snakes[key];
                 for (var i = 0; i < snake_body.length; i++) {
                     id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                    //$("#" + id).addClass(color_lookup[key]);
                     $("#" + id).addClass(user_color_map[key]);
                 }
             }
@@ -514,7 +498,6 @@ var UserHandler = (function() {
             var snake_body = old_snakes_state[key];
             for (var i = 0; i < snake_body.length; i++) {
                 id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                //$("#" + id).removeClass(color_lookup[key]);
                 $("#" + id).removeClass(user_color_map[key]);
             }
         }
@@ -585,7 +568,6 @@ var UserHandler = (function() {
         attachJoinRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
-        //sendKeyStroke();
     };
 
     // PUBLIC METHODS
