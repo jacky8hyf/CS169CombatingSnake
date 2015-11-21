@@ -19,6 +19,12 @@ var UserHandler = (function() {
     var msg;
     var reconn_msg;
 
+    //pick room
+    var pickRoomButton;
+    var pickRoomForm;
+    var cancelRoomButton;
+    //var roomList;
+
     var joinRoomButton;
     var roomSize = 8;
     var players;    // list of players inside the room
@@ -342,6 +348,48 @@ var UserHandler = (function() {
         });
     };
 
+    var attachPickRoomHandler = function(e){
+        $('body').on('click','.join_specific_room', function(e){
+            e.preventDefault();
+            var onSuccess = function(data) {
+                if(data.rooms.length < 1){
+                    alert("No room available! Please create a room instead!");
+                }
+                else{//get all room id and put into roomList
+                    //roomList = [];
+                    var myroomlist = $('#listofrooms');
+                    myroomlist.empty();
+                    for (room in data.rooms){
+                        //roomList.push(room.roomId);
+                        console.log(data.rooms[room]);
+                        myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(data.rooms[room].roomId));
+                    }
+                    //add to listbox
+                    actionMenu.hide();
+                    roomsAction.hide();
+                    pickRoomForm.show();
+                    
+                }
+
+            }
+            var onFailure = function(error) {
+                console.log(error);
+            };
+            //send get request to get a rooms list
+            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
+            makeGetRequest(url, onSuccess, onFailure);
+            
+
+        });
+        $('body').on('click','.cancel_room_pick', function(e){
+            e.preventDefault();
+            pickRoomForm.hide();
+            roomsAction.show();
+            actionMenu.show();
+        });
+
+    };
+
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
             e.preventDefault();
@@ -554,22 +602,27 @@ var UserHandler = (function() {
         loginForm = $("div.login_container");
         signupForm = $("div.signup_container");
         createRoomForm = $(".create_room");
+        pickRoomForm = $(".pick_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
         roomsAction = $('.roomcreate_container');
         actionMenu = $('#cssmenu');
 
         joinRoomButton = $(".submit-roomjoin");
+        pickRoomButton = $(".join_specific_room");
+        cancelRoomButton = $(".cancel_room_pick");
         playerHtmlTemplate = $(".players .player")[0].outerHTML;
         players = $(".players");
         players.html('');
         createRoomForm.hide();
+        pickRoomForm.hide();
 
         attachLoginHandler();
         attachLogoutHandler();
         attachSignupHandler();
         attachCreateRoomHandler();
         attachJoinRoomHandler();
+        attachPickRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
     };
