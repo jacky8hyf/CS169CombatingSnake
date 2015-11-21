@@ -95,7 +95,7 @@
 
 .food {
 	background-color:white;
-	animation: food_blinker .5s linear infinite;
+	animation: food_blinker 1s linear infinite;
 	height: 5%;
 }
 
@@ -103,7 +103,7 @@
   80% { opacity: 0.7; }
 }
 
-.red{
+.red {
 	background-color:red;
 }
 .blue{
