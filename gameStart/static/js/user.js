@@ -26,6 +26,7 @@ var UserHandler = (function() {
 
     // Handle player color
     var color_lookup = ['white', 'red', 'blue', 'orange', 'black', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var user_color_map = {};
 
     // Handle gameboard
     var nRows = 21;
@@ -316,12 +317,15 @@ var UserHandler = (function() {
                         var player = $(playerHtmlTemplate);
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
+                        user_color_map[dict.creator.userId] = color_lookup[players.size()];
                         player.addClass(color_lookup[players.size()]);
+
 
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
                             player.find('.name').text(dict.members[i].nickname);
-                            player.addClass(color_lookup[i+2]);
+                            user_color_map[dict.members.userId] = color_lookup[i + 2];
+                            player.addClass(color_lookup[i + 2]);
                             players.append(player);
                         }
                     } else if (cmd == "g") { //game command
@@ -341,7 +345,6 @@ var UserHandler = (function() {
             makePostRequest(url, room, onSuccess, onFailure);
         });
     };
-
 
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
@@ -425,6 +428,7 @@ var UserHandler = (function() {
                             players.html ('');
                             var player = $(playerHtmlTemplate);
                             player.find('.name').text(available_room.creator.nickname);
+                            user_color_map[dict.creator.userId] = color_lookup[players.size()];
                             player.addClass(color_lookup[1]);
                             players.append(player);
 
@@ -432,11 +436,12 @@ var UserHandler = (function() {
                             for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
                                 var player = $(playerHtmlTemplate);
                                 player.find('.name').text(roominfo.members[i].nickname);
+                                user_color_map[dict.members.userId] = color_lookup[i + 2];
                                 player.addClass(color_lookup[i+2]);
                                 players.append(player);
                             }
                         }
-                    }
+                    };
                     $('#cssmenu').hide();
                 }
                 else{
@@ -496,8 +501,8 @@ var UserHandler = (function() {
                 var snake_body = snakes[key];
                 for (var i = 0; i < snake_body.length; i++) {
                     id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                    $("#" + id).addClass(color_lookup[key]);
-                    //$("#" + id).addClass("cell");
+                    //$("#" + id).addClass(color_lookup[key]);
+                    $("#" + id).addClass(user_color_map[key]);
                 }
             }
         }
@@ -509,8 +514,8 @@ var UserHandler = (function() {
             var snake_body = old_snakes_state[key];
             for (var i = 0; i < snake_body.length; i++) {
                 id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).removeClass(color_lookup[key]);
-                //$("#" + id).addClass("cell"); // add a cell just in case
+                //$("#" + id).removeClass(color_lookup[key]);
+                $("#" + id).removeClass(user_color_map[key]);
             }
         }
     };
