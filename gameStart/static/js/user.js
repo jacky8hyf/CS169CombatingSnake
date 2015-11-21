@@ -296,6 +296,8 @@ var UserHandler = (function() {
                     }
                     if (message.data.indexOf(" ") == -1) { // message: start
                         if (message.data == "start") {
+                            removeFoods();
+                            removeSnakes();
                             alert("Starting Game");
                             gameStarted = true;
                             old_foods = [];
@@ -383,6 +385,8 @@ var UserHandler = (function() {
                         }
                         if (message.data.indexOf(" ") == -1) { // message: start
                             if (message.data == "start") {
+                                removeFoods();
+                                removeSnakes();
                                 alert("Starting Game");
                                 gameStarted = true;
                                 old_foods = [];
