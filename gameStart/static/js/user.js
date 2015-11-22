@@ -318,7 +318,7 @@ var UserHandler = (function() {
                         notReceive = false;
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
-                        player.setAttribute("id", dict.creator.userId);  // add id so we can update health field later
+                        player.attr("id", dict.creator.userId);  // add id so we can update health field later
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
                         user_color_map[dict.creator.userId] = color_lookup[players.size()];
@@ -326,7 +326,7 @@ var UserHandler = (function() {
 
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
-                            player.setAttribute("id", dict.members[i].userId);  // add id so we can update health field later
+                            player.attr("id", dict.members[i].userId);  // add id so we can update health field later
                             player.find('.name').text(dict.members[i].nickname);
                             user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                             player.addClass(color_lookup[i + 2]);
@@ -472,7 +472,7 @@ var UserHandler = (function() {
 
                             players.html ('');
                             var player = $(playerHtmlTemplate);
-                            player.setAttribute("id", dict.creator.userId);  // add id so we can update health field later
+                            player.attr("id", dict.creator.userId);  // add id so we can update health field later
                             player.find('.name').text(available_room.creator.nickname);
                             user_color_map[dict.creator.userId] = color_lookup[players.size()];
                             player.addClass(color_lookup[1]);
@@ -481,7 +481,7 @@ var UserHandler = (function() {
                             //add room_members
                             for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
                                 var player = $(playerHtmlTemplate);
-                                player.setAttribute("id", dict.members[i].userId);  // add id so we can update health field later
+                                player.attr("id", dict.members[i].userId);  // add id so we can update health field later
                                 player.find('.name').text(roominfo.members[i].nickname);
                                 user_color_map[dict.members[i].userId] = color_lookup[i + 2];
                                 player.addClass(color_lookup[i+2]);
