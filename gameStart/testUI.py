@@ -7,6 +7,14 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
+def canRunThisTest():
+    try:
+        webdriver.Firefox()
+        return True
+    except:
+        return False
+
+@unittest.skipUnless(canRunThisTest(), 'No Firefox webdriver')
 class TestUI(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -215,7 +223,7 @@ class TestUI(unittest.TestCase):
 
         # test for making sure the correct error message shown
         try: self.assertEqual("Password is not valid: must be at least 4 characters", driver.find_element_by_css_selector("div.signup_error").text)
-        except AssertionError as e: self.verificationErrors.append(str(e))   
+        except AssertionError as e: self.verificationErrors.append(str(e))
 
     def test6_signup_username_too_short(self):
         driver = self.driver
@@ -246,7 +254,7 @@ class TestUI(unittest.TestCase):
 
         # test for making sure the correct error message shown
         try: self.assertEqual("Username is not valid: aa must be from 4 to 64 alphanumeric characters", driver.find_element_by_css_selector("div.signup_error").text)
-        except AssertionError as e: self.verificationErrors.append(str(e))  
+        except AssertionError as e: self.verificationErrors.append(str(e))
 
     def test7_signup_user_name_too_long(self):
         driver = self.driver
@@ -335,7 +343,7 @@ class TestUI(unittest.TestCase):
 
     def test10_correct_password(self):
         driver = self.driver
-        driver.get(self.base_url + "/") # open new window on Firefox, 
+        driver.get(self.base_url + "/") # open new window on Firefox,
         driver.find_element_by_id("login_username").clear() # clear text field for username
         driver.find_element_by_id("login_username").send_keys("snake2") # enter text
         driver.find_element_by_id("login_password").clear()
@@ -454,7 +462,7 @@ class TestUI(unittest.TestCase):
         else: self.fail("time out")
         try: self.assertFalse(driver.find_element_by_css_selector("div.roomcreate_container.form_container").is_displayed())
         except AssertionError as e: self.verificationErrors.append(str(e))
-        
+
         # test for making sure the player element present
         for i in range(60):
             try:
@@ -665,12 +673,12 @@ class TestUI(unittest.TestCase):
         try: self.driver.find_element(by=how, value=what)
         except NoSuchElementException, e: return False
         return True
-    
+
     def is_alert_present(self):
         try: self.driver.switch_to_alert()
         except NoAlertPresentException, e: return False
         return True
-    
+
     def close_alert_and_get_its_text(self):
         try:
             alert = self.driver.switch_to_alert()
@@ -681,7 +689,7 @@ class TestUI(unittest.TestCase):
                 alert.dismiss()
             return alert_text
         finally: self.accept_next_alert = True
-    
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)

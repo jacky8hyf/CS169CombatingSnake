@@ -3,6 +3,7 @@
 ######################
 
 from django.db import models
+from django.db.models import F
 from utils import *
 from hashing_passwords import *
 from uuid import uuid4
@@ -32,10 +33,14 @@ class BaseModel(models.Model):
     def strId(self):
         return (hex(self.primary_key)[2:]) if self.primary_key is not None else None
 
+    @staticmethod
+    def intId_from_strId(strId):
+        return int(strId, 16)
+
     @classmethod
     def find_by_id(cls, id):
         if isinstance(id, basestring):
-            id = int(id, 16)
+            id = cls.intId_from_strId(id)
         return cls.objects.get(pk = id)
 
 class User(BaseModel):
@@ -45,9 +50,9 @@ class User(BaseModel):
     pwhash = models.CharField(max_length = 69)
     nickname = models.CharField(max_length = 64)
     session_id = models.CharField(max_length = 36, default = None, null = True, unique = True)
-
     inroom = models.ForeignKey('Room', default = None, null = True, on_delete=models.SET_NULL)
-
+    numgames = models.PositiveIntegerField(default = 0)
+    numwin = models.PositiveIntegerField(default = 0)
 
     @property
     def password(self):
@@ -114,6 +119,26 @@ class User(BaseModel):
         '''
         return cls.objects.filter(inroom = room)
 
+    @classmethod
+    def update_scores(cls, players, winner = None):
+        players = set([cls.intId_from_strId(strId) for strId in players])
+        if winner:
+            winner = cls.intId_from_strId(winner)
+            if winner in players:
+                players.remove(winner)
+        cls.objects.filter(userId__in = players).update(numgames = F('numgames') + 1)
+        if winner:
+            cls.objects.filter(userId = winner).update(
+                numgames = F('numgames') + 1,
+                numwin = F('numwin') + 1)
+
+    @classmethod
+    def get_leaderboard(cls):
+        '''
+        Return a QuerySet of Users ordered by the number of winned games.
+        '''
+        return cls.objects.all().order_by('-numwin')
+
     def check_password(self, attemptPassword):
         return check_hash(attemptPassword, self.pwhash)
 
@@ -163,10 +188,12 @@ class User(BaseModel):
             self.inroom = None
         return self
 
-    def to_dict(self, includeProfile = False):
+    def to_dict(self, includeProfile = False, includeScores = False):
         d = {'userId': self.strId}
         if includeProfile:
             d.update({'nickname': self.nickname})
+        if includeScores:
+            d.update({'numgames': self.numgames, 'numwin': self.numwin})
         return d
 
 class Room(BaseModel):

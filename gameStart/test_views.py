@@ -20,18 +20,24 @@ class RestTestCase(TestCase):
     def setUp(self):
         self.c = Client()
         self.sessionId = None
+        self.masterKey = None
     def tearDown(self):
         self.sessionId = None
+        self.masterKey = None
 
     def get(self, path, data=None, **extra):
         if self.sessionId:
             extra.update({SESSION_ID_HEADER : self.sessionId})
+        if self.masterKey:
+            extra.update({MASTER_KEY_HEADER : self.masterKey})
         response = self.c.get(path, data = data, **extra)
         return response
 
     def post(self, path, data = None, **extra):
         if self.sessionId:
             extra.update({SESSION_ID_HEADER : self.sessionId})
+        if self.masterKey:
+            extra.update({MASTER_KEY_HEADER : self.masterKey})
         extra.update({'data' : json.dumps(data) if data else None,
             'content_type' : 'application/json'})
         response = self.c.post(path, **extra)
@@ -40,6 +46,8 @@ class RestTestCase(TestCase):
     def put(self, path, data = None, **extra):
         if self.sessionId:
             extra.update({SESSION_ID_HEADER : self.sessionId})
+        if self.masterKey:
+            extra.update({MASTER_KEY_HEADER : self.masterKey})
         extra.update({'data' : json.dumps(data) if data else None,
             'content_type' : 'application/json'})
         response = self.c.put(path, **extra)
@@ -47,6 +55,8 @@ class RestTestCase(TestCase):
     def delete(self, path, **extra):
         if self.sessionId:
             extra.update({SESSION_ID_HEADER : self.sessionId})
+        if self.masterKey:
+            extra.update({MASTER_KEY_HEADER : self.masterKey})
         response = self.c.delete(path, **extra)
         return response
 
@@ -72,7 +82,11 @@ class RestTestCase(TestCase):
         self.assertIn('err', d)
         return d
 
-class UsersViewTestCase(RestTestCase):
+class SnakeRestTestCase(RestTestCase):
+    def createUser(self, name):
+        return self.assertResponseSuccess(self.post('/users', {'username':name,'password':'pass','nickname':name}));
+
+class UsersViewTestCase(SnakeRestTestCase):
 
     def testRegLogin(self):
         d = self.assertResponseSuccess(self.post('/users', {'username':'user','password':'pass'}))
@@ -155,15 +169,33 @@ class UsersViewTestCase(RestTestCase):
         body = self.assertResponseFail(self.post('/users', {'username':'username','password':'pass', 'nickname':'g' * 65}))
         self.assertEquals(errors.NICKNAME_NOT_VALID(None).err, body['err'])
 
-class RoomsViewTestCase(RestTestCase):
+    def testScores(self):
+        User.objects.all().delete()
+        self.masterKey = MASTER_KEY
+        alice, bob, catherine = self.createUser('iamalice'), self.createUser('iambob'), self.createUser('iamcatherine')
+        aliceId, bobId, catherineId = alice['userId'], bob['userId'], catherine['userId']
+        self.assertResponseFail(self.put('/users/scores',{'winner':catherineId}))
+        self.assertResponseSuccess(self.put('/users/scores',{'players':[aliceId, bobId, catherineId]}))
+        self.assertResponseSuccess(self.put('/users/scores',{'players':[aliceId, bobId, catherineId], 'winner':catherineId}))
+        self.assertResponseSuccess(self.put('/users/scores',{'players':[aliceId, catherineId], 'winner':catherineId}))
+        self.assertResponseSuccess(self.put('/users/scores',{'players':[aliceId, bobId], 'winner':bobId}))
+        aliceObj, bobObj, catherineObj = User.find_by_id(aliceId), User.find_by_id(bobId), User.find_by_id(catherineId)
+        self.assertEquals(4, aliceObj.numgames)
+        self.assertEquals(0, aliceObj.numwin)
+        self.assertEquals(3, bobObj.numgames)
+        self.assertEquals(1, bobObj.numwin)
+        self.assertEquals(3, catherineObj.numgames)
+        self.assertEquals(2, catherineObj.numwin)
+        lb = self.assertResponseSuccess(self.get('/users/scores', {'scores': True})).get('users')
+        self.assertEquals(3, len(lb))
+        self.assertEquals(lb, sorted(lb, key = lambda x: x['numwin'], reverse = True))
+
+class RoomsViewTestCase(SnakeRestTestCase):
     def setUp(self):
         RestTestCase.setUp(self)
         self.user = self.alice = self.createUser('iamalice')
         self.bob = self.createUser('iambob')
         self.iAmAlice()
-
-    def createUser(self, name):
-        return self.assertResponseSuccess(self.post('/users', {'username':name,'password':'pass','nickname':name}));
 
     def iAmAlice(self):
         self.sessionId = self.alice['sessionId']
@@ -304,3 +336,4 @@ class RoomsViewTestCase(RestTestCase):
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
         self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.user['userId']))
+
