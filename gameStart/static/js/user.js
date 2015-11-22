@@ -472,6 +472,7 @@ var UserHandler = (function() {
                 createRoomForm.show();
                 actionMenu.hide();
                 roomsAction.hide();
+                pickRoomForm.hide();
                 $('.logout').hide();
 
                 players.html('');

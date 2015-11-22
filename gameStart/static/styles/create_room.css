@@ -180,13 +180,13 @@
 	margin-left: 8%;
 	margin-right: 5%;
 }
-.game-start-leave .form_field input[type="submit"]{
+.form_field input[type="submit"]{
 	background-color: #265108;
 	color: #eee;
 	font-weight: bold;
 	text-transform: uppercase;
 }
-.game-start-leave .form_field input[type="submit"]:focus, .game-start-leave .form_field input[type="submit"]:hover {
+.form_field input[type="submit"]:focus, .form_field input[type="submit"]:hover {
 	background-color: #1F3311;
 }
 
