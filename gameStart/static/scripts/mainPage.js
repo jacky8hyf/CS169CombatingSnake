@@ -70,11 +70,11 @@ var Frontpage = (function() {
 			$('.winner_table').html('');	//clear the board
 			$('.winner_table').append('<tr><th>Winner Name</th><th>Number of plays</th><th>Number of wins</th></tr>');
 			var onSuccess = function(data){
-				if(data.length > 0){	
-					for (winner in data){
-						var id = data[winner].userId;
-						var numgames = data[winner].numgames;
-						var numwins = data[winner].numwin;
+				if(data.users.length > 0){	
+					for (winner in data.users){
+						var id = data.users[winner].userId;
+						var numgames = data.users[winner].numgames;
+						var numwins = data.users[winner].numwin;
 						$('.winner_table').append('<tr><td>' + id + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
 					}
 
