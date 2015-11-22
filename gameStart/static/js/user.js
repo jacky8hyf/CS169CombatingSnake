@@ -375,7 +375,7 @@ var UserHandler = (function() {
                     roomsAction.hide();
                     $('.logout').hide();
                     pickRoomForm.show();
-                    
+                    attachAvailableRoomOnClickHandler();
                 }
 
             }
@@ -401,7 +401,7 @@ var UserHandler = (function() {
     var attachAvailableRoomOnClickHandler = function(e){
         for (room in roomList){
             //$('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
-            $('body').on('click', '#listofrooms option[value="roomlist.rooms[room].roomId"]', function(e){
+            $('body').on('click', '#listofrooms option[value="'+ roomlist.rooms[room].roomId+'"]', function(e){
                 //e.preventDefault();
                 joinAvailableRoom(roomList[room]);
             });
