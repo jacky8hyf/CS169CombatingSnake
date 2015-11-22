@@ -56,12 +56,19 @@ def OKResponse(*args, **kwargs):
 
 def getBooleanParam(request, key):
     val = request.GET.get(key, None)
-    if not val: return False
+    if val is None: return False
     try:
         return True if json.loads(val.lower()) else False
     except ValueError:
         traceback.print_exc();
         return False
+
+def getIntegerParam(request, key, default = None):
+    val = request.GET.get(key, default)
+    try:
+        return int(val)
+    except ValueError:
+        return default
 
 ### actual routes
 
@@ -121,6 +128,40 @@ class UsersLoginView(View):
             # as per the doc, logging out a non-existent session id has no effect
         return OKResponse()
 
+class UsersScoresView(View):
+    '''
+    /users/scores path
+    '''
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        '''
+        Update scores for a game. Require the POST body to be
+        {'players':[list of user ids], 'winner':'user id of winner'}
+        '''
+        if not validate_master_key(request):
+            return errors.PERMISSION_DENIED
+        args = sanitize_dict(parse_json(request.body),
+            required = {'players':list},
+            optional = {'winner':basestring})
+        User.update_scores(players = args.get('players'), winner = args.get('winner'));
+        return OKResponse()
+
+    def get(self, request, *args, **kwargs):
+        '''
+        Get leaderboard. Accept limit (default 20) and offset (default 0) as query
+        args. Accept 'profile' and 'scores' as in getting single user. List will be ordered by
+        the number of winned games.
+        '''
+        limit = getIntegerParam(request, 'limit', 20)
+        if limit <= 0: limit = 20
+        offset = getIntegerParam(request, 'offset', 0)
+        if offset < 0: offset = 0
+        includeProfile = getBooleanParam(request, 'profile')
+        includeScores = getBooleanParam(request, 'scores')
+        return OKResponse(users =
+            [user.to_dict(includeProfile = includeProfile, includeScores = includeScores)
+                for user in User.get_leaderboard()[offset:limit + offset]])
+
 class SingleUserView(View):
     '''
     /users/:userId path; // https://docs.djangoproject.com/en/1.4/topics/class-based-views/#performing-extra-work
@@ -136,8 +177,9 @@ class SingleUserView(View):
     def get(self, request, userId, *args, **kwargs):
         ''' get user profile'''
         includeProfile = getBooleanParam(request, 'profile')
+        includeScores = getBooleanParam(request, 'scores')
         user = User.find_by_id(str(userId))
-        return OKResponse(user.to_dict(includeProfile = includeProfile))
+        return OKResponse(user.to_dict(includeProfile = includeProfile, includeScores = includeScores))
 
     def delete(self, request, userId, *args, **kwargs):
         ''' delete a user. For testing purposes only; so requires master_key. '''

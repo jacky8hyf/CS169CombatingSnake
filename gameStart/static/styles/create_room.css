@@ -69,16 +69,16 @@
 	max-width: 100%;
 	max-height: 100%;
 }
-.player .form_fill {
-	float: right;
-	max-width: 100%;
-	max-height: 100%;
-}
-.player .form_fill input[type="submit"] {
-	font-size: 80%;
-	border-radius: 6px;
-	padding: 0.5rem;
-}
+/*.player .form_fill {*/
+	/*float: right;*/
+	/*max-width: 100%;*/
+	/*max-height: 100%;*/
+/*}*/
+/*.player .form_fill input[type="submit"] {*/
+	/*font-size: 80%;*/
+	/*border-radius: 6px;*/
+	/*padding: 0.5rem;*/
+/*}*/
 
 .player .name{
 	float:left;
@@ -180,13 +180,13 @@
 	margin-left: 8%;
 	margin-right: 5%;
 }
-.game-start-leave .form_field input[type="submit"]{
+.form_field input[type="submit"]{
 	background-color: #265108;
 	color: #eee;
 	font-weight: bold;
 	text-transform: uppercase;
 }
-.game-start-leave .form_field input[type="submit"]:focus, .game-start-leave .form_field input[type="submit"]:hover {
+.form_field input[type="submit"]:focus, .form_field input[type="submit"]:hover {
 	background-color: #1F3311;
 }
 
@@ -204,4 +204,24 @@ table{
     border-style: solid;
     border-width: 1px;
     border-color: #234A05;
+}
+.room_list{
+	height: 85%;
+}
+.myrooms{
+	height:100%;
+}
+#listofrooms{
+	width:100%;
+	height:100%;
+	background: transparent;
+}
+option{
+	height:10%;
+	font-size: 3vh;
+	border: 1px solid;
+	margin: 2px;
+	padding: 3px;
+	color: aliceblue;
+	background-color: rgba(17,80,22,0.23);
 }

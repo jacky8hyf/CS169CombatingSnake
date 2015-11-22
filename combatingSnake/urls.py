@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^users(/|)$', views.UsersView.as_view()),
     url(r'^users/login(/|)$', views.UsersLoginView.as_view()),
+    url(r'^users/scores(/|)$', views.UsersScoresView.as_view()),
     url(r'^users/(?P<userId>\w*?)(/|)$', views.SingleUserView.as_view()),
     url(r'^users/(?P<userId>\w*?)/authenticate(/|)$', views.SingleUserAuthenticateView.as_view()),
     url(r'^rooms(/|)$', views.RoomsView.as_view()),
