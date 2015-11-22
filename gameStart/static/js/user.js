@@ -375,7 +375,7 @@ var UserHandler = (function() {
                     roomsAction.hide();
                     $('.logout').hide();
                     pickRoomForm.show();
-                    //attachAvailableRoomOnClickHandler();
+                    attachAvailableRoomOnClickHandler();
                 }
 
             }
