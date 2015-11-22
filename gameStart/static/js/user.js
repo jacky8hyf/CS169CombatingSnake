@@ -393,7 +393,7 @@ var UserHandler = (function() {
                     roomsAction.hide();
                     $('.logout').hide();
                     pickRoomForm.show();
-                    attachAvailableRoomOnClickHandler();
+                    //attachAvailableRoomOnClickHandler();
                 }
 
             }
@@ -451,7 +451,7 @@ var UserHandler = (function() {
                     roomsAction.hide();
                     $('.logout').hide();
                     pickRoomForm.show();
-                    attachAvailableRoomOnClickHandler();
+                    //attachAvailableRoomOnClickHandler();
                 }
 
             }
@@ -466,15 +466,27 @@ var UserHandler = (function() {
         });
     };
 
+    //var attachAvailableRoomOnClickHandler = function(e){
+    //    for (room in roomList){
+    //        $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
+    //            //e.preventDefault();
+    //            joinAvailableRoom(roomList[e.target.value]);
+    //        });
+    //    }
+    //};
     var attachAvailableRoomOnClickHandler = function(e){
-        for (room in roomList){
-            $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
-                //e.preventDefault();
-                joinAvailableRoom(roomList[e.target.value]);
-            });
-        }
+        $('body').on('click', '#listofrooms',function(e){
+            var id = $('#listofrooms').val();
+            console.log(id);
+            for (room in roomList){
+                if(roomList[room].roomId == id){
+                    console.log('room is:');
+                    console.log(roomList[room].roomId);
+                    joinAvailableRoom(roomList[room]);
+                }
+            }
+        });
     };
-
 
     function joinAvailableRoom(available_room) {
         roomId = available_room.roomId;
@@ -734,6 +746,7 @@ var UserHandler = (function() {
         attachRefreshRoomListHandler();
         attachLeaveRoomHandler();
         attachStartGame();
+        attachAvailableRoomOnClickHandler();
     };
 
     // PUBLIC METHODS
