@@ -297,24 +297,26 @@ var UserHandler = (function() {
                 };
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("err") != -1) {
+                    var data = message.data.match(/^(\w*)((\s+(.*?))|)$/);
+                    var cmd = data[1];
+                    var dict = data[4];
+                    if (dict != undefined) {
+                        dict = JSON.parse(dict);
+                    }
+
+                    //if (message.data.indexOf("err") != -1) {
+                    if (cmd == 'error') {
                         return;
                     }
-                    if (message.data.indexOf(" ") == -1) { // message: start
-                        if (message.data == "start") {
-                            removeFoods();
-                            removeSnakes();
-                            alert("Starting Game");
-                            gameStarted = true;
-                            old_foods = [];
-                            old_snakes_state = {};
-                            return;
-                        }
-                    }
-                    var cmd = message.data.substring(0, message.data.indexOf(" "));
-                    var dict = message.data.substring(message.data.indexOf(" ") + 1);
-                    dict = JSON.parse(dict);
-                    if (cmd == "room") {
+                    if (cmd == "start") {
+                        removeFoods();
+                        removeSnakes();
+                        alert("Starting Game");
+                        gameStarted = true;
+                        old_foods = [];
+                        old_snakes_state = {};
+                        return;
+                    } else if (cmd == "room") {
                         notReceive = false;
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
@@ -335,8 +337,12 @@ var UserHandler = (function() {
                         drawSnakes(dict); // draw out all snakes
                         drawFoods(dict["_food"]); // draw out all foods
                     } else if (cmd == "end") {
-                        alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
-                        gameStarted = false;
+                        if (dict == undefined) {
+                            alert("Draw");
+                        } else {
+                            alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
+                            gameStarted = false;
+                        }
                     }
                 };
             };
