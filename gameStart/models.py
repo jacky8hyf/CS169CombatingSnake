@@ -65,6 +65,13 @@ class User(BaseModel):
     def primary_key(self):
         return self.userId
 
+    @property
+    def nicknameOrUsername(self):
+        '''
+        Return nickname if it is not empty, otherwise username
+        '''
+        return self.nickname or self.username
+
     @classmethod
     def sanity_check_profile_args(cls, d):
         fieldlenstr = lambda x: str(cls._meta.get_field(x).max_length)
@@ -191,7 +198,7 @@ class User(BaseModel):
     def to_dict(self, includeProfile = False, includeScores = False):
         d = {'userId': self.strId}
         if includeProfile:
-            d.update({'nickname': self.nickname})
+            d.update({'nickname': self.nicknameOrUsername})
         if includeScores:
             d.update({'numgames': self.numgames, 'numwin': self.numwin})
         return d

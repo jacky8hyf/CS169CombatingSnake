@@ -61,12 +61,12 @@ class UserTestCase(TestCase):
         user.update_profile({
             'nickname':'meow'
         })
-        self.assertEquals('meow', user.nickname)
+        self.assertEquals('meow', user.nicknameOrUsername)
 
         user.update_profile({})
         self.assertEquals('testUser', user.username)
         self.assertTrue(user.check_password('danger'),'check_password for new password: {}'.format(user.pwhash))
-        self.assertEquals('meow', user.nickname)
+        self.assertEquals('meow', user.nicknameOrUsername)
 
     def testToDict(self):
         user = User.from_dict({
@@ -82,7 +82,18 @@ class UserTestCase(TestCase):
 
         d = user.to_dict(includeProfile = True)
         self.assertIn('userId', d)
+        self.assertNotIn('pwhash', d)
+        self.assertNotIn('session_id', d)
         self.assertIn('nickname', d)
+        self.assertEquals(d['nickname'],'testUser')
+
+        user = User.from_dict({
+            'username': 'testUser',
+            'password': 'password',
+            'nickname': 'nickname'
+        })
+        d = user.to_dict(includeProfile = True)
+        self.assertEquals(d['nickname'],'nickname')
 
     def testRooms(self):
         return # TODO test find_by_inroom, enter_room, exit_room, all_members
