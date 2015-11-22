@@ -404,7 +404,7 @@ var UserHandler = (function() {
             //$('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
             $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
                 //e.preventDefault();
-                joinAvailableRoom(roomList[room]);
+                joinAvailableRoom(roomList[e.target.value]);
             });
         }
     };
