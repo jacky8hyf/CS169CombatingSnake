@@ -479,6 +479,7 @@ var UserHandler = (function() {
                 removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
+                $('div.game-start-leave').hide();
                 old_foods = [];
                 old_snakes_state = {};
                 return;
@@ -494,6 +495,7 @@ var UserHandler = (function() {
                     alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                 }
                 gameStarted = false;
+                $('div.game-start-leave').show();
             } else if (cmd == "room") {
                 notReceive = false;
                 //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
