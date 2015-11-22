@@ -360,6 +360,7 @@ var UserHandler = (function() {
                 }
                 else{//get all room id and put into roomList
                     //roomList = [];
+                    setBoard();
                     roomList = data.rooms;  // global roomList to track all available room objects
                     var myroomlist = $('#listofrooms');
                     myroomlist.empty();
