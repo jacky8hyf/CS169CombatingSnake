@@ -368,7 +368,7 @@ var UserHandler = (function() {
                         console.log(data.rooms[room]);
                         myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(data.rooms[room].roomId));
                         //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
-                        $('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
+                        //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
                     }
                     //add to listbox
                     actionMenu.hide();
@@ -400,7 +400,8 @@ var UserHandler = (function() {
 
     var attachAvailableRoomOnClickHandler = function(e){
         for (room in roomList){
-            $('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
+            //$('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
+            $('body').on('click', '#listofrooms option[value="roomlist.rooms[room].roomId"]', function(e){
                 //e.preventDefault();
                 joinAvailableRoom(roomList[room]);
             });
