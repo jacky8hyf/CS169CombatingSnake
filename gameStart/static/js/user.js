@@ -661,7 +661,6 @@ var UserHandler = (function() {
         attachPickRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
-        attachAvailableRoomOnClickHandler();
     };
 
     // PUBLIC METHODS
