@@ -19,6 +19,12 @@ var UserHandler = (function() {
     var msg;
     var reconn_msg;
 
+    //pick room
+    var pickRoomButton;
+    var pickRoomForm;
+    var cancelRoomButton;
+    var roomList;
+
     var joinRoomButton;
     var roomSize = 8;
     var players;    // list of players inside the room
@@ -26,6 +32,7 @@ var UserHandler = (function() {
 
     // Handle player color
     var color_lookup = ['white', 'red', 'blue', 'orange', 'black', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var user_color_map = {};
 
     // Handle gameboard
     var nRows = 21;
@@ -239,7 +246,6 @@ var UserHandler = (function() {
             e.preventDefault();
 
             var onSuccess = function(data) {
-                console.log("QUIT");
                 inbox.send("quit");
                 gameStarted = false;
                 inbox.close();
@@ -254,7 +260,6 @@ var UserHandler = (function() {
             makeDeleteRequest(url, onSuccess, onFailure);
         });
     };
-
 
     var attachCreateRoomHandler = function(e) {
         $('body').on('click','.create_button', function(e){
@@ -272,7 +277,6 @@ var UserHandler = (function() {
                 //create a socket connection to server here and remove polling block
                 var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
                 inbox = new ReconnectingWebSocket(urlstr);
-                //inbox = new WebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
@@ -298,6 +302,8 @@ var UserHandler = (function() {
                     }
                     if (message.data.indexOf(" ") == -1) { // message: start
                         if (message.data == "start") {
+                            removeFoods();
+                            removeSnakes();
                             alert("Starting Game");
                             gameStarted = true;
                             old_foods = [];
@@ -310,26 +316,29 @@ var UserHandler = (function() {
                     dict = JSON.parse(dict);
                     if (cmd == "room") {
                         notReceive = false;
-                        console.log(cmd);
-                        console.log(dict);
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
+                        player.attr("id", dict.creator.userId);  // add id so we can update health field later
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
+                        user_color_map[dict.creator.userId] = color_lookup[players.size()];
                         player.addClass(color_lookup[players.size()]);
 
                         for(i = 0; i < dict.members.length && i < roomSize - 1; i++){
                             var player = $(playerHtmlTemplate);
+                            player.attr("id", dict.members[i].userId);  // add id so we can update health field later
                             player.find('.name').text(dict.members[i].nickname);
-                            player.addClass(color_lookup[i+2]);
+                            user_color_map[dict.members[i].userId] = color_lookup[i + 2];
+                            player.addClass(color_lookup[i + 2]);
                             players.append(player);
                         }
                     } else if (cmd == "g") { //game command
                         // Place holder for getting the snakes' positions from the server
                         drawSnakes(dict); // draw out all snakes
                         drawFoods(dict["_food"]); // draw out all foods
+                        updateHealth(dict); // update health field
                     } else if (cmd == "end") {
-                        alert("Winner is " + dict.nickname);
+                        alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                         gameStarted = false;
                     }
                 };
@@ -342,6 +351,151 @@ var UserHandler = (function() {
         });
     };
 
+    var attachPickRoomHandler = function(e){
+        $('body').on('click','.join_specific_room', function(e){
+            e.preventDefault();
+            var onSuccess = function(data) {
+                if(data.rooms.length < 1){
+                    alert("No room available! Please create a room instead!");
+                }
+                else{//get all room id and put into roomList
+                    //roomList = [];
+                    setBoard();
+                    roomList = data.rooms;  // global roomList to track all available room objects
+                    var myroomlist = $('#listofrooms');
+                    myroomlist.empty();
+                    for (room in data.rooms){
+                        //roomList.push(room.roomId);
+                        console.log(data.rooms[room]);
+                        myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));
+                        //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
+                        //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
+                    }
+                    //add to listbox
+                    actionMenu.hide();
+                    roomsAction.hide();
+                    $('.logout').hide();
+                    pickRoomForm.show();
+                    attachAvailableRoomOnClickHandler();
+                }
+
+            }
+            var onFailure = function(error) {
+                console.log(error);
+            };
+            //send get request to get a rooms list
+            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
+            makeGetRequest(url, onSuccess, onFailure);
+            
+
+        });
+        $('body').on('click','.cancel_room_pick', function(e){
+            e.preventDefault();
+            pickRoomForm.hide();
+            roomsAction.show();
+            actionMenu.show();
+        });
+
+    };
+
+
+    var attachAvailableRoomOnClickHandler = function(e){
+        for (room in roomList){
+            $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
+                //e.preventDefault();
+                joinAvailableRoom(roomList[e.target.value]);
+            });
+        }
+    };
+
+
+    function joinAvailableRoom(available_room) {
+        roomId = available_room.roomId;
+        var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+        inbox = new ReconnectingWebSocket(urlstr);
+        //inbox = new WebSocket(urlstr);
+        var ts = Date.now();
+        var hashStr = sessionId + ":" + userId + ":" + ts;
+        var auth = sha256(hashStr);
+        msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        //send hello message
+        var i = 0;
+        var notReceive = true;
+        inbox.onopen = function (e) {
+            if (i < 20) {
+                if (gameStarted == true) {
+                    inbox.send(reconn_msg);
+                }
+                else {
+                    inbox.send(msg);
+                }
+                i++;
+            }
+        };
+        inbox.onmessage = function (message) {
+            if (message.data.indexOf("err") != -1) {
+                return;
+            }
+            if (message.data.indexOf(" ") == -1) { // message: start
+                if (message.data == "start") {
+                    removeFoods();
+                    removeSnakes();
+                    alert("Starting Game");
+                    gameStarted = true;
+                    old_foods = [];
+                    old_snakes_state = {};
+                    return;
+                }
+            }
+            var cmd = message.data.substring(0, message.data.indexOf(" "));
+            var dict = message.data.substring(message.data.indexOf(" ") + 1);
+            dict = JSON.parse(dict);
+            if (cmd == "g") { //game command
+                // Place holder for getting the snakes' positions from the server
+                drawSnakes(dict); // draw out all snakes
+                drawFoods(dict["_food"]); // draw out all snakes
+                updateHealth(dict); // update the health field
+            } else if (cmd == "end") {
+                alert("Winner is " + dict.winner.nickname);
+                return;
+            } else if (cmd == "room") {
+                notReceive = false;
+                //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+                var roominfo = dict;
+
+                if (roominfo.members.length > roomSize - 1) {
+                    return;
+                }
+
+                createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                createRoomForm.show();
+                actionMenu.hide();
+                roomsAction.hide();
+                pickRoomForm.hide();
+                $('.logout').hide();
+
+                players.html('');
+                var player = $(playerHtmlTemplate);
+                player.attr("id", dict.creator.userId);  // add id so we can update health field later
+                player.find('.name').text(available_room.creator.nickname);
+                user_color_map[dict.creator.userId] = color_lookup[players.size()];
+                player.addClass(color_lookup[1]);
+                players.append(player);
+
+                //add room_members
+                for (i = 0; i < roominfo.members.length && i < roomSize - 1; i++) {
+                    var player = $(playerHtmlTemplate);
+                    player.attr("id", dict.members[i].userId);  // add id so we can update health field later
+                    player.find('.name').text(roominfo.members[i].nickname);
+                    user_color_map[dict.members[i].userId] = color_lookup[i + 2];
+                    player.addClass(color_lookup[i + 2]);
+                    players.append(player);
+                }
+            }
+        };
+        $('#cssmenu').hide();
+    }
 
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
@@ -357,94 +511,10 @@ var UserHandler = (function() {
                     }
                 }
                 if(available_room != null){
-                    roomId = available_room.roomId;
-                    var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                    inbox = new ReconnectingWebSocket(urlstr);
-                    //inbox = new WebSocket(urlstr);
-                    var ts = Date.now();
-                    var hashStr = sessionId + ":" + userId + ":" + ts;
-                    var auth = sha256(hashStr);
-                    msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    //send hello message
-                    var i = 0;
-                    var notReceive = true;
-                    inbox.onopen = function(e){
-                        if (i < 20) {
-                            if(gameStarted == true){
-                                inbox.send(reconn_msg);
-                            }
-                            else{
-                                inbox.send(msg);
-                            }
-                            i++;
-                        }
-                    };
-                    inbox.onmessage = function(message) {
-                        console.log(message.data);
-                        if (message.data.indexOf("err") != -1) {
-                            return;
-                        }
-                        if (message.data.indexOf(" ") == -1) { // message: start
-                            if (message.data == "start") {
-                                alert("Starting Game");
-                                gameStarted = true;
-                                old_foods = [];
-                                old_snakes_state = {};
-                                return;
-                            }
-                        }
-                        var cmd = message.data.substring(0, message.data.indexOf(" "));
-                        var dict = message.data.substring(message.data.indexOf(" ") + 1);
-                        dict = JSON.parse(dict);
-                        if (cmd == "g") { //game command
-                            //console.log(dict);
-                            //console.log(cmd);
-                            // Place holder for getting the snakes' positions from the server
-                            drawSnakes(dict); // draw out all snakes
-                            drawFoods(dict["_food"]); // draw out all snakes
-                        } else if (cmd == "end") {
-                            console.log(dict);
-                            console.log(cmd);
-                            alert("Winner is " + dict.nickname);
-                        } else if (cmd == "room") {
-                            notReceive = false;
-                            //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
-                            var roominfo = dict;
-
-                            if(roominfo.members.length > roomSize-1){
-                                return ;
-                            }
-
-                            createRoomForm.find('.room_id').text("Room " + available_room.roomId);
-                            createRoomForm.show();
-                            actionMenu.hide();
-                            roomsAction.hide();
-                            $('.logout').hide();
-
-                            players.html ('');
-                            var player = $(playerHtmlTemplate);
-                            player.find('.name').text(available_room.creator.nickname);
-                            player.addClass(color_lookup[1]);
-                            players.append(player);
-
-                            //add room_members
-                            for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
-                                var player = $(playerHtmlTemplate);
-                                player.find('.name').text(roominfo.members[i].nickname);
-                                player.addClass(color_lookup[i+2]);
-                                players.append(player);
-                            }
-                        }
-                    }
-                    $('#cssmenu').hide();
-                }
-                else{
+                    joinAvailableRoom(available_room);
+                } else{
                     alert("No room available now. Please create a new room!");
                 }
-                
-                //$('#cssmenu').hide();
-               // actionMenu.show();
             };
             var onFailure = function(error) {
                 console.log(error);
@@ -459,7 +529,6 @@ var UserHandler = (function() {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
             if (inbox != null) {
-                console.log("send start to server");
                 inbox.send("start");
             }
             gameStarted = true;
@@ -487,6 +556,15 @@ var UserHandler = (function() {
             }
             inbox.send(msg);
         }
+    }
+
+    var updateHealth = function(snakes) {
+        for (var key in snakes){
+            if (key != '_food') {
+                var snake_body = snakes[key];
+                $("#"+ key).find('.health').text(10*snake_body.length);
+            }
+        }
     };
 
     var drawSnakes = function(snakes) {
@@ -496,8 +574,7 @@ var UserHandler = (function() {
                 var snake_body = snakes[key];
                 for (var i = 0; i < snake_body.length; i++) {
                     id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                    $("#" + id).addClass(color_lookup[key]);
-                    //$("#" + id).addClass("cell");
+                    $("#" + id).addClass(user_color_map[key]);
                 }
             }
         }
@@ -509,8 +586,7 @@ var UserHandler = (function() {
             var snake_body = old_snakes_state[key];
             for (var i = 0; i < snake_body.length; i++) {
                 id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).removeClass(color_lookup[key]);
-                //$("#" + id).addClass("cell"); // add a cell just in case
+                $("#" + id).removeClass(user_color_map[key]);
             }
         }
     };
@@ -562,25 +638,29 @@ var UserHandler = (function() {
         loginForm = $("div.login_container");
         signupForm = $("div.signup_container");
         createRoomForm = $(".create_room");
+        pickRoomForm = $(".pick_room");
         createRoomButton = $(".create_button");
         userInfo = $('div.userInfo');
         roomsAction = $('.roomcreate_container');
         actionMenu = $('#cssmenu');
 
         joinRoomButton = $(".submit-roomjoin");
+        pickRoomButton = $(".join_specific_room");
+        cancelRoomButton = $(".cancel_room_pick");
         playerHtmlTemplate = $(".players .player")[0].outerHTML;
         players = $(".players");
         players.html('');
         createRoomForm.hide();
+        pickRoomForm.hide();
 
         attachLoginHandler();
         attachLogoutHandler();
         attachSignupHandler();
         attachCreateRoomHandler();
         attachJoinRoomHandler();
+        attachPickRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
-        //sendKeyStroke();
     };
 
     // PUBLIC METHODS
