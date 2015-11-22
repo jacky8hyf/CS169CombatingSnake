@@ -368,7 +368,7 @@ var UserHandler = (function() {
                         console.log(data.rooms[room]);
                         myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(data.rooms[room].roomId));
                         //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
-                        $('<option></option>').attr("class", data.rooms[room].roomId);  //  set class name as room id
+                        $('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
                     }
                     //add to listbox
                     actionMenu.hide();
