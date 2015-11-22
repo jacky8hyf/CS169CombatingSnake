@@ -393,6 +393,93 @@ var UserHandler = (function() {
 
     };
 
+    function joinAvailableRoom(available_room) {
+        roomId = available_room.roomId;
+        var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+        inbox = new ReconnectingWebSocket(urlstr);
+        //inbox = new WebSocket(urlstr);
+        var ts = Date.now();
+        var hashStr = sessionId + ":" + userId + ":" + ts;
+        var auth = sha256(hashStr);
+        msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        //send hello message
+        var i = 0;
+        var notReceive = true;
+        inbox.onopen = function (e) {
+            if (i < 20) {
+                if (gameStarted == true) {
+                    inbox.send(reconn_msg);
+                }
+                else {
+                    inbox.send(msg);
+                }
+                i++;
+            }
+        };
+        inbox.onmessage = function (message) {
+            if (message.data.indexOf("err") != -1) {
+                return;
+            }
+            if (message.data.indexOf(" ") == -1) { // message: start
+                if (message.data == "start") {
+                    removeFoods();
+                    removeSnakes();
+                    alert("Starting Game");
+                    gameStarted = true;
+                    old_foods = [];
+                    old_snakes_state = {};
+                    return;
+                }
+            }
+            var cmd = message.data.substring(0, message.data.indexOf(" "));
+            var dict = message.data.substring(message.data.indexOf(" ") + 1);
+            dict = JSON.parse(dict);
+            if (cmd == "g") { //game command
+                // Place holder for getting the snakes' positions from the server
+                drawSnakes(dict); // draw out all snakes
+                drawFoods(dict["_food"]); // draw out all snakes
+                updateHealth(dict); // update the health field
+            } else if (cmd == "end") {
+                alert("Winner is " + dict.winner.nickname);
+                return;
+            } else if (cmd == "room") {
+                notReceive = false;
+                //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
+                var roominfo = dict;
+
+                if (roominfo.members.length > roomSize - 1) {
+                    return;
+                }
+
+                createRoomForm.find('.room_id').text("Room " + available_room.roomId);
+                createRoomForm.show();
+                actionMenu.hide();
+                roomsAction.hide();
+                $('.logout').hide();
+
+                players.html('');
+                var player = $(playerHtmlTemplate);
+                player.attr("id", dict.creator.userId);  // add id so we can update health field later
+                player.find('.name').text(available_room.creator.nickname);
+                user_color_map[dict.creator.userId] = color_lookup[players.size()];
+                player.addClass(color_lookup[1]);
+                players.append(player);
+
+                //add room_members
+                for (i = 0; i < roominfo.members.length && i < roomSize - 1; i++) {
+                    var player = $(playerHtmlTemplate);
+                    player.attr("id", dict.members[i].userId);  // add id so we can update health field later
+                    player.find('.name').text(roominfo.members[i].nickname);
+                    user_color_map[dict.members[i].userId] = color_lookup[i + 2];
+                    player.addClass(color_lookup[i + 2]);
+                    players.append(player);
+                }
+            }
+        };
+        $('#cssmenu').hide();
+    }
+
     var attachJoinRoomHandler = function(e) {
         $('body').on('click','.submit-roomjoin', function(e){
             e.preventDefault();
@@ -407,90 +494,7 @@ var UserHandler = (function() {
                     }
                 }
                 if(available_room != null){
-                    roomId = available_room.roomId;
-                    var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
-                    inbox = new ReconnectingWebSocket(urlstr);
-                    //inbox = new WebSocket(urlstr);
-                    var ts = Date.now();
-                    var hashStr = sessionId + ":" + userId + ":" + ts;
-                    var auth = sha256(hashStr);
-                    msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                    //send hello message
-                    var i = 0;
-                    var notReceive = true;
-                    inbox.onopen = function(e){
-                        if (i < 20) {
-                            if(gameStarted == true){
-                                inbox.send(reconn_msg);
-                            }
-                            else{
-                                inbox.send(msg);
-                            }
-                            i++;
-                        }
-                    };
-                    inbox.onmessage = function(message) {
-                        if (message.data.indexOf("err") != -1) {
-                            return;
-                        }
-                        if (message.data.indexOf(" ") == -1) { // message: start
-                            if (message.data == "start") {
-                                removeFoods();
-                                removeSnakes();
-                                alert("Starting Game");
-                                gameStarted = true;
-                                old_foods = [];
-                                old_snakes_state = {};
-                                return;
-                            }
-                        }
-                        var cmd = message.data.substring(0, message.data.indexOf(" "));
-                        var dict = message.data.substring(message.data.indexOf(" ") + 1);
-                        dict = JSON.parse(dict);
-                        if (cmd == "g") { //game command
-                            // Place holder for getting the snakes' positions from the server
-                            drawSnakes(dict); // draw out all snakes
-                            drawFoods(dict["_food"]); // draw out all snakes
-                            updateHealth(dict); // update the health field
-                        } else if (cmd == "end") {
-                            alert("Winner is " + dict.winner.nickname);
-                            return;
-                        } else if (cmd == "room") {
-                            notReceive = false;
-                            //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
-                            var roominfo = dict;
-
-                            if(roominfo.members.length > roomSize-1){
-                                return ;
-                            }
-
-                            createRoomForm.find('.room_id').text("Room " + available_room.roomId);
-                            createRoomForm.show();
-                            actionMenu.hide();
-                            roomsAction.hide();
-                            $('.logout').hide();
-
-                            players.html ('');
-                            var player = $(playerHtmlTemplate);
-                            player.attr("id", dict.creator.userId);  // add id so we can update health field later
-                            player.find('.name').text(available_room.creator.nickname);
-                            user_color_map[dict.creator.userId] = color_lookup[players.size()];
-                            player.addClass(color_lookup[1]);
-                            players.append(player);
-
-                            //add room_members
-                            for(i=0; i< roominfo.members.length && i < roomSize - 1; i++){
-                                var player = $(playerHtmlTemplate);
-                                player.attr("id", dict.members[i].userId);  // add id so we can update health field later
-                                player.find('.name').text(roominfo.members[i].nickname);
-                                user_color_map[dict.members[i].userId] = color_lookup[i + 2];
-                                player.addClass(color_lookup[i+2]);
-                                players.append(player);
-                            }
-                        }
-                    };
-                    $('#cssmenu').hide();
+                    joinAvailableRoom(available_room);
                 } else{
                     alert("No room available now. Please create a new room!");
                 }
