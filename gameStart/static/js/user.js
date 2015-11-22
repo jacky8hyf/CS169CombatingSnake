@@ -336,6 +336,7 @@ var UserHandler = (function() {
                         // Place holder for getting the snakes' positions from the server
                         drawSnakes(dict); // draw out all snakes
                         drawFoods(dict["_food"]); // draw out all foods
+                        updateHealth(dict); // update health field
                     } else if (cmd == "end") {
                         alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                         gameStarted = false;
