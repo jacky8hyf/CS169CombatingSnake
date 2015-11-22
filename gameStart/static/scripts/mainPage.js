@@ -72,10 +72,10 @@ var Frontpage = (function() {
 			var onSuccess = function(data){
 				if(data.users.length > 0){	
 					for (winner in data.users){
-						var id = data.users[winner].userId;
+						var name = data.users[winner].nickname;
 						var numgames = data.users[winner].numgames;
 						var numwins = data.users[winner].numwin;
-						$('.winner_table').append('<tr><td>' + id + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
+						$('.winner_table').append('<tr><td>' + name + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
 					}
 
 				}
