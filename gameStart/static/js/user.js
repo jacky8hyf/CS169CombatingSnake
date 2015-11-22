@@ -366,8 +366,19 @@ var UserHandler = (function() {
                     myroomlist.empty();
                     for (room in data.rooms){
                         //roomList.push(room.roomId);
-                        console.log(data.rooms[room]);
-                        myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));
+                        try {
+                            console.log(data.rooms[room]);
+                            var current_room = data.rooms[room];
+                            var members = "";
+                            for (var i = 0; current_room.members.length; i++) {
+                                members += current_room.members[i].nickname + " ";
+                            }
+                            myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
+                                + current_room.creator.nickname + ", members: " + members));
+
+                        } catch(err) {
+                            console.log(err);
+                        }
                         //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
                         //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
                     }
