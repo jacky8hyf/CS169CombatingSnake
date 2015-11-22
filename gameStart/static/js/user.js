@@ -23,7 +23,7 @@ var UserHandler = (function() {
     var pickRoomButton;
     var pickRoomForm;
     var cancelRoomButton;
-    //var roomList;
+    var roomList;
 
     var joinRoomButton;
     var roomSize = 8;
@@ -360,16 +360,20 @@ var UserHandler = (function() {
                 }
                 else{//get all room id and put into roomList
                     //roomList = [];
+                    roomList = data.rooms;  // global roomList to track all available room objects
                     var myroomlist = $('#listofrooms');
                     myroomlist.empty();
                     for (room in data.rooms){
                         //roomList.push(room.roomId);
                         console.log(data.rooms[room]);
                         myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(data.rooms[room].roomId));
+                        //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
+                        $('<option></option>').attr("class", data.rooms[room].roomId);  //  set class name as room id
                     }
                     //add to listbox
                     actionMenu.hide();
                     roomsAction.hide();
+                    $('.logout').hide();
                     pickRoomForm.show();
                     
                 }
@@ -392,6 +396,17 @@ var UserHandler = (function() {
         });
 
     };
+
+
+    var attachAvailableRoomOnClickHandler = function(e){
+        for (room in roomList){
+            $('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
+                //e.preventDefault();
+                joinAvailableRoom(roomList[room]);
+            });
+        }
+    };
+
 
     function joinAvailableRoom(available_room) {
         roomId = available_room.roomId;
@@ -644,6 +659,7 @@ var UserHandler = (function() {
         attachPickRoomHandler();
         attachLeaveRoomHandler();
         attachStartGame();
+        attachAvailableRoomOnClickHandler();
     };
 
     // PUBLIC METHODS
