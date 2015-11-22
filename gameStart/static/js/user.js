@@ -375,7 +375,7 @@ var UserHandler = (function() {
                     roomsAction.hide();
                     $('.logout').hide();
                     pickRoomForm.show();
-                    attachAvailableRoomOnClickHandler();
+                    //attachAvailableRoomOnClickHandler();
                 }
 
             }
@@ -399,9 +399,7 @@ var UserHandler = (function() {
 
 
     var attachAvailableRoomOnClickHandler = function(e){
-
         for (room in roomList){
-            //$('body').on('click', '.'+ roomList.rooms[room].roomId, function(e){
             $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
                 //e.preventDefault();
                 joinAvailableRoom(roomList[e.target.value]);
