@@ -11,6 +11,19 @@ var Frontpage = (function() {
 	var roomAction;
 	var createRoom;
 
+	//leaderboard
+	var winner_table;
+	var makeGetRequest = function(url, onSuccess, onFailure) {
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: "json",
+            success: onSuccess,
+            error: onFailure
+        });
+    };
+
+
 	var hideAll = function() {
 		gameRule.hide();
 		intro.hide();
@@ -46,11 +59,38 @@ var Frontpage = (function() {
 			$('.intro').fadeIn(fadeInTime);
 		});
 	};
+
+//	GET /users/scores?limit=3&offset=0&profile=true&scores=true Example Output:
+//[
+//{"userId":"2e98dd","nickname":"jacky","numgames":1,"numwin":0}, {"userId":"2e98df","nickname":"Krist","numgames":4,"numwin":2}, {"userId":"2e98df","nickname":"Zoe","numgames":1,"numwin":0}
+//]
 	var attachLeaderboardHandler = function(e){
 		$('.leader-button').click(function(e){
 			e.preventDefault();
+			$('.winner_table').html('');	//clear the board
+			$('.winner_table').append('<tr><th>Winner Name</th><th>Number of plays</th><th>Number of wins</th></tr>');
+			var onSuccess = function(data){
+				if(data.users.length > 0){	
+					for (winner in data.users){
+						var id = data.users[winner].userId;
+						var numgames = data.users[winner].numgames;
+						var numwins = data.users[winner].numwin;
+						$('.winner_table').append('<tr><td>' + id + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
+					}
+
+				}
+				
+
+			};
+
+			var onFailure = function(error) {
+                console.log(error);
+            };
 			hideAll();
 			$('.leaderboard').fadeIn(fadeInTime);
+			//default is getting 20 winners
+			var url = "/users/scores?profile=true&scores=true";
+            makeGetRequest(url, onSuccess, onFailure);
 		});
 	};
 	var attachStartGameHandler = function(e){
@@ -73,6 +113,7 @@ var Frontpage = (function() {
 		intro = $('.intro');
 		login = $('.login_container');
 		leaderboard = $('.leaderboard');
+		winner_table = $('.winner_table');
 		signup = $('.signup_container');
 		roomAction = $('.roomcreate_container');
 		createRoom = $('.create_room');

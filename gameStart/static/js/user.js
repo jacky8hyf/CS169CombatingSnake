@@ -297,24 +297,26 @@ var UserHandler = (function() {
                 };
 
                 inbox.onmessage = function(message) {
-                    if (message.data.indexOf("err") != -1) {
+                    var data = message.data.match(/^(\w*)((\s+(.*?))|)$/);
+                    var cmd = data[1];
+                    var dict = data[4];
+                    if (dict != undefined) {
+                        dict = JSON.parse(dict);
+                    }
+
+                    //if (message.data.indexOf("err") != -1) {
+                    if (cmd == 'error') {
                         return;
                     }
-                    if (message.data.indexOf(" ") == -1) { // message: start
-                        if (message.data == "start") {
-                            removeFoods();
-                            removeSnakes();
-                            alert("Starting Game");
-                            gameStarted = true;
-                            old_foods = [];
-                            old_snakes_state = {};
-                            return;
-                        }
-                    }
-                    var cmd = message.data.substring(0, message.data.indexOf(" "));
-                    var dict = message.data.substring(message.data.indexOf(" ") + 1);
-                    dict = JSON.parse(dict);
-                    if (cmd == "room") {
+                    if (cmd == "start") {
+                        removeFoods();
+                        removeSnakes();
+                        alert("Starting Game");
+                        gameStarted = true;
+                        old_foods = [];
+                        old_snakes_state = {};
+                        return;
+                    } else if (cmd == "room") {
                         notReceive = false;
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
@@ -338,7 +340,11 @@ var UserHandler = (function() {
                         drawFoods(dict["_food"]); // draw out all foods
                         updateHealth(dict); // update health field
                     } else if (cmd == "end") {
-                        alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
+                        if (dict == undefined) {
+                            alert("Draw");
+                        } else {
+                            alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
+                        }
                         gameStarted = false;
                     }
                 };
@@ -366,8 +372,19 @@ var UserHandler = (function() {
                     myroomlist.empty();
                     for (room in data.rooms){
                         //roomList.push(room.roomId);
-                        console.log(data.rooms[room]);
-                        myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));
+                        try {
+                            console.log(data.rooms[room]);
+                            var current_room = data.rooms[room];
+                            var members = "";
+                            for (var i = 0; current_room.members.length; i++) {
+                                members += current_room.members[i].nickname + " ";
+                            }
+                            myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
+                                + current_room.creator.nickname + ", members: " + members));
+
+                        } catch(err) {
+                            console.log(err);
+                        }
                         //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
                         //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
                     }
@@ -434,36 +451,41 @@ var UserHandler = (function() {
             }
         };
         inbox.onmessage = function (message) {
-            if (message.data.indexOf("err") != -1) {
+            var data = message.data.match(/^(\w*)((\s+(.*?))|)$/);
+            var cmd = data[1];
+            var dict = data[4];
+            if (dict != undefined) {
+                dict = JSON.parse(dict);
+            }
+
+            //if (message.data.indexOf("err") != -1) {
+            if (cmd == 'error') {
                 return;
             }
-            if (message.data.indexOf(" ") == -1) { // message: start
-                if (message.data == "start") {
-                    removeFoods();
-                    removeSnakes();
-                    alert("Starting Game");
-                    gameStarted = true;
-                    old_foods = [];
-                    old_snakes_state = {};
-                    return;
-                }
-            }
-            var cmd = message.data.substring(0, message.data.indexOf(" "));
-            var dict = message.data.substring(message.data.indexOf(" ") + 1);
-            dict = JSON.parse(dict);
-            if (cmd == "g") { //game command
+            if (cmd == "start") {
+                removeFoods();
+                removeSnakes();
+                alert("Starting Game");
+                gameStarted = true;
+                old_foods = [];
+                old_snakes_state = {};
+                return;
+            } else if (cmd == "g") { //game command
                 // Place holder for getting the snakes' positions from the server
                 drawSnakes(dict); // draw out all snakes
-                drawFoods(dict["_food"]); // draw out all snakes
-                updateHealth(dict); // update the health field
+                drawFoods(dict["_food"]); // draw out all foods
+                updateHealth(dict); // update health field
             } else if (cmd == "end") {
-                alert("Winner is " + dict.winner.nickname);
-                return;
+                if (dict == undefined) {
+                    alert("Draw");
+                } else {
+                    alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
+                }
+                gameStarted = false;
             } else if (cmd == "room") {
                 notReceive = false;
                 //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
                 var roominfo = dict;
-
                 if (roominfo.members.length > roomSize - 1) {
                     return;
                 }

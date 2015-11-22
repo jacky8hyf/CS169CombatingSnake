@@ -38,7 +38,14 @@ body{
 .leaderboard{
 }
 
+.winner_table, .winner_table td, .winner_table th{
+	border: 1px solid white;
+	border-collapse: collapse;
+}
 
+.winner_table td{
+	text-align: center;
+}
 /* log in container design */
 .form_container{
 	-webkit-box-flex: 1;
