@@ -344,8 +344,8 @@ var UserHandler = (function() {
                             alert("Draw");
                         } else {
                             alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
-                            gameStarted = false;
                         }
+                        gameStarted = false;
                     }
                 };
             };
@@ -480,8 +480,8 @@ var UserHandler = (function() {
                     alert("Draw");
                 } else {
                     alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
-                    gameStarted = false;
                 }
+                gameStarted = false;
             } else if (cmd == "room") {
                 notReceive = false;
                 //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
