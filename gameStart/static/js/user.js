@@ -378,7 +378,7 @@ var UserHandler = (function() {
                         for (var i = 0; current_room.members.length; i++) {
                             members += current_room.members[i].nickname + " ";
                         }
-                        myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
+                        myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(current_room.roomId + ": creator: "
                             + current_room.creator.nickname + ", members: " + members));
 
                     } catch (err) {
