@@ -43,6 +43,9 @@ body{
 	border-collapse: collapse;
 }
 
+.winner_table td{
+	text-align: center;
+}
 /* log in container design */
 .form_container{
 	-webkit-box-flex: 1;
