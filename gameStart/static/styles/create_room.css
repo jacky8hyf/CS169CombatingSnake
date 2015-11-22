@@ -69,16 +69,16 @@
 	max-width: 100%;
 	max-height: 100%;
 }
-.player .form_fill {
-	float: right;
-	max-width: 100%;
-	max-height: 100%;
-}
-.player .form_fill input[type="submit"] {
-	font-size: 80%;
-	border-radius: 6px;
-	padding: 0.5rem;
-}
+/*.player .form_fill {*/
+	/*float: right;*/
+	/*max-width: 100%;*/
+	/*max-height: 100%;*/
+/*}*/
+/*.player .form_fill input[type="submit"] {*/
+	/*font-size: 80%;*/
+	/*border-radius: 6px;*/
+	/*padding: 0.5rem;*/
+/*}*/
 
 .player .name{
 	float:left;
