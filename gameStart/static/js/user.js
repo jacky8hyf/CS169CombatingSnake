@@ -357,112 +357,62 @@ var UserHandler = (function() {
         });
     };
 
+    function roomListShowingHelper(e) {
+        e.preventDefault();
+        var onSuccess = function (data) {
+            if (data.rooms.length < 1) {
+                alert("No room available! Please create a room instead!");
+            }
+            else {//get all room id and put into roomList
+                //roomList = [];
+                setBoard();
+                roomList = data.rooms;  // global roomList to track all available room objects
+                var myroomlist = $('#listofrooms');
+                myroomlist.empty();
+                for (room in data.rooms) {
+                    //roomList.push(room.roomId);
+                    try {
+                        console.log(data.rooms[room]);
+                        var current_room = data.rooms[room];
+                        var members = "";
+                        for (var i = 0; current_room.members.length; i++) {
+                            members += current_room.members[i].nickname + " ";
+                        }
+                        myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
+                            + current_room.creator.nickname + ", members: " + members));
+
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
+                    //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
+                }
+                //add to listbox
+                actionMenu.hide();
+                roomsAction.hide();
+                $('.logout').hide();
+                pickRoomForm.show();
+                //attachAvailableRoomOnClickHandler();
+            }
+
+        }
+        var onFailure = function (error) {
+            console.log(error);
+        };
+        //send get request to get a rooms list
+        var url = "/rooms?creator-profile=true&members=true&member-profile=true";
+        makeGetRequest(url, onSuccess, onFailure);
+    }
+
     var attachPickRoomHandler = function(e){
         $('body').on('click','.join_specific_room', function(e){
-            e.preventDefault();
-            var onSuccess = function(data) {
-                if(data.rooms.length < 1){
-                    alert("No room available! Please create a room instead!");
-                }
-                else{//get all room id and put into roomList
-                    //roomList = [];
-                    setBoard();
-                    roomList = data.rooms;  // global roomList to track all available room objects
-                    var myroomlist = $('#listofrooms');
-                    myroomlist.empty();
-                    for (room in data.rooms){
-                        //roomList.push(room.roomId);
-                        try {
-                            console.log(data.rooms[room]);
-                            var current_room = data.rooms[room];
-                            var members = "";
-                            for (var i = 0; current_room.members.length; i++) {
-                                members += current_room.members[i].nickname + " ";
-                            }
-                            myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
-                                + current_room.creator.nickname + ", members: " + members));
-
-                        } catch(err) {
-                            console.log(err);
-                        }
-                        //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
-                        //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
-                    }
-                    //add to listbox
-                    actionMenu.hide();
-                    roomsAction.hide();
-                    $('.logout').hide();
-                    pickRoomForm.show();
-                    //attachAvailableRoomOnClickHandler();
-                }
-
-            }
-            var onFailure = function(error) {
-                console.log(error);
-            };
-            //send get request to get a rooms list
-            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
-            makeGetRequest(url, onSuccess, onFailure);
-            
-
+            roomListShowingHelper(e);
         });
-        $('body').on('click','.cancel_room_pick', function(e){
-            e.preventDefault();
-            pickRoomForm.hide();
-            roomsAction.show();
-            actionMenu.show();
-        });
-
     };
 
     var attachRefreshRoomListHandler = function(e){
         $('body').on('click','.refresh_rooms', function(e){
-            e.preventDefault();
-            var onSuccess = function(data) {
-                if(data.rooms.length < 1){
-                    alert("No room available! Please create a room instead!");
-                }
-                else{//get all room id and put into roomList
-                    //roomList = [];
-                    setBoard();
-                    roomList = data.rooms;  // global roomList to track all available room objects
-                    var myroomlist = $('#listofrooms');
-                    myroomlist.empty();
-                    for (room in data.rooms){
-                        //roomList.push(room.roomId);
-                        try {
-                            console.log(data.rooms[room]);
-                            var current_room = data.rooms[room];
-                            var members = "";
-                            for (var i = 0; current_room.members.length; i++) {
-                                members += current_room.members[i].nickname + " ";
-                            }
-                            myroomlist.append($('<option></option>').val(room).html(current_room.roomId + ": creator: "
-                                + current_room.creator.nickname + ", members: " + members));
-
-                        } catch(err) {
-                            console.log(err);
-                        }
-                        //myroomlist.append($('<option></option>').val(room).html(data.rooms[room].roomId));  // use val to track index of room
-                        //$('<option></option>').addClass(data.rooms[room].roomId);  //  set class name as room id
-                    }
-                    //add to listbox
-                    actionMenu.hide();
-                    roomsAction.hide();
-                    $('.logout').hide();
-                    pickRoomForm.show();
-                    //attachAvailableRoomOnClickHandler();
-                }
-
-            }
-            var onFailure = function(error) {
-                console.log(error);
-            };
-            //send get request to get a rooms list
-            var url = "/rooms?creator-profile=true&members=true&member-profile=true";
-            makeGetRequest(url, onSuccess, onFailure);
-
-
+            roomListShowingHelper(e);
         });
     };
 
