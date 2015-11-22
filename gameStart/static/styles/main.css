@@ -38,6 +38,10 @@ body{
 .leaderboard{
 }
 
+.winner_table, .winner_table td, .winner_table th{
+	border: 1px solid white;
+	border-collapse: collapse;
+}
 
 /* log in container design */
 .form_container{
