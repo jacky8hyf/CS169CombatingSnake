@@ -437,6 +437,7 @@ var UserHandler = (function() {
         $('body').on('click','.cancel_room_pick', function(e){
             e.preventDefault();
             pickRoomForm.hide();
+            $('.logout').show();
             roomsAction.show();
             actionMenu.show();
         });
