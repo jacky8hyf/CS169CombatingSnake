@@ -18,12 +18,9 @@ var UserHandler = (function() {
     var createRoomButton;
 
     //pick room
-    var pickRoomButton;
     var pickRoomForm;
-    var cancelRoomButton;
     var roomList;
 
-    var joinRoomButton;
     var roomSize = 8;
     var players;    // list of players inside the room
     var playerHtmlTemplate;
@@ -686,10 +683,6 @@ var UserHandler = (function() {
         userInfo = $('div.userInfo');
         roomsAction = $('.roomcreate_container');
         actionMenu = $('#cssmenu');
-
-        joinRoomButton = $(".submit-roomjoin");
-        pickRoomButton = $(".join_specific_room");
-        cancelRoomButton = $(".cancel_room_pick");
         playerHtmlTemplate = $(".players .player")[0].outerHTML;
         players = $(".players");
         players.html('');
