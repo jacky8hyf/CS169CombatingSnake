@@ -1,0 +1,227 @@
+.create_room {
+	position: relative;
+ 	box-shadow: 0 0 20px #CCCCCC;
+	margin-right: 2%;
+	margin-left: 2%;
+	margin-bottom: 2%;
+	background-color:rgba(0,0,0,0.8);
+	height: 80%;
+}
+.pick_room{
+	position: relative;
+ 	box-shadow: 0 0 20px #CCCCCC;
+	margin-right: 2%;
+	margin-left: 2%;
+	margin-bottom: 2%;
+	background-color:rgba(0,0,0,0.8);
+	height: 80%;
+}
+.gameboard{
+	display: block;
+	border:solid;
+	border-width: 2px;
+	border-color: #265108;
+	box-shadow: 0 0 20px #CCCCCC;
+	height: 100%;
+	width: 73%;
+	float: left;
+}
+.user-panel{
+	background-color:rgba(38,81,8,0.2);
+	display: block;
+	border:solid;
+	border-width: 2px;
+	border-color: #265108;
+	box-shadow: 0 0 20px #CCCCCC;
+	height: 100%;
+	width: calc(27%  - 10px);
+	float: right;
+	position: relative;
+}
+.right_panel{
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	margin-right: 10px;
+	overflow: auto;
+}
+.players{
+	height: 75%;
+	border:solid;
+	border-width: 2px;
+	//border-color: red;
+}
+.room_id{
+	margin-bottom: 20px;
+	color: #CC9900;
+	font-size: 30px;
+}
+.player{
+	border:solid;
+	border-width: 2px;
+	border-color: #265108;
+	box-shadow: 0 0 20px #CCCCCC;
+	width: 100%;
+	height: 8%;
+}
+.snake_icon{
+	float: left;
+	max-width: 100%;
+	max-height: 100%;
+}
+/*.player .form_fill {*/
+	/*float: right;*/
+	/*max-width: 100%;*/
+	/*max-height: 100%;*/
+/*}*/
+/*.player .form_fill input[type="submit"] {*/
+	/*font-size: 80%;*/
+	/*border-radius: 6px;*/
+	/*padding: 0.5rem;*/
+/*}*/
+
+.player .name{
+	float:left;
+	font-size: 20px;
+	color: white;
+}
+
+.player .health{
+	margin-left:15%;
+	float:left;
+	font-size: 20px;
+	color: white;
+}
+
+.food {
+	background-color:white;
+	animation: food_blinker 1s linear infinite;
+	height: 5%;
+}
+
+@keyframes food_blinker {
+  80% { opacity: 0.7; }
+}
+
+.red {
+	background-color:red;
+}
+.blue{
+	background-color:blue;
+}
+.orange{
+	background-color:orange;
+}
+.black{
+	background-color:black;
+}
+.yellow{
+	background-color:yellow;
+}
+.green{
+	background-color: green;
+}
+.purple {
+	background-color: purple;
+}
+.pink {
+	background-color: deeppink;
+}
+.aqua {
+	background-color: aqua;
+}
+
+
+/*.leave{
+	display: block;
+	float: left;
+	margin:0px 20px;
+	text-decoration: none;
+	border: 1px solid gray;
+	font-size: 30px;
+	padding: 5px 10px;
+	background-color: #c0c0c0;
+	color: blue;
+	position: absolute;
+	bottom: 0;
+	border-radius: 10px;
+
+}
+
+.start{
+	display: block;
+	float: right;
+	height:50px;
+	width: 100px;
+	font-size: 30px;
+	color:blue;
+	position: absolute;
+	bottom: 0;
+	margin-left: 80%;
+}*/
+
+.game-start-leave{
+	width: 100%;
+	float: left;
+	bottom:0;
+	position: absolute;
+}
+
+.game-start-leave .form_field{
+	width: 40%;
+	float: left;
+}
+
+.submit-leave{
+	margin-left: 5%;
+	margin-right: 8%;
+}
+.submit-start{
+	margin-left: 8%;
+	margin-right: 5%;
+}
+.form_field input[type="submit"]{
+	background-color: #265108;
+	color: #eee;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.form_field input[type="submit"]:focus, .form_field input[type="submit"]:hover {
+	background-color: #1F3311;
+}
+
+.game-start-leave .form_field{
+	width:50%;
+	float: left;
+}
+table{
+	height:100%;
+	width:100%;
+}
+.cell {
+	width: 100%;
+	height: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #234A05;
+}
+.room_list{
+	height: 85%;
+}
+.myrooms{
+	height:100%;
+}
+#listofrooms{
+	width:100%;
+	height:100%;
+	background: transparent;
+}
+option{
+	height:10%;
+	font-size: 3vh;
+	border: 1px solid;
+	margin: 2px;
+	padding: 3px;
+	color: aliceblue;
+	background-color: rgba(17,80,22,0.23);
+}
