@@ -16,8 +16,6 @@ var UserHandler = (function() {
     // Handle room requests
     var createRoomForm;
     var createRoomButton;
-    var msg;
-    var reconn_msg;
 
     //pick room
     var pickRoomButton;
@@ -185,7 +183,7 @@ var UserHandler = (function() {
 
             var onFailure = function(response) {
                 var data = response.responseJSON;
-                errorElem.text(data.msg);
+                alert(data.msg);
             };
             makeDeleteRequest("/users/login", onSuccess, onFailure);
         });
@@ -280,8 +278,8 @@ var UserHandler = (function() {
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
-                msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
@@ -438,6 +436,15 @@ var UserHandler = (function() {
         });
     };
 
+    var cancelJoinRoomHandler = function(e){
+        $('body').on('click','.cancel_room_pick', function(e){
+            e.preventDefault();
+            pickRoomForm.hide();
+            roomsAction.show();
+            actionMenu.show();
+        });
+    };
+
     function joinAvailableRoom(available_room) {
         roomId = available_room.roomId;
         var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
@@ -446,8 +453,8 @@ var UserHandler = (function() {
         var ts = Date.now();
         var hashStr = sessionId + ":" + userId + ":" + ts;
         var auth = sha256(hashStr);
-        msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
-        reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        var msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        var reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
         //send hello message
         var i = 0;
         var notReceive = true;
@@ -699,6 +706,7 @@ var UserHandler = (function() {
         attachLeaveRoomHandler();
         attachStartGame();
         attachAvailableRoomOnClickHandler();
+        cancelJoinRoomHandler();
     };
 
     // PUBLIC METHODS
