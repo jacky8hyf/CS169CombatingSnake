@@ -39,6 +39,9 @@ var UserHandler = (function() {
     var inbox = null;
     var gameStarted = false;
 
+    // flag to make sure only the first click on start game will send the start game requrest to server
+    var start_req_sent = false;
+
     /**
      * HTTP GET request
      * @param  {string}   url       URL path
@@ -343,6 +346,7 @@ var UserHandler = (function() {
                             alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                         }
                         gameStarted = false;
+                        start_req_sent = false;
                         $('.submit-leave').show();
                         $('.submit-start').show();
                     }
@@ -505,6 +509,7 @@ var UserHandler = (function() {
                     alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                 }
                 gameStarted = false;
+                start_req_sent = false;
                 $('.submit-leave').show();
                 $('.submit-start').show();
             } else if (cmd == "room") {
@@ -575,7 +580,8 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
-            if (inbox != null) {
+            if (inbox != null && !start_req_sent) {
+                start_req_sent = true;
                 inbox.send("start");
             }
             gameStarted = true;
