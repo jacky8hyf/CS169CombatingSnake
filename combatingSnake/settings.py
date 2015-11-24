@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'ws4redis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -165,6 +166,19 @@ LOGGING = {
     }
 }
 
+WS4REDIS_SUBSCRIBER = 'gameStart.redis_subscriber.RedisSubscriber'
+WEBSOCKET_URL = '/ws/'
+REDISCLOUD_URL = os.environ.get('REDISCLOUD_URL')
+if REDISCLOUD_URL:
+    import re
+    mo = re.match("redis://(.*):(.*)@(.*):(.*)", REDISCLOUD_URL)
+    if mo:
+        WS4REDIS_CONNECTION = {
+            'host': mo.group(3),
+            'port': mo.group(4),
+            # 'db': 17,
+            'password': mo.group(2),
+        }
 
 SESSION_ID_HEADER = 'HTTP_X_SNAKE_SESSION_ID'
 MASTER_KEY_HEADER = 'HTTP_X_SNAKE_MASTER_KEY'
