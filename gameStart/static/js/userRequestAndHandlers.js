@@ -174,6 +174,9 @@ var UserHandler = (function() {
 
             var onSuccess = function(data) {
                 is_login = false;
+                $('.leaderboard').hide();
+                $('.intro').hide();
+                $('.gamerule').hide();
                 loginForm.show();
                 userInfo.hide();
                 actionMenu.show();
@@ -203,7 +206,7 @@ var UserHandler = (function() {
 
             // Error handling
             if (password != passwordRetype) {
-                errorElem.text("Pasword does not match.");
+                errorElem.text("Password does not match.");
                 return;
             }
 
