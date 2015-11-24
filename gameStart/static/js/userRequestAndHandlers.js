@@ -26,7 +26,7 @@ var UserHandler = (function() {
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'grey', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'yellow', 'green', 'aqua', 'purple', 'pink', 'grey'];
     var user_color_map = {};
 
     // Handle gameboard
@@ -310,8 +310,6 @@ var UserHandler = (function() {
                         return;
                     }
                     if (cmd == "start") {
-                        removeFoods();
-                        removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
                         $('.submit-start').hide();
@@ -476,13 +474,10 @@ var UserHandler = (function() {
                 dict = JSON.parse(dict);
             }
 
-            //if (message.data.indexOf("err") != -1) {
             if (cmd == 'error') {
                 return;
             }
             if (cmd == "start") {
-                removeFoods();
-                removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
                 $('.submit-start').hide();
@@ -505,7 +500,6 @@ var UserHandler = (function() {
                 $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
-                //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
                 var roominfo = dict;
                 if (roominfo.members.length > roomSize - 1) {
                     return;
@@ -593,12 +587,10 @@ var UserHandler = (function() {
                 case 40:      // DOWN: 40
                     msg = "d";
                     break;
-                case 39:      // LEFT: 37
-                    // msg = "l"; //FIXME: FIND OUT WHY THE DIRECTION IS OPPOSITE
+                case 39:      // RIGHT: 39
                     msg = "r";
                     break;
-                case 37:      // RIGHT: 39
-                    // msg = "r";
+                case 37:      // LEFT: 37
                     msg = "l";
                     break;
             }
@@ -622,10 +614,12 @@ var UserHandler = (function() {
     var drawSnakes = function(snakes) {
         // Remove old snakes on the board.
         for (var key in old_snakes_state){
-            var snake_body = old_snakes_state[key];
-            for (var i = 0; i < snake_body.length; i++) {
-                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).removeClass(user_color_map[key]);
+            if (key != '_food') {
+                var snake_body = old_snakes_state[key];
+                for (var i = 0; i < snake_body.length; i++) {
+                    id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                    $("#" + id).removeClass(user_color_map[key]);
+                }
             }
         }
         // Add in new snakes.
