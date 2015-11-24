@@ -26,7 +26,7 @@ var UserHandler = (function() {
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'black', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'grey', 'yellow', 'green', 'purple', 'pink', 'aqua'];
     var user_color_map = {};
 
     // Handle gameboard
