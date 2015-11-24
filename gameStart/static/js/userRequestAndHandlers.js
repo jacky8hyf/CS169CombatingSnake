@@ -12,6 +12,7 @@ var UserHandler = (function() {
     var roomsAction;
     var actionMenu;
     var roomId;
+    var is_login;
 
     // Handle room requests
     var createRoomForm;
