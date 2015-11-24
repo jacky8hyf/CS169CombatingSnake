@@ -314,7 +314,6 @@ var UserHandler = (function() {
                         removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
-                        $('.submit-leave').hide();
                         $('.submit-start').hide();
                         old_foods = [];
                         old_snakes_state = {};
@@ -350,7 +349,6 @@ var UserHandler = (function() {
                         }
                         gameStarted = false;
                         start_req_sent = false;
-                        $('.submit-leave').show();
                         $('.submit-start').show();
                     }
                 };
@@ -495,7 +493,6 @@ var UserHandler = (function() {
                 removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
-                $('.submit-leave').hide();
                 $('.submit-start').hide();
                 old_foods = [];
                 old_snakes_state = {};
@@ -513,7 +510,6 @@ var UserHandler = (function() {
                 }
                 gameStarted = false;
                 start_req_sent = false;
-                $('.submit-leave').show();
                 $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
