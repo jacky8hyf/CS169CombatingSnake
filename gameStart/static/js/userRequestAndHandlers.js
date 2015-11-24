@@ -627,17 +627,7 @@ var UserHandler = (function() {
      * Draw the snakes in @param snakes onto the board.
      * @param snakes
      */
-    var drawSnakes = function(snakes) {
-        // Remove old snakes on the board.
-        for (var key in old_snakes_state){
-            if (key != '_food') {
-                var snake_body = old_snakes_state[key];
-                for (var i = 0; i < snake_body.length; i++) {
-                    id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                    $("#" + id).removeClass(user_color_map[key]);
-                }
-            }
-        }
+    var drawSnakes = function() {
         // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
@@ -651,17 +641,24 @@ var UserHandler = (function() {
         old_snakes_state = snakes;
     };
 
+    var removeSnakes = function(snakes) {
+        // Remove old snakes on the board.
+        for (var key in old_snakes_state){
+            if (key != '_food') {
+                var snake_body = old_snakes_state[key];
+                for (var i = 0; i < snake_body.length; i++) {
+                    id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                    $("#" + id).removeClass(user_color_map[key]);
+                }
+            }
+        }
+    }
+
     /**
      * Draw all foods onto the board.
      * @param foods : new foods
      */
     var drawFoods = function(foods) {
-        // Remove the old foods from the board
-        for (var i = 0; i < old_foods.length; i++){
-            var food = old_foods[i];
-            id = "r" + food[0] + "c" + food[1];
-            $("#" + id).removeClass("food");
-        }
         // add in the new foods
         for (var i = 0; i < foods.length; i++) {
             var food = foods[i];
@@ -670,6 +667,15 @@ var UserHandler = (function() {
         }
         old_foods = foods;
     };
+
+    var removeFoods = function() {
+        // Remove the old foods from the board
+        for (var i = 0; i < old_foods.length; i++){
+            var food = old_foods[i];
+            id = "r" + food[0] + "c" + food[1];
+            $("#" + id).removeClass("food");
+        }
+    }
 
     /**
      * Draw the initial board.
