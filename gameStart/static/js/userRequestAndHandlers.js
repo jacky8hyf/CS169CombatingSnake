@@ -569,7 +569,7 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
-            if ($('player').length < 2) {
+            if ($('.player').length < 2) {
                 alert("You need at least 2 players to start the game");
                 return;
             }
