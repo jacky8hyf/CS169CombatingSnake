@@ -312,6 +312,8 @@ var UserHandler = (function() {
                         return;
                     }
                     if (cmd == "start") {
+                        removeFoods();
+                        removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
                         $('.submit-start').hide();
@@ -481,6 +483,8 @@ var UserHandler = (function() {
                 return;
             }
             if (cmd == "start") {
+                removeFoods();
+                removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
                 $('.submit-start').hide();
