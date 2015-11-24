@@ -13,6 +13,7 @@ var UserHandler = (function() {
     var roomsAction;
     var actionMenu;
     var roomId;
+    var is_login;
 
     // Handle room requests
     var createRoomForm;
@@ -27,7 +28,7 @@ var UserHandler = (function() {
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'grey', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'yellow', 'green', 'aqua', 'purple', 'pink', 'grey'];
     var user_color_map = {};
 
     // Handle gameboard
@@ -311,8 +312,6 @@ var UserHandler = (function() {
                         return;
                     }
                     if (cmd == "start") {
-                        removeFoods();
-                        removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
                         $('.submit-start').hide();
@@ -422,14 +421,6 @@ var UserHandler = (function() {
         });
     };
 
-    //var attachAvailableRoomOnClickHandler = function(e){
-    //    for (room in roomList){
-    //        $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
-    //            //e.preventDefault();
-    //            joinAvailableRoom(roomList[e.target.value]);
-    //        });
-    //    }
-    //};
     var attachAvailableRoomOnClickHandler = function(e){
         $('body').on('click', '#listofrooms',function(e){
             var id = $('#listofrooms').val();
@@ -486,13 +477,10 @@ var UserHandler = (function() {
                 dict = JSON.parse(dict);
             }
 
-            //if (message.data.indexOf("err") != -1) {
             if (cmd == 'error') {
                 return;
             }
             if (cmd == "start") {
-                removeFoods();
-                removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
                 $('.submit-start').hide();
@@ -515,7 +503,6 @@ var UserHandler = (function() {
                 $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
-                //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
                 var roominfo = dict;
                 if (roominfo.members.length > roomSize - 1) {
                     return;
@@ -532,7 +519,7 @@ var UserHandler = (function() {
                 var player = $(playerHtmlTemplate);
                 creatorId = dict.creator.userId;
                 player.attr("id", dict.creator.userId);  // add id so we can update health field later
-                player.find('.name').text(available_room.creator.nickname);
+                player.find('.name').text(dict.creator.nickname);
                 user_color_map[dict.creator.userId] = color_lookup[players.size()];
                 player.addClass(color_lookup[1]);
                 players.append(player);
@@ -598,6 +585,10 @@ var UserHandler = (function() {
         });
     };
 
+    /**
+     * Send the keystroke to the server using websocket.
+     * @param e
+     */
     var sendKeyStroke = function(e) {
         if (inbox != null && gameStarted) {
             var msg;
@@ -608,12 +599,10 @@ var UserHandler = (function() {
                 case 40:      // DOWN: 40
                     msg = "d";
                     break;
-                case 39:      // LEFT: 37
-                    // msg = "l"; //FIXME: FIND OUT WHY THE DIRECTION IS OPPOSITE
+                case 39:      // RIGHT: 39
                     msg = "r";
                     break;
-                case 37:      // RIGHT: 39
-                    // msg = "r";
+                case 37:      // LEFT: 37
                     msg = "l";
                     break;
             }
@@ -630,8 +619,22 @@ var UserHandler = (function() {
         }
     };
 
+    /**
+     * Draw the snakes in @param snakes onto the board.
+     * @param snakes
+     */
     var drawSnakes = function(snakes) {
-        removeSnakes();
+        // Remove old snakes on the board.
+        for (var key in old_snakes_state){
+            if (key != '_food') {
+                var snake_body = old_snakes_state[key];
+                for (var i = 0; i < snake_body.length; i++) {
+                    id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                    $("#" + id).removeClass(user_color_map[key]);
+                }
+            }
+        }
+        // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
                 var snake_body = snakes[key];
@@ -644,22 +647,18 @@ var UserHandler = (function() {
         old_snakes_state = snakes;
     };
 
-    var removeSnakes = function() {
-        for (var key in old_snakes_state){
-            var snake_body = old_snakes_state[key];
-            for (var i = 0; i < snake_body.length; i++) {
-                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).removeClass(user_color_map[key]);
-            }
-        }
-    };
-
     /**
      * Draw all foods onto the board.
      * @param foods : new foods
      */
     var drawFoods = function(foods) {
-        removeFoods();
+        // Remove the old foods from the board
+        for (var i = 0; i < old_foods.length; i++){
+            var food = old_foods[i];
+            id = "r" + food[0] + "c" + food[1];
+            $("#" + id).removeClass("food");
+        }
+        // add in the new foods
         for (var i = 0; i < foods.length; i++) {
             var food = foods[i];
             id = "r" + food[0] + "c" + food[1];
@@ -669,17 +668,8 @@ var UserHandler = (function() {
     };
 
     /**
-     * Remove all old foods
+     * Draw the initial board.
      */
-    var removeFoods = function() {
-        for (var i = 0; i < old_foods.length; i++){
-            var food = old_foods[i];
-            id = "r" + food[0] + "c" + food[1];
-            $("#" + id).removeClass("food");
-        }
-    };
-
-
     var setBoard = function() {
         var table = "<table>";
         for(var i=0; i < nRows; i ++) {
