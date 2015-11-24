@@ -7,6 +7,7 @@ var UserHandler = (function() {
     var signupForm;
     var sessionId;
     var userId;
+    var creatorId;
     var usernameGlobal;
     var userInfo;
     var roomsAction;
@@ -322,6 +323,7 @@ var UserHandler = (function() {
                         notReceive = false;
                         players.html('');   //clear players list
                         var player = $(playerHtmlTemplate);
+                        creatorId = dict.creator.userId;
                         player.attr("id", dict.creator.userId);  // add id so we can update health field later
                         player.find('.name').text(dict.creator.nickname);
                         players.append(player);
@@ -528,6 +530,7 @@ var UserHandler = (function() {
 
                 players.html('');
                 var player = $(playerHtmlTemplate);
+                creatorId = dict.creator.userId;
                 player.attr("id", dict.creator.userId);  // add id so we can update health field later
                 player.find('.name').text(available_room.creator.nickname);
                 user_color_map[dict.creator.userId] = color_lookup[players.size()];
@@ -579,11 +582,19 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
+            if ($('player').length < 2) {
+                alert("You need at least 2 players to start the game");
+                return;
+            }
+            if (userId != creatorId) {
+                alert("You need to be the owner of the room to start the game");
+                return;
+            }
             if (inbox != null && !start_req_sent) {
                 start_req_sent = true;
                 inbox.send("start");
+                gameStarted = true;
             }
-            gameStarted = true;
         });
     };
 
