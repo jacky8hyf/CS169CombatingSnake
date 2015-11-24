@@ -378,7 +378,7 @@ var UserHandler = (function() {
                         console.log(data.rooms[room]);
                         var current_room = data.rooms[room];
                         var members = "";
-                        for (var i = 0; current_room.members.length; i++) {
+                        for (var i = 0; i < current_room.members.length; i++) {
                             members += current_room.members[i].nickname + " ";
                         }
                         myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(current_room.roomId + ": creator: "
