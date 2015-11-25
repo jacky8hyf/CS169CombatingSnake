@@ -628,6 +628,7 @@ var UserHandler = (function() {
      * @param snakes
      */
     var drawSnakes = function(snakes) {
+        removeSnakes();
         // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
@@ -659,6 +660,7 @@ var UserHandler = (function() {
      * @param foods : new foods
      */
     var drawFoods = function(foods) {
+        removeFoods();
         // add in the new foods
         for (var i = 0; i < foods.length; i++) {
             var food = foods[i];
