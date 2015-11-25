@@ -18,22 +18,17 @@ var UserHandler = (function() {
     // Handle room requests
     var createRoomForm;
     var createRoomButton;
-    var msg;
-    var reconn_msg;
 
     //pick room
-    var pickRoomButton;
     var pickRoomForm;
-    var cancelRoomButton;
     var roomList;
 
-    var joinRoomButton;
     var roomSize = 8;
     var players;    // list of players inside the room
     var playerHtmlTemplate;
 
     // Handle player color
-    var color_lookup = ['white', 'red', 'blue', 'orange', 'black', 'yellow', 'green', 'purple', 'pink', 'aqua'];
+    var color_lookup = ['white', 'red', 'blue', 'orange', 'grey', 'yellow', 'green', 'purple', 'pink', 'aqua'];
     var user_color_map = {};
 
     // Handle gameboard
@@ -45,6 +40,9 @@ var UserHandler = (function() {
     // WebSocket logics
     var inbox = null;
     var gameStarted = false;
+
+    // flag to make sure only the first click on start game will send the start game requrest to server
+    var start_req_sent = false;
 
     /**
      * HTTP GET request
@@ -178,6 +176,9 @@ var UserHandler = (function() {
 
             var onSuccess = function(data) {
                 is_login = false;
+                $('.leaderboard').hide();
+                $('.intro').hide();
+                $('.gamerule').hide();
                 loginForm.show();
                 userInfo.hide();
                 actionMenu.show();
@@ -187,7 +188,7 @@ var UserHandler = (function() {
 
             var onFailure = function(response) {
                 var data = response.responseJSON;
-                errorElem.text(data.msg);
+                alert(data.msg);
             };
             makeDeleteRequest("/users/login", onSuccess, onFailure);
         });
@@ -207,7 +208,7 @@ var UserHandler = (function() {
 
             // Error handling
             if (password != passwordRetype) {
-                errorElem.text("Pasword does not match.");
+                errorElem.text("Password does not match.");
                 return;
             }
 
@@ -282,8 +283,8 @@ var UserHandler = (function() {
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
                 var auth = sha256(hashStr);
-                msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
-                reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var msg = "join " + JSON.stringify({userId:userId, ts:ts, auth:auth});
+                var reconn_msg = "reconn " + JSON.stringify({userId:userId, ts:ts, auth:auth});
                 var i = 0;
                 var notReceive = true;
                 inbox.onopen = function(e){
@@ -315,6 +316,7 @@ var UserHandler = (function() {
                         removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
+                        $('.submit-start').hide();
                         old_foods = [];
                         old_snakes_state = {};
                         return;
@@ -348,6 +350,8 @@ var UserHandler = (function() {
                             alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                         }
                         gameStarted = false;
+                        start_req_sent = false;
+                        $('.submit-start').show();
                     }
                 };
             };
@@ -377,7 +381,7 @@ var UserHandler = (function() {
                         console.log(data.rooms[room]);
                         var current_room = data.rooms[room];
                         var members = "";
-                        for (var i = 0; current_room.members.length; i++) {
+                        for (var i = 0; i < current_room.members.length; i++) {
                             members += current_room.members[i].nickname + " ";
                         }
                         myroomlist.append($('<option></option>').val(data.rooms[room].roomId).html(current_room.roomId + ": creator: "
@@ -418,14 +422,6 @@ var UserHandler = (function() {
         });
     };
 
-    //var attachAvailableRoomOnClickHandler = function(e){
-    //    for (room in roomList){
-    //        $('body').on('click', '#listofrooms option[value='+ room +']', function(e){
-    //            //e.preventDefault();
-    //            joinAvailableRoom(roomList[e.target.value]);
-    //        });
-    //    }
-    //};
     var attachAvailableRoomOnClickHandler = function(e){
         $('body').on('click', '#listofrooms',function(e){
             var id = $('#listofrooms').val();
@@ -440,6 +436,16 @@ var UserHandler = (function() {
         });
     };
 
+    var cancelJoinRoomHandler = function(e){
+        $('body').on('click','.cancel_room_pick', function(e){
+            e.preventDefault();
+            pickRoomForm.hide();
+            $('.logout').show();
+            roomsAction.show();
+            actionMenu.show();
+        });
+    };
+
     function joinAvailableRoom(available_room) {
         roomId = available_room.roomId;
         var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
@@ -448,8 +454,8 @@ var UserHandler = (function() {
         var ts = Date.now();
         var hashStr = sessionId + ":" + userId + ":" + ts;
         var auth = sha256(hashStr);
-        msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
-        reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        var msg = "join " + JSON.stringify({userId: userId, ts: ts, auth: auth});
+        var reconn_msg = "reconn " + JSON.stringify({userId: userId, ts: ts, auth: auth});
         //send hello message
         var i = 0;
         var notReceive = true;
@@ -481,7 +487,7 @@ var UserHandler = (function() {
                 removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
-                $('div.game-start-leave').hide();
+                $('.submit-start').hide();
                 old_foods = [];
                 old_snakes_state = {};
                 return;
@@ -497,7 +503,8 @@ var UserHandler = (function() {
                     alert("Winner is " + dict.winner.nickname); // print the nickname of the winner player
                 }
                 gameStarted = false;
-                $('div.game-start-leave').show();
+                start_req_sent = false;
+                $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
                 //var roominfo = JSON.parse(message.data.substring(message.data.indexOf(" ")));
@@ -516,7 +523,7 @@ var UserHandler = (function() {
                 players.html('');
                 var player = $(playerHtmlTemplate);
                 player.attr("id", dict.creator.userId);  // add id so we can update health field later
-                player.find('.name').text(available_room.creator.nickname);
+                player.find('.name').text(dict.creator.nickname);
                 user_color_map[dict.creator.userId] = color_lookup[players.size()];
                 player.addClass(color_lookup[1]);
                 players.append(player);
@@ -566,13 +573,18 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
-            if (inbox != null) {
+            if (inbox != null && !start_req_sent) {
+                start_req_sent = true;
                 inbox.send("start");
             }
             gameStarted = true;
         });
     };
 
+    /**
+     * Send the keystroke to the server using websocket.
+     * @param e
+     */
     var sendKeyStroke = function(e) {
         if (inbox != null && gameStarted) {
             var msg;
@@ -605,8 +617,20 @@ var UserHandler = (function() {
         }
     };
 
+    /**
+     * Draw the snakes in @param snakes onto the board.
+     * @param snakes
+     */
     var drawSnakes = function(snakes) {
-        removeSnakes();
+        // Remove old snakes on the board.
+        for (var key in old_snakes_state){
+            var snake_body = old_snakes_state[key];
+            for (var i = 0; i < snake_body.length; i++) {
+                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
+                $("#" + id).removeClass(user_color_map[key]);
+            }
+        }
+        // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
                 var snake_body = snakes[key];
@@ -619,22 +643,18 @@ var UserHandler = (function() {
         old_snakes_state = snakes;
     };
 
-    var removeSnakes = function() {
-        for (var key in old_snakes_state){
-            var snake_body = old_snakes_state[key];
-            for (var i = 0; i < snake_body.length; i++) {
-                id = "r" + snake_body[i][0] + "c" + snake_body[i][1];
-                $("#" + id).removeClass(user_color_map[key]);
-            }
-        }
-    };
-
     /**
      * Draw all foods onto the board.
      * @param foods : new foods
      */
     var drawFoods = function(foods) {
-        removeFoods();
+        // Remove the old foods from the board
+        for (var i = 0; i < old_foods.length; i++){
+            var food = old_foods[i];
+            id = "r" + food[0] + "c" + food[1];
+            $("#" + id).removeClass("food");
+        }
+        // add in the new foods
         for (var i = 0; i < foods.length; i++) {
             var food = foods[i];
             id = "r" + food[0] + "c" + food[1];
@@ -644,17 +664,8 @@ var UserHandler = (function() {
     };
 
     /**
-     * Remove all old foods
+     * Draw the initial board.
      */
-    var removeFoods = function() {
-        for (var i = 0; i < old_foods.length; i++){
-            var food = old_foods[i];
-            id = "r" + food[0] + "c" + food[1];
-            $("#" + id).removeClass("food");
-        }
-    };
-
-
     var setBoard = function() {
         var table = "<table>";
         for(var i=0; i < nRows; i ++) {
@@ -681,10 +692,6 @@ var UserHandler = (function() {
         userInfo = $('div.userInfo');
         roomsAction = $('.roomcreate_container');
         actionMenu = $('#cssmenu');
-
-        joinRoomButton = $(".submit-roomjoin");
-        pickRoomButton = $(".join_specific_room");
-        cancelRoomButton = $(".cancel_room_pick");
         playerHtmlTemplate = $(".players .player")[0].outerHTML;
         players = $(".players");
         players.html('');
@@ -701,6 +708,7 @@ var UserHandler = (function() {
         attachLeaveRoomHandler();
         attachStartGame();
         attachAvailableRoomOnClickHandler();
+        cancelJoinRoomHandler();
     };
 
     // PUBLIC METHODS
