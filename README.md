@@ -16,7 +16,7 @@ Visit the [Combating Snake website](https://combating-snake.herokuapp.com/) to t
     1. The stuff in brackets are optional. But don't type the brackets themselves even if you add these options.
     2. `CHAT_BACKEND_BASE_URL` indicates which WebSocket server should the client JavaScript code connect to
     3. `PORT` indicates on which port should this Django app run on.
-2. Clone [the chat backend repository](/jacky8hyf/CombatingSnakeChatBackend).
+2. Clone [the chat backend repository](https://github.com/jacky8hyf/CombatingSnakeChatBackend).
 3. Under the root of the chat backend repository, run `[REST_HOST="http://localhost:8080"] PORT=8081 heroku local`
     1. The stuff in brackets are optional. But don't type the brackets themselves even if you add these options.
     2. `REST_HOST` indicates which RESTful API server should this app connect to
@@ -27,4 +27,4 @@ Visit the [Combating Snake website](https://combating-snake.herokuapp.com/) to t
 ## Test it
 After setting up the repository, simply `python manage.py test`!
 This will run tests on the Django app (a.k.a. this repository). Some of the views
-are tested in the [Flask app](/jacky8hyf/CombatingSnakeChatBackend).
+are tested in the [Flask app](https://github.com/jacky8hyf/CombatingSnakeChatBackend).
