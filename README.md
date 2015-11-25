@@ -24,7 +24,7 @@ Visit the [Combating Snake website](https://combating-snake.herokuapp.com/) to t
 4. When you run these apps, make sure the port matches.
 5. Open `http://localhost:8080` (for example) to see.
 
-# Test it
+## Test it
 After setting up the repository, simply `python manage.py test`!
 This will run tests on the Django app (a.k.a. this repository). Some of the views
 are tested in the [Flask app](/jacky8hyf/CombatingSnakeChatBackend).
