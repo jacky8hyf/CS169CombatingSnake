@@ -12,9 +12,12 @@
     <script type = "text/javascript" src="../static/bower_components/js-sha256/build/sha256.min.js"></script>
     <script type = "text/javascript" src="../static/bower_components/reconnectingWebsocket/reconnecting-websocket.min.js"></script>
     <!-- JavaScript files -->
-    <script type = "text/javascript" src="../static/scripts/script.js"></script>
-    <script type = "text/javascript" src="../static/scripts/mainPage.js"></script>
-    <script type = "text/javascript" src="../static/js/user.js"></script>
+    <script type="text/javascript">
+        CHAT_BACKEND_BASE_URL = "{{CHAT_BACKEND_BASE_URL}}"
+    </script>
+    <script type = "text/javascript" src="../static/js/navigationBarAnimation.js"></script>
+    <script type = "text/javascript" src="../static/js/homePageLayout.js"></script>
+    <script type = "text/javascript" src="../static/js/userRequestAndHandlers.js"></script>
     <!--script type = "text/javascript" src="../static/scripts/create_room.js"></script-->
     <script type="text/javascript">
         var is_login = false;

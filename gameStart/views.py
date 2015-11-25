@@ -20,7 +20,7 @@ from utils import *
 
 @csrf_exempt
 def homePage(request):
-    return render(request, 'index.html')
+    return render(request, 'index.html', context={'CHAT_BACKEND_BASE_URL': CHAT_BACKEND_BASE_URL})
 
 ###########################
 

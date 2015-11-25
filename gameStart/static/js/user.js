@@ -1,3 +1,4 @@
+console.log(CHAT_BACKEND_BASE_URL)
 var UserHandler = (function() {
 
     // PRIVATE VARIABLES
