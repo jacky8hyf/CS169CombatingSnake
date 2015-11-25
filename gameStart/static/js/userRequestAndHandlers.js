@@ -13,7 +13,7 @@ var UserHandler = (function() {
     var roomsAction;
     var actionMenu;
     var roomId;
-    var is_login;
+    var is_login = false;
 
     // Handle room requests
     var createRoomForm;
