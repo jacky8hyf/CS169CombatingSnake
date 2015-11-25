@@ -627,7 +627,7 @@ var UserHandler = (function() {
      * Draw the snakes in @param snakes onto the board.
      * @param snakes
      */
-    var drawSnakes = function() {
+    var drawSnakes = function(snakes) {
         // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
@@ -641,7 +641,7 @@ var UserHandler = (function() {
         old_snakes_state = snakes;
     };
 
-    var removeSnakes = function(snakes) {
+    var removeSnakes = function() {
         // Remove old snakes on the board.
         for (var key in old_snakes_state){
             if (key != '_food') {
