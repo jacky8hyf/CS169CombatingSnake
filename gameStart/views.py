@@ -318,12 +318,9 @@ class SingleRoomSingleMemberView(View):
                 return errors.PERMISSION_DENIED
         room = Room.find_by_id(str(roomId))
         user.exit_room(room).save()
-        try:
-            room.reassign_creator_if_created_by(user).save()
-        except RoomEmptyError:
-            return OKResponse() # even if return-room is true
 
-        if not returnRoom:
+        if room.roomId is None or not returnRoom:
+            # room.roomId is None only if exit_room deletes the room
             return OKResponse()
         else:
             return OKResponse(Room.find_by_id(str(roomId)).to_dict(

@@ -179,20 +179,25 @@ class User(BaseModel):
 
     def enter_room(self, room):
         '''
-        inroom setter. Return self to allow chaining.
+        Mark user as in specified room. Exit previous rooms. Return self to allow chaining.
         '''
-        if room.creator == self:
-            return self
+        if self.inroom:
+            self.exit_room(self.inroom)
         self.inroom = room
         return self
 
     def exit_room(self, room):
         '''
-        inroom setter. Return self to allow chaining.
         Exit the specified room if the user is in that room, otherwise no-op.
+        Will delete the room if the room is empty.
+        Return self to allow chaining.
         '''
         if self.inroom == room:
             self.inroom = None
+            try:
+                room.reassign_creator_if_created_by(self).save()
+            except RoomEmptyError:
+                pass
         return self
 
     def to_dict(self, includeProfile = False, includeScores = False):
@@ -248,12 +253,15 @@ class Room(BaseModel):
         to some other members in the room. If there is no members left, delete
         the room and raise RoomEmptyError.
         '''
+
+        # print "room {} created by {} is reassigining creator if by {}".format(self.strId, self.creator.strId, user.strId)
         if self.creator != user:
             return self
         members = self.all_members
         if members:
             self.creator = random.choice(members)
         else:
+            # print 'deleting room {}'.format(self.strId)
             self.delete()
             raise RoomEmptyError()
         return self

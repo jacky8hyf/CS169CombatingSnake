@@ -211,12 +211,17 @@ class RoomsViewTestCase(SnakeRestTestCase):
         self.assertTrue(d['roomId'], '{} is False or empty'.format(d['roomId']))
 
     def testGetRooms(self):
-        roomIds = [self.assertResponseSuccess(self.post('/rooms'))['roomId']
-            for _ in range(20)]
+        roomIds = []
+        for i in range(20):
+            user = self.createUser('user' + str(i))
+            self.iAm(user)
+            roomIds.append(self.assertResponseSuccess(self.post('/rooms'))['roomId'])
+
+
         gotArray = self.assertResponseSuccess(self.get('/rooms'))['rooms']
         gotRoomIds = [e['roomId'] for e in gotArray]
-        self.assertEquals(set(roomIds), set(gotRoomIds))
-        self.assertEquals(len(roomIds), len(gotRoomIds), 'GET /rooms size doesn\'t match')
+        self.assertEquals(set(roomIds), set(gotRoomIds), 'GET /rooms doesn\'t match: expected {}, got {}'.format(roomIds, gotRoomIds))
+        self.assertEquals(len(roomIds), len(gotRoomIds), 'GET /rooms size doesn\'t match: expected {}, got {}'.format(roomIds, gotRoomIds))
 
         gotArrayLookup = dict()
         for e in gotArray:
@@ -227,6 +232,7 @@ class RoomsViewTestCase(SnakeRestTestCase):
             self.assertEquals(gotArrayLookup[roomId], gotRoom)
 
     def testJoinExitRoom(self):
+        catherine = self.createUser('iamcatherine')
         self.iAmAlice()
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
@@ -238,7 +244,9 @@ class RoomsViewTestCase(SnakeRestTestCase):
         gotUserId = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members'][0]['userId'];
         self.assertEquals(self.bob['userId'], gotUserId)
 
+        self.iAm(catherine)
         anotherRoomId = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+        self.iAmBob()
         self.assertResponseSuccess(self.delete('/rooms/' + anotherRoomId + '/members/' + self.bob['userId']))
         self.assertIsNotNone(User.find_by_id(self.bob['userId']).inroom, 'exiting a wrong room should not have effects')
         self.assertEquals(roomId, User.find_by_id(self.bob['userId']).inroom.strId, 'exiting a wrong room should not have effects')
@@ -255,6 +263,7 @@ class RoomsViewTestCase(SnakeRestTestCase):
         self.iAmAlice()
         self.assertResponseSuccess(self.delete('/rooms/' + roomId + '/members/' + self.alice['userId']))
         roomObj = Room.find_by_id(roomId)
+        # print roomObj.to_dict(includeMembers = True, includeMemberProfile = True)
         self.assertEquals(self.bob['userId'], roomObj.creator.strId, 'Bob is not creator when old creator exits it')
         self.assertFalse(roomObj.all_members)
 
@@ -336,4 +345,36 @@ class RoomsViewTestCase(SnakeRestTestCase):
         room = self.assertResponseSuccess(self.post('/rooms'))
         roomId = room['roomId']
         self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.user['userId']))
+
+    def testAbnormalExit(self):
+        catherine = self.createUser('iamcatherine')
+
+        self.iAmAlice()
+        roomId = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+
+        self.iAm(catherine)
+        roomId2 = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+
+        self.iAmBob()
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.bob['userId']))
+        members = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members']
+        self.assertEquals(1, len(members))
+
+        # entering room2 exits room 1
+        self.assertResponseSuccess(self.put('/rooms/' + roomId2 + '/members/' + self.bob['userId']))
+        members = self.assertResponseSuccess(self.get('/rooms/' + roomId, {'members': True}))['members']
+        self.assertEquals(0, len(members))
+
+        self.iAmAlice()
+        self.assertResponseSuccess(self.put('/rooms/' + roomId2 + '/members/' + self.alice['userId']))
+        d = self.assertResponseFail(self.get('/rooms/' + roomId))
+        self.assertEquals(errors.DOES_NOT_EXIST('').err, d['err'])
+
+
+    def testAbnormalExit2(self):
+        self.iAmAlice()
+        roomId = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+        roomId2 = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+        d = self.assertResponseFail(self.get('/rooms/' + roomId))
+        self.assertEquals(errors.DOES_NOT_EXIST('').err, d['err'])
 
