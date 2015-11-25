@@ -316,7 +316,6 @@ var UserHandler = (function() {
                         removeSnakes();
                         alert("Starting Game");
                         gameStarted = true;
-                        $('.submit-start').hide();
                         old_foods = [];
                         old_snakes_state = {};
                         return;
@@ -352,7 +351,6 @@ var UserHandler = (function() {
                         }
                         gameStarted = false;
                         start_req_sent = false;
-                        $('.submit-start').show();
                     }
                 };
             };
@@ -487,7 +485,6 @@ var UserHandler = (function() {
                 removeSnakes();
                 alert("Starting Game");
                 gameStarted = true;
-                $('.submit-start').hide();
                 old_foods = [];
                 old_snakes_state = {};
                 return;
@@ -504,7 +501,6 @@ var UserHandler = (function() {
                 }
                 gameStarted = false;
                 start_req_sent = false;
-                $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
                 var roominfo = dict;
