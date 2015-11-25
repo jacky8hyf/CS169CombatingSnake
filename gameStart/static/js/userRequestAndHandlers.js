@@ -312,8 +312,7 @@ var UserHandler = (function() {
                         return;
                     }
                     if (cmd == "start") {
-                        removeFoods();
-                        removeSnakes();
+                        setBoard();
                         alert("Starting Game");
                         gameStarted = true;
                         old_foods = [];
@@ -481,8 +480,7 @@ var UserHandler = (function() {
                 return;
             }
             if (cmd == "start") {
-                removeFoods();
-                removeSnakes();
+                setBoard();
                 alert("Starting Game");
                 gameStarted = true;
                 old_foods = [];
