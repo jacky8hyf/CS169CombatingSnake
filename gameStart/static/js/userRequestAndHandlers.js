@@ -312,11 +312,9 @@ var UserHandler = (function() {
                         return;
                     }
                     if (cmd == "start") {
-                        removeFoods();
-                        removeSnakes();
+                        setBoard();
                         alert("Starting Game");
                         gameStarted = true;
-                        $('.submit-start').hide();
                         old_foods = [];
                         old_snakes_state = {};
                         return;
@@ -352,7 +350,6 @@ var UserHandler = (function() {
                         }
                         gameStarted = false;
                         start_req_sent = false;
-                        $('.submit-start').show();
                     }
                 };
             };
@@ -483,11 +480,9 @@ var UserHandler = (function() {
                 return;
             }
             if (cmd == "start") {
-                removeFoods();
-                removeSnakes();
+                setBoard();
                 alert("Starting Game");
                 gameStarted = true;
-                $('.submit-start').hide();
                 old_foods = [];
                 old_snakes_state = {};
                 return;
@@ -504,7 +499,6 @@ var UserHandler = (function() {
                 }
                 gameStarted = false;
                 start_req_sent = false;
-                $('.submit-start').show();
             } else if (cmd == "room") {
                 notReceive = false;
                 var roominfo = dict;
@@ -573,15 +567,15 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
-            if ($('.player').length < 2) {
-                alert("You need at least 2 players to start the game");
-                return;
-            }
-            if (userId != creatorId) {
-                alert("You need to be the owner of the room to start the game");
-                return;
-            }
             if (inbox != null && !start_req_sent) {
+                if ($('.player').length < 2) {
+                    alert("You need at least 2 players to start the game");
+                    return;
+                }
+                if (userId != creatorId) {
+                    alert("You need to be the owner of the room to start the game");
+                    return;
+                }
                 start_req_sent = true;
                 inbox.send("start");
                 gameStarted = true;
@@ -628,6 +622,7 @@ var UserHandler = (function() {
      * @param snakes
      */
     var drawSnakes = function(snakes) {
+        removeSnakes();
         // Add in new snakes.
         for (var key in snakes){
             if (key != '_food') {
@@ -659,6 +654,7 @@ var UserHandler = (function() {
      * @param foods : new foods
      */
     var drawFoods = function(foods) {
+        removeFoods();
         // add in the new foods
         for (var i = 0; i < foods.length; i++) {
             var food = foods[i];
