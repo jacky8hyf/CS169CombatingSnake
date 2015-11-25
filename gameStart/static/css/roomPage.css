@@ -87,8 +87,9 @@
 }
 
 .player .health{
+	padding-right:10%;
 	margin-left:15%;
-	float:left;
+	float:right;
 	font-size: 20px;
 	color: white;
 }
