@@ -569,15 +569,15 @@ var UserHandler = (function() {
     var attachStartGame = function(e) {
         $('body').on('click','.submit-start', function(e){
             e.preventDefault();
-            if ($('.player').length < 2) {
-                alert("You need at least 2 players to start the game");
-                return;
-            }
-            if (userId != creatorId) {
-                alert("You need to be the owner of the room to start the game");
-                return;
-            }
             if (inbox != null && !start_req_sent) {
+                if ($('.player').length < 2) {
+                    alert("You need at least 2 players to start the game");
+                    return;
+                }
+                if (userId != creatorId) {
+                    alert("You need to be the owner of the room to start the game");
+                    return;
+                }
                 start_req_sent = true;
                 inbox.send("start");
                 gameStarted = true;
