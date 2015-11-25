@@ -277,7 +277,7 @@ var UserHandler = (function() {
 
                 roomId = data.roomId;
                 //create a socket connection to server here and remove polling block
-                var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + roomId;
+                var urlstr = CHAT_BACKEND_BASE_URL + "/rooms/" + roomId;
                 inbox = new ReconnectingWebSocket(urlstr);
                 var ts = Date.now();
                 var hashStr = sessionId + ":" + userId + ":" + ts;
@@ -445,7 +445,7 @@ var UserHandler = (function() {
 
     function joinAvailableRoom(available_room) {
         roomId = available_room.roomId;
-        var urlstr = "wss://combating-snake-chat-backend.herokuapp.com/rooms/" + available_room.roomId;
+        var urlstr = CHAT_BACKEND_BASE_URL + "/rooms/" + available_room.roomId;
         inbox = new ReconnectingWebSocket(urlstr);
         //inbox = new WebSocket(urlstr);
         var ts = Date.now();

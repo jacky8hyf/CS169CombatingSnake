@@ -11,12 +11,17 @@ Visit the [Combating Snake website](https://combating-snake.herokuapp.com/) to t
 3. `source venv/bin/activate`
 4. `[sudo] pip install -r requirements.txt`
 
-## Run it "locally"
-Simply run `heroku local`! Still, it will use
-ws://combating-snake-chat-backend.herokuapp.com as the Websockets backend, which
-in turn will actually connect to the deployed Heroku app to look for data. So you
-should not expect normal behavior by doing so. Please head on to the
-[Combating Snake website](https://combating-snake.herokuapp.com/) to try it out.
+## Run it locally
+1. Under the root of this repository, run `[CHAT_BACKEND_BASE_URL="ws://localhost:8081"] [PORT=8080] heroku local`
+    1. The stuff in brackets are optional. Don't type the brackets if you need to change these options.
+    2. `CHAT_BACKEND_BASE_URL` indicates which WebSocket server should the client JavaScript code connect to
+    3. `PORT` indicates on which port should this Django app run on.
+2. Clone [the chat backend repository](/jacky8hyf/CombatingSnakeChatBackend).
+3. Under the root of the chat backend repository, run `[REST_HOST="http://localhost:8080"] [PORT=8081] heroku local`
+    1. The stuff in brackets are optional. Don't type the brackets if you need to change these options.
+    2. `REST_HOST` indicates which RESTful API server should this app connect to
+    3. `PORT` indicates on which port should this Flask app run on.
+4. Open `http://localhost:8080` (for example) to see.
 
 # Test it
 After setting up the repository, simply `python manage.py test`!
