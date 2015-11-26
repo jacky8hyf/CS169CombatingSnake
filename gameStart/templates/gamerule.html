@@ -1,14 +1,23 @@
 <html>
 <body>
-<h3>Initial Health and Damage:</h3>
-<p>Each snake has its health initially set to 10 hp.</p>
+<h3>Health:</h3>
+<p>Each snake has its health initially set to 10 hp and its length set to 1.</p>
 
-<h3>Attack Model:</h3>
-<p>Every time a snake is hit by head of another snake, its health will be reduced by 10 (length reduced by 1 respectively).</p>
+<h3>Attack:</h3>
+<p>Every time a snake is hit by head of another snake, its length will be reduced by 1 (health reduced by 10 respectively).</p>
 
-<h3>Food-health Model:</h3>
+<h3>Food:</h3>
 <p>The total number of food in the board should be (number of users - 1) so as to force competition. Once a food is taken another one will be generated randomly into the board.
 Once a snake takes in a food the length will be increased by 1 (health increased by 10 until it reaches the maximum health) to win.</p>
+
+<h3>Wall:</h3>
+<p>Every time the snake hits the wall, its length will decrease by 1.</p>
+
+<h3>Win:</h3>
+<ul>
+    <li>The snake wins when its length reaches 10</li>
+    <li>The snake also wins when all the other snakes have died.</li>
+</ul>
 
 </body>
 </html>
