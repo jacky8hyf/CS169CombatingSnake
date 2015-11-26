@@ -123,9 +123,6 @@ class UserTestCase(TestCase):
         #delete room a here
 
 
-
-
-
     def testFinds(self):
         users = [User.from_dict({
             'username': 'user{}'.format(i),

@@ -182,7 +182,8 @@ class User(BaseModel):
         Mark user as in specified room. Exit previous rooms. Return self to allow chaining.
         '''
         if self.inroom:
-            self.exit_room(self.inroom)
+            if self.inroom != room:
+                self.exit_room(self.inroom)
         self.inroom = room
         return self
 

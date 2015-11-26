@@ -378,3 +378,8 @@ class RoomsViewTestCase(SnakeRestTestCase):
         d = self.assertResponseFail(self.get('/rooms/' + roomId))
         self.assertEquals(errors.DOES_NOT_EXIST('').err, d['err'])
 
+    def testEnterSameRoom(self):
+        self.iAmAlice()
+        roomId = self.assertResponseSuccess(self.post('/rooms'))['roomId']
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.alice['userId']))
+        self.assertResponseSuccess(self.put('/rooms/' + roomId + '/members/' + self.alice['userId']))
