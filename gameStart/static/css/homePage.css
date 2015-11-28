@@ -11,13 +11,17 @@ body{
 	background-color: #060606;
 }
 .logo{
-	text-align: center;
 	animation: blinker 1.5s linear infinite;
 	height: 5%;
 }
-
+.logo
 @keyframes blinker {  
   80% { opacity: 0.7; }
+}
+
+.logo img{
+	max-height: 55%;
+	max-width: 55%;
 }
 
 .frame {
@@ -116,17 +120,20 @@ body{
 }
 
 .userInfo{
+	width:43%;
 	float: right;
 	padding-right: 20px;
 	font-size: 16px;
 }
 
 .usernameInfo {
-	padding-top: 10px;
-	padding-bottom: 10px;
+	text-align: right;
 	color: whitesmoke;
 }
-
+input.logout.generic-button{
+	margin-left: 90%;
+	margin-right: 0.5%;
+}
 .logout {
 	font-size: 16px;
 	width: 100%;
