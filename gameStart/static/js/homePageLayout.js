@@ -70,20 +70,22 @@ var Frontpage = (function() {
 			$('.winner_table').html('');	//clear the board
 			$('.winner_table').append('<tr><th>Winner Name</th><th>Number of plays</th><th>Number of wins</th></tr>');
 			var onSuccess = function(data){
-				if(data.users.length > 0){	
+				if(data.users.length > 0){
 					for (winner in data.users){
-						var name = data.users[winner].nickname;
-						//var name1 = name.replaceAll('<','aa');
-						var nickname = name.replace(/>/g,'aa');
-						nickname = nickname.replace(/</g,'aa');
+						var nickname = data.users[winner].nickname;
 						var numgames = data.users[winner].numgames;
 						var numwins = data.users[winner].numwin;
-						$('.winner_table').append('<tr><td>' + nickname + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
-						//... .append('<>').append(document.createTextNode(nickname)).append('<>').append
+						$('.winner_table')
+							.append($('<tr>')
+								.append($('<td>').text(nickname))
+								.append($('<td>').text(numgames))
+								.append($('<td>').text(numwins))
+							)
+
 					}
 
 				}
-				
+
 
 			};
 
