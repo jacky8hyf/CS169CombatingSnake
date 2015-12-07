@@ -73,6 +73,8 @@ var Frontpage = (function() {
 				if(data.users.length > 0){	
 					for (winner in data.users){
 						var name = data.users[winner].nickname;
+						name = name.replace('<','0');
+						name = name.replace('>','0');
 						var numgames = data.users[winner].numgames;
 						var numwins = data.users[winner].numwin;
 						$('.winner_table').append('<tr><td>' + name + '</td><td>' + numgames + '</td><td>' + numwins + '</td></tr>');
