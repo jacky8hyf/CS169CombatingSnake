@@ -71,6 +71,8 @@ var Frontpage = (function() {
 			$('.winner_table').append('<tr><th>Winner Name</th><th>Number of plays</th><th>Number of wins</th></tr>');
 			var onSuccess = function(data){
 				if(data.users.length > 0){
+					$('.winner_table').html('');	//clear the board
+					$('.winner_table').append('<tr><th>Winner Name</th><th>Number of plays</th><th>Number of wins</th></tr>');
 					for (winner in data.users){
 						var nickname = data.users[winner].nickname;
 						var numgames = data.users[winner].numgames;
